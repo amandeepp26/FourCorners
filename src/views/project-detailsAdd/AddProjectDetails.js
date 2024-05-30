@@ -252,7 +252,7 @@ const AddProjectDetails = ({show}) => {
         <Grid item xs={12} sx={{ marginTop: 4.8, marginBottom: 3 }}>
           <Box>
             <Typography variant='body2' sx={{ marginTop: 5, fontWeight: 'bold', fontSize: 20 }}>
-              Manage Project Details
+              Manage Project Details 
             </Typography>
           </Box>
         </Grid>

@@ -106,16 +106,12 @@ const LoginPage = () => {
         setErrorMessage('Login failed. Please try again later.');
     }
 };
-
-
-
   return (
     <Box className='content-center'>
     <Card sx={{ zIndex: 1 }}>
       <CardContent sx={{ padding: theme => `${theme.spacing(12, 9, 7)} !important` }}>
         <Box sx={{ mb: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          {/* Your Logo */}
-        </Box>
+        <img src="https://raw.githubusercontent.com/alokkaintura/forcorners/main/logo.png" alt="logo" style={{ maxWidth: '200px' }} />  </Box>
         <Box sx={{ mb: 6 }}>
           <Typography variant='h5' sx={{ fontWeight: 600, marginBottom: 1.5 }}>
             Welcome to Four Corner! 👋🏻
@@ -156,9 +152,10 @@ const LoginPage = () => {
           </FormControl>
           <Button
             fullWidth
+            
             size='large'
             variant='contained'
-            sx={{ marginBottom: 7 }}
+            sx={{ marginBottom: 7 , marginTop:5}}
             type='submit'
           
           >
@@ -167,7 +164,7 @@ const LoginPage = () => {
         </form>
       </CardContent>
     </Card>
-    <FooterIllustrationsV1 />
+    
   </Box>
   );
 };
