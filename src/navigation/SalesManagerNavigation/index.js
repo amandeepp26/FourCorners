@@ -21,6 +21,12 @@ const SalesManagerNavigation = () => {
     },
 
     {
+      title: "Project Details",
+      icon: AssignmentIcon,
+      path: "/sales-project-details",
+    },
+
+    {
       title: "Opportunity",
       icon: TrendingUpIcon,
       path: "/opportunity",
@@ -72,11 +78,9 @@ const SalesManagerNavigation = () => {
           icon: CubeOutlineIcon,
           path: "/opportunity",
         },
-       
-       
       ],
     },
-  
+
     {
       title: "Post Sales",
       icon: TrendingUpIcon,

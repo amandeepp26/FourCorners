@@ -78,6 +78,9 @@ const AddcampaignDetails = ({ show, editData }) => {
 
   const [formData, setFormData] = useState(initialFormData);
   const [compaignTypeData, setCampaignTypedata] = useState([]);
+  const [campaignUpdateApi, setCampaignUpdateApi] = useState([]);
+  const [campaignDataApi, setCampaignDataApi] = useState([]);
+  const [campaignInsertApi, setCampaignInsertApi] = useState([]);
   const [templateData, setTemplatedata] = useState([]);
   const [customerTypeData, setCustomerTypeData] = useState([]);
   const [contactTypeData, setContactTypeData] = useState([]);
@@ -111,6 +114,9 @@ const AddcampaignDetails = ({ show, editData }) => {
     fetchDataBhk();
     fetchDataTellecalling();
     fetchDataTitle();
+    campaignUpdate();
+    campaignData();
+    campaignInsert();
   }, []);
 
   useEffect(() => {
@@ -130,6 +136,32 @@ const AddcampaignDetails = ({ show, editData }) => {
   useEffect(() => {
     axios
       .get("https://apiforcorners.cubisysit.com/api/api-fetch-source.php")
+      .then((response) => {
+        if (response.data.status === "Success") {
+          setSource(response.data.data);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
+  }, []);
+
+  useEffect(() => {
+    axios
+      .get("https://apiforcorners.cubisysit.com/api/api-fetch-campaign.php")
+      .then((response) => {
+        if (response.data.status === "Success") {
+          setCampaignDataApi(response.data.data);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
+  }, []);
+
+  useEffect(() => {
+    axios
+      .get("https://apiforcorners.cubisysit.com/api/api-update-campaign.php")
       .then((response) => {
         if (response.data.status === "Success") {
           setSource(response.data.data);
@@ -194,6 +226,45 @@ const AddcampaignDetails = ({ show, editData }) => {
       });
   }, []);
 
+  useEffect(() => {
+    axios
+      .get("https://apiforcorners.cubisysit.com/api/api-update-campaign.php ")
+      .then((response) => {
+        if (response.data.status === "Success") {
+          setCampaignUpdateApi(response.data.data);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
+  }, []);
+
+  useEffect(() => {
+    axios
+      .get("https://apiforcorners.cubisysit.com/api/api-insert-campaign.php")
+      .then((response) => {
+        if (response.data.status === "Success") {
+          setCampaignInsertApi(response.data.data);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
+  }, []);
+
+  useEffect(() => {
+    axios
+      .get("https://apiforcorners.cubisysit.com/api/api-fetch-citymaster.php")
+      .then((response) => {
+        if (response.data.status === "Success") {
+          setCityData(response.data.data);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
+  }, []);
+
   const fetchDataBhk = async () => {
     try {
       const response = await axios.get(
@@ -233,6 +304,39 @@ const AddcampaignDetails = ({ show, editData }) => {
         "https://apiforcorners.cubisysit.com/api/api-fetch-titleprefix.php"
       );
       setTitles(response.data.data || []);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  const campaignUpdate = async () => {
+    try {
+      const response = await axios.get(
+        "https://apiforcorners.cubisysit.com/api/api-update-campaign.php "
+      );
+      setCampaignUpdateApi(response.data.data || []);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  const campaignData = async () => {
+    try {
+      const response = await axios.get(
+        "https://apiforcorners.cubisysit.com/api/api-fetch-campaign.php"
+      );
+      setCampaignDataApi(response.data.data || []);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  const campaignInsert = async () => {
+    try {
+      const response = await axios.get(
+        "https://apiforcorners.cubisysit.com/api/api-insert-campaign.php"
+      );
+      setCampaignInsertApi(response.data.data || []);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -1042,11 +1146,11 @@ const AddcampaignDetails = ({ show, editData }) => {
                   </InputLabel>
                   <Select
                     value={formData.SourceID}
-                    onChange={handleSource}
+                    onChange={handleChange}
                     label="Source"
                   >
                     {source.map((bhk) => (
-                      <MenuItem key={bhk.SourceID} value={bhk.SourceID}>
+                      <MenuItem key={bhk.Source} value={bhk.Source}>
                         {bhk.SourceName}
                       </MenuItem>
                     ))}
