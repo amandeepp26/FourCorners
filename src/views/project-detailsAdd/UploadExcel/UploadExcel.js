@@ -12,20 +12,18 @@ import MenuItem from "@mui/material/MenuItem";
 import Swal from "sweetalert2";
 import Box from "@mui/material/Box";
 import { useCookies } from "react-cookie";
-
-import EditIcon from "@mui/icons-material/Edit";
-import spacing from "src/@core/theme/spacing";
+import CircularProgress from "@mui/material/CircularProgress";
 
 const UploadExcel = ({ show, rowData }) => {
   const [file, setFile] = useState(null);
+  const [parkingFile, setParkingFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [loadingEdit, setLoadingEdit] = useState(false);
-
   const [error, setError] = useState(null);
-  const [parkingFile, setParkingFile] = useState(null);
-  const [cookies, setCookie] = useCookies(["amr"]);
+  const [cookies] = useCookies(["amr"]);
 
   const [projectMaster, setProjectMaster] = useState([]);
+  const [wingData, setWingData] = useState([]);
   const [formData, setFormData] = useState({
     ProjectID: "",
     WingID: "",
@@ -33,163 +31,110 @@ const UploadExcel = ({ show, rowData }) => {
     CreateUID: 1,
   });
 
-  const [wingData, setWingData] = useState([]);
-
+  // Fetch project data on component mount
   useEffect(() => {
     axios
-      .get(
-        "https://apiforcorners.cubisysit.com/api/api-dropdown-projectinfo.php"
-      )
-      .then((response) => {
+      .get("https://apiforcorners.cubisysit.com/api/api-dropdown-projectinfo.php")
+      .then(response => {
         if (response.data.status === "Success") {
           setProjectMaster(response.data.data);
         }
       })
-      .catch((error) => {
-        console.error("Error fetching project master data:", error);
-      });
+      .catch(error => console.error("Error fetching project master data:", error));
   }, []);
 
+  // Fetch wing data when ProjectID changes
   useEffect(() => {
     if (formData.ProjectID) {
       axios
-        .get(
-          `https://apiforcorners.cubisysit.com/api/api-fetch-projectwings.php?ProjectID=${formData.ProjectID}`
-        )
-        .then((response) => {
+        .get(`https://apiforcorners.cubisysit.com/api/api-fetch-projectwings.php?ProjectID=${formData.ProjectID}`)
+        .then(response => {
           if (response.data.status === "Success") {
             setWingData(response.data.data);
           }
         })
-        .catch((error) => {
-          console.error("Error fetching wing data:", error);
-        });
+        .catch(error => console.error("Error fetching wing data:", error));
     }
   }, [formData.ProjectID]);
 
-  const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
-  };
-  const handleParkingFileChange = (e) => {
-    setParkingFile(e.target.files[0]);
-  };
+  const handleFileChange = (e) => setFile(e.target.files[0]);
+  const handleParkingFileChange = (e) => setParkingFile(e.target.files[0]);
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
+    setFormData(prevState => ({
+      ...prevState,
       [name]: value,
-    });
+    }));
   };
 
-  const handleSubmitFile = async (event) => {
-    event.preventDefault();
+  const handleFormSubmit = async (url, data, setLoadingFn) => {
+    try {
+      setLoadingFn(true);
+      const response = await axios.post(url, data, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      if (response.data.status === "Success") {
+        Swal.fire({
+          icon: "success",
+          title: "Operation successful!",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+        show(false);
+      } else {
+        showError("Failed to process the file.");
+      }
+    } catch (error) {
+      showError("Error during file processing.");
+    } finally {
+      setLoadingFn(false);
+    }
+  };
 
+  const showError = (message) => {
+    Swal.fire({
+      icon: "error",
+      title: "Oops...",
+      text: message,
+    });
+    setError(message);
+  };
+
+  const handleSubmitFile = (event) => {
+    event.preventDefault();
     if (!file) {
-      setError("Please select a file.");
+      showError("Please select a project file.");
       return;
     }
-
     const formDataFile = new FormData();
     formDataFile.append("file", file);
     formDataFile.append("ParkingAvilability", parkingFile);
-    formDataFile.append("ProjectID", formData.ProjectID);
-    formDataFile.append("WingID", formData.WingID);
-    formDataFile.append("Status", formData.Status);
-    formDataFile.append("CreateUID", formData.CreateUID);
-
-    try {
-      setLoading(true);
-
-      const response = await axios.post(
-        "https://apiforcorners.cubisysit.com/api/api-excel-projectroom.php",
-        formDataFile,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-
-      if (response.data.status === "Success") {
-        Swal.fire({
-          icon: "success",
-          title: "File uploaded successfully!",
-          showConfirmButton: false,
-          timer: 1500,
-        });
-        show(false);
-      } else {
-        Swal.fire({
-          icon: "error",
-          title: "Oops...",
-          text: "Failed to upload file.",
-        });
-      }
-    } catch (error) {
-      console.error("Error uploading file:", error);
-      Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: "Failed to upload file.",
-      });
-    } finally {
-      setLoading(false);
-    }
+    Object.keys(formData).forEach(key => formDataFile.append(key, formData[key]));
+    
+    handleFormSubmit(
+      "https://apiforcorners.cubisysit.com/api/api-excel-parking.php",
+      formDataFile,
+      setLoading
+    );
   };
 
-  const handleEdit = async () => {
+  const handleEdit = (event) => {
+    event.preventDefault();
     if (!file && !parkingFile) {
-      setError("Please select a file to update.");
+      showError("Please select a file to update.");
       return;
     }
-
     const formDataFile = new FormData();
     formDataFile.append("file", file);
-    // formDataFile.append("ParkingAvilability", parkingFile);
     formDataFile.append("ModifyUID", cookies.amr?.UserID || 1);
-    formDataFile.append("ProjectID", formData.ProjectID);
-    formDataFile.append("WingID", formData.WingID);
-    formDataFile.append("Status", formData.Status);
-    formDataFile.append("CreateUID", formData.CreateUID);
+    Object.keys(formData).forEach(key => formDataFile.append(key, formData[key]));
 
-    try {
-      setLoadingEdit(true);
-
-      const response = await axios.post(
-        "https://apiforcorners.cubisysit.com/api/api-update-projectroomexcel.php",
-        formDataFile,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-
-      if (response.data.status === "Success") {
-        Swal.fire({
-          icon: "success",
-          title: "File updated successfully!",
-          showConfirmButton: false,
-          timer: 1500,
-        });
-        show(false);
-      } else {
-        Swal.fire({
-          icon: "error",
-          title: "Oops...",
-          text: "Failed to update file.",
-        });
-      }
-    } catch (error) {
-      console.error("Error updating file:", error);
-      Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: "Failed to update file.",
-      });
-    } finally {
-      setLoadingEdit(false);
-    }
+    handleFormSubmit(
+      "https://apiforcorners.cubisysit.com/api/api-update-projectroomexcel.php",
+      formDataFile,
+      setLoadingEdit
+    );
   };
 
   return (
@@ -197,10 +142,7 @@ const UploadExcel = ({ show, rowData }) => {
       <CardContent>
         <Grid container spacing={2}>
           <Grid item xs={12}>
-            <Typography
-              variant="body2"
-              sx={{ fontWeight: "bold", fontSize: 20 }}
-            >
+            <Typography variant="h6" fontWeight="bold">
               Add Project Details
             </Typography>
           </Grid>
@@ -214,7 +156,7 @@ const UploadExcel = ({ show, rowData }) => {
                 name="ProjectID"
                 label="Project Name"
               >
-                {projectMaster.map((project) => (
+                {projectMaster.map(project => (
                   <MenuItem key={project.ProjectID} value={project.ProjectID}>
                     {project.ProjectName}
                   </MenuItem>
@@ -232,7 +174,7 @@ const UploadExcel = ({ show, rowData }) => {
                 name="WingID"
                 label="Wings"
               >
-                {wingData.map((wing) => (
+                {wingData.map(wing => (
                   <MenuItem key={wing.WingID} value={wing.WingID}>
                     {wing.WingName}
                   </MenuItem>
@@ -246,17 +188,13 @@ const UploadExcel = ({ show, rowData }) => {
               <input
                 type="file"
                 accept=".xls,.xlsx"
-                name="Project File"
                 onChange={handleFileChange}
                 style={{ marginRight: "10px" }}
               />
-
               <input
                 type="file"
-                name="Parking File"
                 accept=".xls,.xlsx"
                 onChange={handleParkingFileChange}
-                style={{ marginRight: "1px" }}
               />
             </Box>
           </Grid>
@@ -267,16 +205,15 @@ const UploadExcel = ({ show, rowData }) => {
                 variant="contained"
                 onClick={handleSubmitFile}
                 disabled={loading}
-                sx={{ marginRight: 1 }} // Adjust this value as needed
               >
-                {loading ? "Uploading..." : "Upload File"}
+                {loading ? <CircularProgress size={24} /> : "Upload File"}
               </Button>
               <Button
                 variant="contained"
                 onClick={handleEdit}
-                disabled={loading}
+                disabled={loadingEdit}
               >
-                {loading ? "Uploading..." : "Edit File"}
+                {loadingEdit ? <CircularProgress size={24} /> : "Edit File"}
               </Button>
             </Box>
           </Grid>
