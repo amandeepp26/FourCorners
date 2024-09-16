@@ -166,6 +166,11 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
       });
   }, []);
 
+
+  // const handleCloseEditForm = () =>{
+  //   setOpenEdit{false}
+  // }
+
   useEffect(() => {
     // Fetch amount types from the API
     const fetchAmountTypes = async () => {
@@ -1202,6 +1207,7 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
         >
           <EditBookingform
             bookingID={bookingID}
+            handleCloseEditForm={handleCloseEditForm}
             // handleCancel={handleCloseTemplate}
           />
         </Card>

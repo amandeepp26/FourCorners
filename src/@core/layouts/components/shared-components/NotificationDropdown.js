@@ -80,9 +80,21 @@ const NotificationDropdown = ({
   const router = useRouter();
 
   useEffect(() => {
-    fetchData();
-    fetchDataBooking();
+  
   }, []);
+
+
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      fetchData();
+    fetchDataBooking();
+    }, 1000);
+  
+    return () => clearInterval(intervalId); // Clean up the interval on unmount
+  }, []);
+
+
 
   const [cookies, setCookie] = useCookies(["amr"]);
   const userid = cookies.amr?.UserID || 'Role';

@@ -27,7 +27,7 @@ import {
   IconButton,
   Checkbox,
 } from "@mui/material";
-import CancelIcon from '@mui/icons-material/Cancel';
+import CancelIcon from "@mui/icons-material/Cancel";
 
 import MuiAlert from "@mui/material/Alert";
 import { useCookies } from "react-cookie";
@@ -36,30 +36,29 @@ import { Add as AddIcon, Delete as DeleteIcon } from "@mui/icons-material";
 import { useRouter } from "next/router";
 import { format } from "date-fns";
 
-const EditBookingform = ({  show, bookingID , goBack}) => {
+const EditBookingform = ({ show, bookingID, goBack , handleCloseEditForm}) => {
   const router = useRouter();
-
   const initialRemark = {
+    BookingremarkID: "",
     RemarkName: "",
-    RemarkDate: null, // or new Date() if you want a default date
+    RemarkDate: null, 
     AmountTypeID: "",
     Remarkamount: "",
     Loan: 0,
+    Register: 0,
   };
-
   const initialFormData = {
     BookingDate: null,
-    BookingID : "",
+    BookingID: "",
     Mobile: "",
     BookingRef: "",
     Name: "",
     Address: "",
-    BookedByID:"",
+    BookedByID: "",
     Pancard: "",
     Email: "",
     BookingType: "",
-    ParkingAvilability:"",
-    area: "",
+    ParkingAvilability: "",
     TtlAmount: "",
     Charges: "",
     Aadhar: "",
@@ -86,8 +85,6 @@ const EditBookingform = ({  show, bookingID , goBack}) => {
     Status: 1,
     // CreateUID: 1,
   };
-  
-
   const [remarks, setRemarks] = useState([initialRemark]);
   const [formData, setFormData] = useState(initialFormData);
   const [projectMaster, setProjectMaster] = useState([]);
@@ -100,11 +97,9 @@ const EditBookingform = ({  show, bookingID , goBack}) => {
   const [cNames, setCNames] = useState([]);
   const [selectedCid, setSelectedCid] = useState("");
   const [errors, setErrors] = useState({});
-  const [notification, setNotification] = useState(null);
   const [wingData, setWingData] = useState([]);
   const [parking, setParking] = useState([]);
   const [error, setError] = useState(null);
-
   const [bookedByOptions, setBookedByOptions] = useState([]);
   const [bhkOptions, setBhkOptions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -112,31 +107,34 @@ const EditBookingform = ({  show, bookingID , goBack}) => {
   const [submitError, setSubmitError] = useState(false);
   const [cookies, setCookie] = useCookies(["amr"]);
 
-
   useEffect(() => {
     if (bookingID) {
-      console.log(bookingID, "Edit data aaya dekhooooo<<<<<<<<>>>>>>>>>>>>>>>>>>");
+      console.log(
+        bookingID,
+        "Edit data aaya dekhooooo"
+      );
       fetchData();
     } else {
       console.error("bookingID is undefined");
     }
   }, [bookingID]);
-  
+
   const fetchData = async () => {
     if (!bookingID) {
       console.error("bookingID is undefined when fetchData is called");
       return;
     }
-  
+
     try {
       const response = await axios.get(
         `https://apiforcorners.cubisysit.com/api/api-edit-projectbooking.php?BookingID=${bookingID}`
       );
       console.log("Data received:<<<<<>>>>>>>>", response.data);
       const res = response.data.data;
-  
+
       setFormData({
         ...formData,
+        BookingremarkID: res.BookingremarkID || "",
         BookingID: res.BookingID || "",
         Name: res.BookingName || "",
         SourceName: res.SourceName || "",
@@ -172,7 +170,7 @@ const EditBookingform = ({  show, bookingID , goBack}) => {
         UsableArea: res.UsableArea || "",
         AgreementCarpet: res.AgreementCarpet || "",
       });
-  
+
       setRemarks(res.remarksWithCreateDate || []);
       setLoading(false);
     } catch (error) {
@@ -181,9 +179,6 @@ const EditBookingform = ({  show, bookingID , goBack}) => {
       setLoading(false);
     }
   };
-  
-  
-  
 
   const numberToWordsIndian = (num) => {
     const singleDigits = [
@@ -265,28 +260,26 @@ const EditBookingform = ({  show, bookingID , goBack}) => {
     }));
   }, [formData.TotalCost]);
 
+
+  
   const handleChange = (event, index, field) => {
-    const { type, checked, value } = event.target;
-    const name = event.target.name;
-
+    const { name, type, checked, value } = event.target; // Extract `name`
+  
     if (index !== undefined && field !== undefined) {
+      // Handle remarks update
       const newRemarks = [...remarks];
-
-      if (type === "checkbox") {
-        newRemarks[index][field] = checked ? 1 : 0;
-      } else {
-        newRemarks[index][field] = value;
-      }
-
+      newRemarks[index][field] = type === "checkbox" ? (checked ? 1 : 0) : value;
       setRemarks(newRemarks);
     } else {
+      // Clear error for the field being changed
       setErrors((prevErrors) => ({
         ...prevErrors,
         [name]: undefined,
       }));
-
+  
+      // Handle specific fields like 'Mobile', 'TotalCost', etc.
       if (name === "Mobile" || name === "AlternateMobileNo") {
-        const numericValue = value.replace(/\D/g, "");
+        const numericValue = value.replace(/\D/g, ""); 
         setFormData((prevFormData) => ({
           ...prevFormData,
           [name]: numericValue,
@@ -294,7 +287,6 @@ const EditBookingform = ({  show, bookingID , goBack}) => {
       } else if (name === "TotalCost") {
         const numericValue = value.replace(/,/g, "");
         const formattedValue = formatNumber(numericValue);
-
         setFormData((prevFormData) => ({
           ...prevFormData,
           [name]: formattedValue,
@@ -302,47 +294,46 @@ const EditBookingform = ({  show, bookingID , goBack}) => {
       } else if (name === "Area" || name === "Ratesqft") {
         const newArea = name === "Area" ? value : formData.Area;
         const newRatesqft = name === "Ratesqft" ? value : formData.Ratesqft;
-        const newTtlAmount =
-          (parseFloat(newArea) || 0) * (parseFloat(newRatesqft) || 0);
-
+        const newTtlAmount = (parseFloat(newArea) || 0) * (parseFloat(newRatesqft) || 0);
+  
         setFormData((prevFormData) => ({
           ...prevFormData,
-          Area: name === "Area" ? value : prevFormData.Area,
-          Ratesqft: name === "Ratesqft" ? value : prevFormData.Ratesqft,
+          Area: newArea,
+          Ratesqft: newRatesqft,
           TtlAmount: newTtlAmount.toFixed(2),
         }));
       } else {
+        // Default update for other fields
         setFormData((prevFormData) => ({
           ...prevFormData,
-          [name]: value,
+          [name]: value, // Correctly update the field based on `name`
         }));
       }
-
-      const { TtlAmount, Charges, ParkingFacility, Advocate } = formData;
-      if (
-        name === "TtlAmount" ||
-        name === "Charges" ||
-        name === "ParkingFacility" ||
-        name === "Advocate"
-      ) {
-        const newFlatCost =
-          (parseFloat(TtlAmount) || 0) +
-          (parseFloat(Charges) || 0) +
-          (parseFloat(ParkingFacility) || 0) +
+  
+      // Additional calculation for FlatCost
+      const { TtlAmount, Charges, ParkingFacility, Advocate } = {
+        ...formData,
+        [name]: value,
+      };
+  
+      if (["TtlAmount", "Charges", "ParkingFacility", "Advocate"].includes(name)) {
+        const newFlatCost = 
+          (parseFloat(TtlAmount) || 0) + 
+          (parseFloat(Charges) || 0) + 
+          (parseFloat(ParkingFacility) || 0) + 
           (parseFloat(Advocate) || 0);
-
+  
         const FlatCostInWords = numberToWordsIndian(parseInt(newFlatCost || 0));
-
+  
         setFormData((prevFormData) => ({
           ...prevFormData,
           FlatCost: newFlatCost.toFixed(2),
-          FlatCostInWords:
-            FlatCostInWords.charAt(0).toUpperCase() + FlatCostInWords.slice(1),
+          FlatCostInWords: FlatCostInWords.charAt(0).toUpperCase() + FlatCostInWords.slice(1),
         }));
       }
     }
   };
-
+  
   const formatNumber = (num) => {
     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   };
@@ -388,9 +379,9 @@ const EditBookingform = ({  show, bookingID , goBack}) => {
   useEffect(() => {
     setFormData((prevFormData) => ({
       ...prevFormData,
-      TtlAmount: formData.area * areainbuiltup,
+      TtlAmount: formData.Area * formData.Ratesqft,
     }));
-  }, [areainbuiltup, formData.area]);
+  }, [formData.Ratesqft, formData.Area]);
 
   useEffect(() => {
     if (formData.WingID) {
@@ -433,7 +424,7 @@ const EditBookingform = ({  show, bookingID , goBack}) => {
           "https://apiforcorners.cubisysit.com/api/api-fetch-usersales.php"
         );
         if (response.data && response.data.data) {
-          setBookedByOptions(response.data.data); // Use response.data.data to set the options
+          setBookedByOptions(response.data.data);
         } else {
           console.error("Unexpected response structure:", response);
         }
@@ -515,7 +506,7 @@ const EditBookingform = ({  show, bookingID , goBack}) => {
         )
         .then((response) => {
           if (response.data.status === "Success") {
-            console.log("Flat No Data:<<<<<<<<<<<<<<<<1", response.data.data); // Log the fetched data
+            console.log("Flat No Data:", response.data.data); // Log the fetched data
             setFlatNoData(response.data.data);
           }
         })
@@ -541,6 +532,7 @@ const EditBookingform = ({  show, bookingID , goBack}) => {
           if (response.data.status === "Success") {
             console.log("Flat No Data:", response.data.data); // Log the fetched data
             const { Area, UsableArea, AgreementCarpet } = response.data.data[0];
+            console.log(Area, "see this area in builtupp");
             setAreainbuiltup(Area); // Set the Area value
             setFormData((prevFormData) => ({
               ...prevFormData,
@@ -626,51 +618,57 @@ const EditBookingform = ({  show, bookingID , goBack}) => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-
-    const url = 
-      `https://ideacafe-backend.vercel.app/api/proxy/api-update-projectbooking.php?BookingID=${bookingID}`
-     
-
-    const formattedRemarks = remarks.map((remark, index) => ({
-      ...remark,
+  
+    // URL for the API request
+    const url = `https://ideacafe-backend.vercel.app/api/proxy/api-update-projectbooking.php`;
+  
+    // Format remarks to match the API format and include BookingRemarkID
+    const formattedRemarks = remarks.map((remark) => ({
+      BookingremarkID: remark.BookingremarkID || "", // Include BookingRemarkID
+      Remarkamount: remark.Remarkamount ? parseFloat(remark.Remarkamount) : 0, // Convert to number or fallback to 0
+      RemarkName: remark.RemarkName || "",
       RemarkDate: remark.RemarkDate
         ? format(new Date(remark.RemarkDate), "yyyy-MM-dd")
         : null,
-      RemarkUpdateID: index + 1,
+      AmountTypeID: remark.AmountTypeID || "",
+      Loan: remark.Loan || 0,
+      Proccess: remark.Proccess || "",
       Status: 1,
-      CreateUID: 1,
+      ModifyUID: cookies?.amr?.UserID || 1,
     }));
-    console.log(formattedRemarks, "Formatted Remarks");
-
+  
+    // Structure the data as per the API requirement
     const dataToSend = {
-      ...formData,
-      BookingID:bookingID,
-      Remarks: formattedRemarks,
+      ...formData, // All other form data like BookingDate, Mobile, etc.
+      BookingID: bookingID, // Ensure this is included
+      BookingremarkData: formattedRemarks, // Add the formatted remarks with BookingRemarkID
     };
-
-    console.log(dataToSend, "Edit Data to Send<<<<>>>>>>>>>>>>><<<<<<<<");
-
+  
+    console.log(dataToSend, "Data to Send<<<<>>>>>>>>>>>>><<<<<<<<");
+  
     try {
       const response = await axios.post(url, dataToSend, {
         headers: {
           "Content-Type": "application/json",
         },
       });
-
+  
       if (response.data.status === "Success") {
         console.log(response.data, "Submission successful<>>>>>>>>>>>>>>>");
-        // const { BookingID } = response.data;
-        // onFormSubmitSuccess(BookingID);
-        setFormData(initialFormData);
-        setRemarks([{ ...initialRemark }]);
-
+  
+        setFormData(initialFormData); // Reset form data
+        setRemarks([initialRemark]); // Reset remarks
+  
+        // Show success alert
         Swal.fire({
           icon: "success",
           title: "Data Updated Successfully",
           showConfirmButton: false,
           timer: 1000,
         });
-        // goBack()
+  
+        // Close the modal after success
+        handleCloseEditForm();  // Call the function to close the modal
       } else {
         Swal.fire({
           icon: "error",
@@ -679,6 +677,7 @@ const EditBookingform = ({  show, bookingID , goBack}) => {
         });
       }
     } catch (error) {
+      // Handle error case
       console.error("There was an error!", error);
       Swal.fire({
         icon: "error",
@@ -687,6 +686,7 @@ const EditBookingform = ({  show, bookingID , goBack}) => {
       });
     }
   };
+  
 
   const handleAlertClose = (event, reason) => {
     if (reason === "clickaway") {
@@ -706,7 +706,6 @@ const EditBookingform = ({  show, bookingID , goBack}) => {
     updatedRemarks[index] = { ...updatedRemarks[index], RemarkDate: date };
     setRemarks(updatedRemarks);
   };
-  
 
   const handleSelectChange = async (event) => {
     const selectedCid = event.target.value;
@@ -764,7 +763,6 @@ const EditBookingform = ({  show, bookingID , goBack}) => {
               >
                 {bookingID ? "Edit Booking Details" : "Edit Booking Details"}
               </Typography>
-            
             </Box>
           </Grid>
           <form style={{ marginTop: "50px" }}>
@@ -805,17 +803,16 @@ const EditBookingform = ({  show, bookingID , goBack}) => {
                   onChange={handleChange}
                 />
               </Grid>
-
               <Grid item xs={8} sm={4}>
-                <TextField
-                  fullWidth
-                  label={<>Pan Card Number</>}
-                  name="Pancard"
-                  placeholder="Pan Card Number"
-                  value={formData.Pancard}
-                  onChange={handleChange}
-                />
-              </Grid>
+  <TextField
+    fullWidth
+    label={<>Pan Card Number</>}
+    name="Pancard" // Make sure the `name` corresponds to the field in `formData`
+    placeholder="Pan Card Number"
+    value={formData.Pancard} // Ensure the value is correctly bound from `formData`
+    onChange={handleChange} // Correctly pass the `handleChange` function
+  />
+</Grid>
 
               <Grid item xs={8} sm={4}>
                 <TextField
@@ -915,47 +912,50 @@ const EditBookingform = ({  show, bookingID , goBack}) => {
               </Grid>
 
               <Grid item xs={12} md={4}>
-                <FormControl fullWidth>
-                  <InputLabel>Floor</InputLabel>
-                  <Select
-                    value={formData.FloorNo}
-                    onChange={handleChange}
-                    name="FloorNo"
-                    label="Floor"
-                  >
-                    {floor.map((wing, index) => (
-                      <MenuItem
-                        key={`${wing.FloorNo}-${index}`}
-                        value={wing.FloorNo}
-                      >
-                        {wing.FloorNo}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
+  <FormControl fullWidth>
+    <InputLabel>Floor</InputLabel>
+    <Select
+      value={formData.FloorNo || ''} // Ensure default value if undefined
+      onChange={handleChange}
+      name="FloorNo"
+      label="Floor"
+    >
+      {floor.map((wing, index) => (
+        <MenuItem
+          key={`${wing.FloorNo}-${index}`}
+          value={wing.FloorNo}
+        >
+          {wing.FloorNo}
+        </MenuItem>
+      ))}
+    </Select>
+  </FormControl>
+</Grid>
 
-              <Grid item xs={12} md={4}>
-                <FormControl fullWidth>
-                  <InputLabel>Flat Number</InputLabel>
-                  <Select
-                    value={formData.FlatNo}
-                    onChange={handleChange}
-                    name="FlatNo"
-                    label="FlatNo"
-                  >
-                    {flatNoData.map((wing, index) => (
-                      <MenuItem
-                        key={`${wing.FlatNo}-${index}`}
-                        value={wing.FlatNo}
-                      >
-                        {wing.FlatNo}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-
+<Grid item xs={12} md={4}>
+  <FormControl fullWidth>
+    <InputLabel>Flat Number</InputLabel>
+    <Select
+      value={formData.FlatNo || ''} // Ensure default value if undefined
+      onChange={handleChange}
+      name="FlatNo"
+      label="Flat Number"
+    >
+      {flatNoData.length > 0 ? (
+        flatNoData.map((wing, index) => (
+          <MenuItem
+            key={`${wing.FlatNo}-${index}`}
+            value={wing.FlatNo}
+          >
+            {wing.FlatNo}
+          </MenuItem>
+        ))
+      ) : (
+        <MenuItem disabled>No flats available</MenuItem>
+      )}
+    </Select>
+  </FormControl>
+</Grid>
 
               <Grid item xs={12} md={4}>
                 <FormControl fullWidth>
@@ -1024,7 +1024,7 @@ const EditBookingform = ({  show, bookingID , goBack}) => {
                   label="TTL Amount As Per Builtup"
                   name="TtlAmount"
                   placeholder="TTL Amount as per Builtup"
-                  value={formData.TtlAmount}
+                  value={formData.TtlAmount} // Ensure this is set correctly in `setFormData`
                   onChange={handleChange}
                 />
               </Grid>
@@ -1302,18 +1302,17 @@ const EditBookingform = ({  show, bookingID , goBack}) => {
 
                   {/* Date Field */}
                   <Grid item xs={12} sm={6}>
-      <DatePicker
-        selected={
-          remark.RemarkDate && remark.RemarkDate !== "0000-00-00"
-            ? new Date(remark.RemarkDate)
-            : null
-        }
-        onChange={(date) => handleDateRemarks(date, index)}
-        dateFormat="yyyy-MM-dd"
-        customInput={<TextField label="Remark Date" fullWidth />}
-      />
-    </Grid>
-
+                    <DatePicker
+                      selected={
+                        remark.RemarkDate && remark.RemarkDate !== "0000-00-00"
+                          ? new Date(remark.RemarkDate)
+                          : null
+                      }
+                      onChange={(date) => handleDateRemarks(date, index)}
+                      dateFormat="yyyy-MM-dd"
+                      customInput={<TextField label="Remark Date" fullWidth />}
+                    />
+                  </Grid>
 
                   {/* Loan Process Checkbox */}
                   <Grid item xs={2}>
@@ -1325,6 +1324,19 @@ const EditBookingform = ({  show, bookingID , goBack}) => {
                         />
                       }
                       label="Loan Process"
+                    />
+                  </Grid>
+                  <Grid item xs={2}>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={remark.Registraion === 1} // Note the typo here, make sure it's consistent
+                          onChange={(e) =>
+                            handleChange(e, index, "Registraion")
+                          } // Use "Registraion" to match the API response
+                        />
+                      }
+                      label="Register" // This is the label text; it can be "Register" or anything you want
                     />
                   </Grid>
 
