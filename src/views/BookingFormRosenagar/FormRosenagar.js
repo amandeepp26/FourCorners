@@ -1371,15 +1371,21 @@ const FormRosenagar = ({ onFormSubmitSuccess, show, editData }) => {
 
                   {/* Date Field */}
                   <Grid item xs={4}>
-                    <DatePicker
-                      selected={remark.RemarkDate}
-                      onChange={(date) => handleDateRemarks(date, index)}
-                      dateFormat="dd-MM-yyyy"
-                      customInput={
-                        <TextField fullWidth label="Expected Date" />
-                      }
-                    />
-                  </Grid>
+      <DatePicker
+        selected={remark.RemarkDate}
+        onChange={(date) => handleDateRemarks(date, index)}
+        dateFormat="dd-MM-yyyy"
+        customInput={
+          <TextField fullWidth label="Expected Date" />
+        }
+        // Shows both the date picker and allows month/year selection
+        showMonthDropdown
+        showYearDropdown
+        yearDropdownItemNumber={15} // Number of years to show in dropdown
+        scrollableYearDropdown // Makes year dropdown scrollable
+      />
+    </Grid>
+
 
                   {/* Loan Process Checkbox */}
                   <Grid item xs={2}>
