@@ -85,9 +85,6 @@ const OpportunityNotification = () => {
   const hidden = useMediaQuery(theme => theme.breakpoints.down('lg'));
   const router = useRouter();
 
-  useEffect(() => {
-    fetchData();
-  }, []);
 
   // useEffect(() => {
   //   if (typeof window !== 'undefined' && messaging) {
@@ -119,7 +116,20 @@ const OpportunityNotification = () => {
   const playNotificationSound = () => {
     const audio = new Audio('/notification.mp3');
     audio.play();
+
   };
+
+
+
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      fetchData(); // Fetch data every 60 seconds (60000 ms)
+    }, 1000);
+  
+    return () => clearInterval(intervalId); // Clean up the interval on unmount
+  }, []);
+  
 
   const fetchData = async () => {
     const userid = cookies.amr?.UserID || 'Role';

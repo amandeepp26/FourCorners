@@ -184,6 +184,7 @@ const ListTellecalling = ({ item, onDelete, onEdit, onHistoryClick }) => {
       if (response.data.status === "Success") {
         // setFormData(intialName);
         setOpen(false);
+        
         setSubmitSuccess(true);
         setSubmitError(false);
         // Show success message using SweetAlert
