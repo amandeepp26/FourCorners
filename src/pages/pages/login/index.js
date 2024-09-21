@@ -96,7 +96,7 @@ const LoginPage = () => {
         password: values.password,
       };
   
-      axios.post('https://apiforcornershost.cubisysit.com/api/api-login.php', formData, {
+      axios.post('https://apiforcornershost.cubisysit.com/api/api-login', formData, {
         headers: {
           'Content-Type': 'application/json',
         },
