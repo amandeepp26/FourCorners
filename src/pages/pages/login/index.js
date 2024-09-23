@@ -96,42 +96,47 @@ const LoginPage = () => {
         password: values.password,
       };
   
-      axios.post('https://apiforcornershost.cubisysit.com/api/api-login', formData, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-        .then(response => {
-          if (response.data.status === 'Success') {
+      axios
+        .post(
+          "https://ideacafe-backend.vercel.app/api/proxy/api-login.php",
+          formData,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        )
+        .then((response) => {
+          if (response.data.status === "Success") {
             const user = {
               FullName: response.data.data.Name,
               UserID: response.data.data.userid,
               RoleID: response.data.data.roleid,
               RoleName: response.data.data.rolename,
             };
-            console.log(user, 'SUBMITTED DATA');
+            console.log(user, "SUBMITTED DATA");
             setCookie("amr", JSON.stringify(user), { path: "/" });
-       
+
             // router.push('/SaleDashboard');
-            console.log('bac');
+            console.log("bac");
             // return
             if (user.RoleID === 1) {
-              router.push('/');
+              router.push("/");
             } else if (user.RoleID === 3) {
-              router.push('/SaleDashboard');
+              router.push("/SaleDashboard");
             } else {
-              router.push('/Telecalling');
+              router.push("/Telecalling");
             }
-            console.log('SUBMITTED DATA');
+            console.log("SUBMITTED DATA");
           } else {
             setIsSnackbarOpen(true);
             setSnackbarMessage(response.data.message);
           }
         })
-        .catch(error => {
-          console.error('There was an error!', error);
+        .catch((error) => {
+          console.error("There was an error!", error);
           setIsSnackbarOpen(true);
-          setSnackbarMessage('There was an error, Please contact admin');
+          setSnackbarMessage("There was an error, Please contact admin");
         });
   
     } catch (error) {
