@@ -119,7 +119,7 @@ const SaleDashboard = () => {
         todate: formData?.todate?.toISOString(),
       });
       const response = await fetch(
-        `https://apiforcorners.cubisysit.com/api/api-fetch-opportunitydashboard.php?${params}`
+        `https://apiforcornershost.cubisysit.com/api/api-fetch-opportunitydashboard.php?${params}`
       );
 
       if (!response.ok) {
@@ -157,7 +157,7 @@ const SaleDashboard = () => {
   };
   useEffect(() => {
     axios
-      .get("https://apiforcorners.cubisysit.com/api/api-fetch-source.php")
+      .get("https://apiforcornershost.cubisysit.com/api/api-fetch-source.php")
       .then((response) => {
         if (response.data.status === "Success") {
           setSource(response.data.data);
@@ -169,7 +169,7 @@ const SaleDashboard = () => {
   }, []);
   const fetchDataForModal = async (Tid) => {
     try {
-      const apiUrl = `https://apiforcorners.cubisysit.com/api/api-singel-telecalling.php?Tid=${Tid}`;
+      const apiUrl = `https://apiforcornershost.cubisysit.com/api/api-singel-telecalling.php?Tid=${Tid}`;
       const response = await axios.get(apiUrl);
 
       if (response.data.status === "Success") {
@@ -198,7 +198,7 @@ const SaleDashboard = () => {
     console.log("CID AAYA", Cid);
     console.log("press");
     try {
-      const apiUrl = `https://apiforcorners.cubisysit.com/api/api-singel-contacts.php?Cid=${Cid}`;
+      const apiUrl = `https://apiforcornershost.cubisysit.com/api/api-singel-contacts.php?Cid=${Cid}`;
       const response = await axios.get(apiUrl);
 
       if (response.data.status === "Success") {
@@ -217,7 +217,7 @@ const SaleDashboard = () => {
     console.log("Oid AAYA", Oid);
     console.log("press");
     try {
-      const apiUrl = `https://apiforcorners.cubisysit.com/api/api-singel-opportunity.php?Oid=${Oid}`;
+      const apiUrl = `https://apiforcornershost.cubisysit.com/api/api-singel-opportunity.php?Oid=${Oid}`;
       const response = await axios.get(apiUrl);
 
       if (response.data.status === "Success") {
@@ -236,7 +236,7 @@ const SaleDashboard = () => {
   const handleHistoryClickOppo = async () => {
     try {
       debugger;
-      const apiUrl = `https://apiforcorners.cubisysit.com/api/api-singel-opportunityfollowup.php?Oid=${selectedOpportunity?.Oid}`;
+      const apiUrl = `https://apiforcornershost.cubisysit.com/api/api-singel-opportunityfollowup.php?Oid=${selectedOpportunity?.Oid}`;
       const response = await axios.get(apiUrl);
       if (response.data.status === "Success") {
         console.log(response.data, "OID OID OID ODI  OID dataaaa<<<<<>>>>>>>>>>>");
@@ -261,7 +261,7 @@ const SaleDashboard = () => {
     console.log("Oid AAYA", BookingID);
     console.log("press");
     try {
-      const apiUrl = `https://apiforcorners.cubisysit.com/api/api-fetch-singel-bookingremark.php?BookingID=${BookingID}`;
+      const apiUrl = `https://apiforcornershost.cubisysit.com/api/api-fetch-singel-bookingremark.php?BookingID=${BookingID}`;
       const response = await axios.get(apiUrl);
 
       if (response.data.status === "Success") {

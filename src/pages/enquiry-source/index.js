@@ -16,7 +16,7 @@ const Enquirysource = () => {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get('https://ideacafe-backend.vercel.app/api/proxy/api-fetch-enquirysource.php');
+      const response = await axios.get('https://proxy-forcorners.vercel.app/api/proxy/api-fetch-enquirysource.php');
       console.log('API Response:', response.data);
       setRows(response.data.data || []);
       setLoading(false);
@@ -37,7 +37,7 @@ const Enquirysource = () => {
   const handleDelete = async (id) => {
     console.log(id, 'id aayaaaaaaa');
     try {
-      const response = await axios.post('https://ideacafe-backend.vercel.app/api/proxy/api-delete-enquirysource.php', {
+      const response = await axios.post('https://proxy-forcorners.vercel.app/api/proxy/api-delete-enquirysource.php', {
         EnquirySourceID: id,
         DeleteUID: 1
       });

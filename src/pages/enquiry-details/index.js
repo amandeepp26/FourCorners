@@ -20,7 +20,7 @@ const AccountSettings = () => {
   const fetchData = async () => {
     try {
       const response = await axios.get(
-        "https://apiforcorners.cubisysit.com/api/api-fetch-companymaster.php"
+        "https://apiforcornershost.cubisysit.com/api/api-fetch-companymaster.php"
       );
       console.log("API Response:", response.data);
       setRows(response.data.data || []);

@@ -21,7 +21,7 @@ const ListTemplate = ({ item, onEdit, onHistoryClick }) => {
 
   const fetchData = async () => {
     try {
-      const apiUrl = `https://apiforcorners.cubisysit.com/api/api-fetch-template.php?Tid=${item.templateID}`;
+      const apiUrl = `https://apiforcornershost.cubisysit.com/api/api-fetch-template.php?Tid=${item.templateID}`;
       const response = await axios.get(apiUrl);
 
       if (response.data.status === "Success") {

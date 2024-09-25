@@ -77,7 +77,7 @@ const BacklogLoanList = ({ item, onDelete, onEdit, onHistoryClick }) => {
   const fetchDataCurrent = async () => {
     try {
       const response = await axios.get(
-        "https://apiforcorners.cubisysit.com/api/api-fetch-currentupdate.php"
+        "https://apiforcornershost.cubisysit.com/api/api-fetch-currentupdate.php"
       );
       setCurrentUpdate(response.data.data || []);
     } catch (error) {
@@ -121,7 +121,7 @@ const BacklogLoanList = ({ item, onDelete, onEdit, onHistoryClick }) => {
   
     try {
       const response = await axios.get(
-        `https://apiforcorners.cubisysit.com/api/api-dropdown-loanbookingremark.php?BookingID=${item?.BookingID}`
+        `https://apiforcornershost.cubisysit.com/api/api-dropdown-loanbookingremark.php?BookingID=${item?.BookingID}`
       );
       if (response.data.status === "Success") {
         console.log(response.data.data, 'Received booking remarks data');
@@ -141,7 +141,7 @@ const BacklogLoanList = ({ item, onDelete, onEdit, onHistoryClick }) => {
   const fetchBookingRemarkDetails = async (bookingRemarkID) => {
     try {
       const response = await axios.get(
-        `https://apiforcorners.cubisysit.com/api/api-dropdown-bookingremarkdetails.php?BookingremarkID=${bookingRemarkID}`
+        `https://apiforcornershost.cubisysit.com/api/api-dropdown-bookingremarkdetails.php?BookingremarkID=${bookingRemarkID}`
       );
       if (response.data.status === "Success") {
         setBookingRemarkDetails(response.data.data[0]);
@@ -182,7 +182,7 @@ const BacklogLoanList = ({ item, onDelete, onEdit, onHistoryClick }) => {
 
     console.log(payload, "Payload to be sent to the API<<<<<<>>>>>>>>>>");
 
-    const url = "https://ideacafe-backend.vercel.app/api/proxy/api-insert-paymentreminder.php";
+    const url = "https://proxy-forcorners.vercel.app/api/proxy/api-insert-paymentreminder.php";
 
     try {
       const response = await axios.post(url, payload, {

@@ -72,7 +72,7 @@ const ListOpportunitybacklog = ({ item, onDelete, onEdit, onHistoryClick }) => {
   const fetchDataCurrent = async () => {
     try {
       const response = await axios.get(
-        "https://apiforcorners.cubisysit.com/api/api-fetch-currentupdate.php"
+        "https://apiforcornershost.cubisysit.com/api/api-fetch-currentupdate.php"
       );
       setCurrentUpdate(response.data.data || []);
     } catch (error) {
@@ -86,7 +86,7 @@ const ListOpportunitybacklog = ({ item, onDelete, onEdit, onHistoryClick }) => {
   const fetchUserMasterData = async () => {
     try {
       const response = await axios.get(
-        "https://apiforcorners.cubisysit.com/api/api-fetch-useradmin.php"
+        "https://apiforcornershost.cubisysit.com/api/api-fetch-useradmin.php"
       );
       if (response.data.status === "Success") {
         setUserMaster(response.data.data);
@@ -134,7 +134,7 @@ const ListOpportunitybacklog = ({ item, onDelete, onEdit, onHistoryClick }) => {
     const fetchData = async () => {
       if (!item) return; // Exit if no item is provided
       try {
-        const apiUrl = `https://apiforcorners.cubisysit.com/api/api-fetch-opportunitybacklog.php?Oid=${item.Oid}`;
+        const apiUrl = `https://apiforcornershost.cubisysit.com/api/api-fetch-opportunitybacklog.php?Oid=${item.Oid}`;
 
         const response = await axios.get(apiUrl);
 
@@ -178,7 +178,7 @@ const ListOpportunitybacklog = ({ item, onDelete, onEdit, onHistoryClick }) => {
     console.log(formData, "COVERT TO Booking Data 1");
 
     const url =
-      "https://ideacafe-backend.vercel.app/api/proxy/api-insert-convertbooking.php";
+      "https://proxy-forcorners.vercel.app/api/proxy/api-insert-convertbooking.php";
 
     try {
       const response = await axios.post(url, formData, {
@@ -243,7 +243,7 @@ const ListOpportunitybacklog = ({ item, onDelete, onEdit, onHistoryClick }) => {
     };
 
     const url =
-      "https://ideacafe-backend.vercel.app/api/proxy/api-insert-opportunityfollowup.php";
+      "https://proxy-forcorners.vercel.app/api/proxy/api-insert-opportunityfollowup.php";
 
     try {
       const response = await axios.post(url, formDataWithNid, {

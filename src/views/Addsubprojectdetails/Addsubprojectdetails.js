@@ -78,7 +78,7 @@ const Addsubprojectdetails = ({ show, editData }) => {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get("https://apiforcorners.cubisysit.com/api/api-dropdown-projectmaster.php");
+      const response = await axios.get("https://apiforcornershost.cubisysit.com/api/api-dropdown-projectmaster.php");
       setProjectTypes(response.data.data || []);
       setLoading(false);
     } catch (error) {
@@ -92,7 +92,7 @@ const Addsubprojectdetails = ({ show, editData }) => {
 
   const fetchDataCompany = async () => {
     try {
-      const response = await axios.get("https://apiforcorners.cubisysit.com/api/api-fetch-companymaster.php");
+      const response = await axios.get("https://apiforcornershost.cubisysit.com/api/api-fetch-companymaster.php");
       setRows(response.data.data || []);
       setLoading(false);
     } catch (error) {
@@ -115,7 +115,7 @@ const Addsubprojectdetails = ({ show, editData }) => {
   
   const fetchDataSubProject = async () => {
     try {
-      const response = await axios.get("https://apiforcorners.cubisysit.com/api/api-fetch-subprojectmaster.php");
+      const response = await axios.get("https://apiforcornershost.cubisysit.com/api/api-fetch-subprojectmaster.php");
       console.log(response.data.data , 'AAYAAA DATA DEKHHH');
       setSubProjectIdData(response.data.data || []);
       setLoading(false);
@@ -139,8 +139,8 @@ const Addsubprojectdetails = ({ show, editData }) => {
     event.preventDefault();
   
     const url = editData
-      ? "https://ideacafe-backend.vercel.app/api/proxy/api-update-subprojectmaster.php"
-      : "https://ideacafe-backend.vercel.app/api/proxy/api-insert-subprojectmaster.php";
+      ? "https://proxy-forcorners.vercel.app/api/proxy/api-update-subprojectmaster.php"
+      : "https://proxy-forcorners.vercel.app/api/proxy/api-insert-subprojectmaster.php";
   
     try {
       const response = await axios.post(url, formData, {

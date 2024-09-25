@@ -47,7 +47,7 @@ const opportunity = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get(`https://apiforcorners.cubisysit.com/api/api-graph-oppo.php?UserID=${userid}`);
+      const response = await axios.get(`https://apiforcornershost.cubisysit.com/api/api-graph-oppo.php?UserID=${userid}`);
       setRows(response.data.data || []);
       setCounts(response.data.counts || {});
     } catch (error) {
@@ -231,7 +231,7 @@ useEffect(() => {
   //   setLoading(true);
   //   setError(null);
   //   try {
-  //     const response = await axios.get(`https://apiforcorners.cubisysit.com/api/api-fetch-opportunity.php?UserID=${userid}`);
+  //     const response = await axios.get(`https://apiforcornershost.cubisysit.com/api/api-fetch-opportunity.php?UserID=${userid}`);
   //     setRows(response.data.data || []);
   //   } catch (error) {
   //     setError(error);
@@ -242,7 +242,7 @@ useEffect(() => {
 
   const handleDelete = async (id) => {
     try {
-      const response = await axios.post('https://ideacafe-backend.vercel.app/api/proxy/api-delete-opportunity.php', {
+      const response = await axios.post('https://proxy-forcorners.vercel.app/api/proxy/api-delete-opportunity.php', {
         Tid: id,
         DeleteUID: 1
       });

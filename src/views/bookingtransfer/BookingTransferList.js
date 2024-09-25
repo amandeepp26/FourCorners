@@ -75,7 +75,7 @@ const BookingTransferList = ({ item, onDelete, onEdit, onHistoryClick }) => {
   const fetchDataCurrent = async () => {
     try {
       const response = await axios.get(
-        "https://apiforcorners.cubisysit.com/api/api-fetch-currentupdate.php"
+        "https://apiforcornershost.cubisysit.com/api/api-fetch-currentupdate.php"
       );
       setCurrentUpdate(response.data.data || []);
     } catch (error) {
@@ -120,7 +120,7 @@ const BookingTransferList = ({ item, onDelete, onEdit, onHistoryClick }) => {
     const fetchData = async () => {
       if (!item) return; // Exit if no item is provided
       try {
-        const apiUrl = `https://apiforcorners.cubisysit.com/api/api-singel-opportunity.php?Oid=${item.Oid}`;
+        const apiUrl = `https://apiforcornershost.cubisysit.com/api/api-singel-opportunity.php?Oid=${item.Oid}`;
 
         const response = await axios.get(apiUrl);
 
@@ -138,7 +138,7 @@ const BookingTransferList = ({ item, onDelete, onEdit, onHistoryClick }) => {
   const fetchUserMasterData = async () => {
     try {
       const response = await axios.get(
-        "https://apiforcorners.cubisysit.com/api/api-fetch-usersales.php"
+        "https://apiforcornershost.cubisysit.com/api/api-fetch-usersales.php"
       );
       if (response.data.status === "Success") {
         setUserMaster(response.data.data);
@@ -170,7 +170,7 @@ const BookingTransferList = ({ item, onDelete, onEdit, onHistoryClick }) => {
     console.log(formData, "COVERT TO OPPORTUNITY Data 1");
 
     const url =
-      "https://ideacafe-backend.vercel.app/api/proxy/api-insert-convtoppo.php";
+      "https://proxy-forcorners.vercel.app/api/proxy/api-insert-convtoppo.php";
 
     try {
       const response = await axios.post(url, formData, {

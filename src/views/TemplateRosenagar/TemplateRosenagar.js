@@ -61,7 +61,7 @@ const TemplateRosenagar = ({ bookingID , onGoBack }) => {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get(`https://apiforcorners.cubisysit.com/api/api-fetch-projectbooking.php?BookingID=${bookingID}`);
+      const response = await axios.get(`https://apiforcornershost.cubisysit.com/api/api-fetch-projectbooking.php?BookingID=${bookingID}`);
       console.log("data aaya dekh", response.data);
       setData(response.data.data);
       setLoading(false);

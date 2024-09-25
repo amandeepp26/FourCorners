@@ -65,7 +65,7 @@ const UpdateProjectMaster = ({ show, rowData }) => {
   const fetchData = async () => {
     try {
       const response = await axios.get(
-        "https://apiforcorners.cubisysit.com/api/api-fetch-companymaster.php"
+        "https://apiforcornershost.cubisysit.com/api/api-fetch-companymaster.php"
       );
       setRows(response.data.data || []);
       setLoading(false);
@@ -78,7 +78,7 @@ const UpdateProjectMaster = ({ show, rowData }) => {
   useEffect(() => {
     axios
       .get(
-        "https://apiforcorners.cubisysit.com/api/api-fetch-projecttypemaster.php"
+        "https://apiforcornershost.cubisysit.com/api/api-fetch-projecttypemaster.php"
       )
       .then((response) => {
         if (response.data.status === "Success") {
@@ -92,7 +92,7 @@ const UpdateProjectMaster = ({ show, rowData }) => {
 
   useEffect(() => {
     axios
-      .get("https://apiforcorners.cubisysit.com/api/api-fetch-citymaster.php")
+      .get("https://apiforcornershost.cubisysit.com/api/api-fetch-citymaster.php")
       .then((response) => {
         if (response.data.status === "Success") {
           setCities(response.data.data);
@@ -103,7 +103,7 @@ const UpdateProjectMaster = ({ show, rowData }) => {
       });
 
     axios
-      .get("https://apiforcorners.cubisysit.com/api/api-fetch-statemaster.php")
+      .get("https://apiforcornershost.cubisysit.com/api/api-fetch-statemaster.php")
       .then((response) => {
         if (response.data.status === "Success") {
           setStates(response.data.data);
@@ -118,7 +118,7 @@ const UpdateProjectMaster = ({ show, rowData }) => {
     const fetchData = async () => {
       try {
         const projectId = rowData?.ProjectID;
-        const apiUrl = `https://apiforcorners.cubisysit.com/api/api-singel-projectmaster.php?ProjectID=${projectId}`;
+        const apiUrl = `https://apiforcornershost.cubisysit.com/api/api-singel-projectmaster.php?ProjectID=${projectId}`;
 
         const response = await axios.get(apiUrl);
         if (response.data.status === "Success") {
@@ -260,7 +260,7 @@ const UpdateProjectMaster = ({ show, rowData }) => {
 
     axios
       .post(
-        "https://ideacafe-backend.vercel.app/api/proxy/api-update-projectmaster.php",
+        "https://proxy-forcorners.vercel.app/api/proxy/api-update-projectmaster.php",
         JSON.stringify(submitData),
         {
           headers: {

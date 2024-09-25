@@ -30,7 +30,7 @@ const TodaysFollowupPayment = ({ initialRows }) => {
     setError(null);
     try {
       const response = await axios.get(
-        `https://apiforcorners.cubisysit.com/api/api-fetch-todayereminder.php?UserID=${userid}`
+        `https://apiforcornershost.cubisysit.com/api/api-fetch-todayereminder.php?UserID=${userid}`
       );
       setRows(response.data.data || []);
     } catch (error) {

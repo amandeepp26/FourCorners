@@ -49,7 +49,7 @@ const OpenLead = () => {
     setError(null);
     try {
       const response = await axios.get(
-        `https://apiforcorners.cubisysit.com/api/api-graph-lead.php?UserID=${userid}`
+        `https://apiforcornershost.cubisysit.com/api/api-graph-lead.php?UserID=${userid}`
       );
       console.log(response.data.counts, "api res");
 
@@ -65,7 +65,7 @@ const OpenLead = () => {
   const handleDelete = async (id) => {
     try {
       const response = await axios.post(
-        "https://ideacafe-backend.vercel.app/api/proxy/api-delete-telecalling.php",
+        "https://proxy-forcorners.vercel.app/api/proxy/api-delete-telecalling.php",
         {
           Tid: id,
           DeleteUID: 1,

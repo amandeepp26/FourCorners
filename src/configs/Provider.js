@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = 'https://apiforcorners.cubisysit.com/api/';
+const BASE_URL = 'https://apiforcornershost.cubisysit.com/api/';
 
 class Provider {
 

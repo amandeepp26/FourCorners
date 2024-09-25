@@ -50,7 +50,7 @@ const UpdateCompanyMaster = ({ show, rowData }) => {
   });
 
   useEffect(() => {
-    axios.get('https://apiforcorners.cubisysit.com/api/api-fetch-citymaster.php')
+    axios.get('https://apiforcornershost.cubisysit.com/api/api-fetch-citymaster.php')
       .then(response => {
         if (response.data.status === 'Success') {
           setCities(response.data.data);
@@ -60,7 +60,7 @@ const UpdateCompanyMaster = ({ show, rowData }) => {
         console.error('Error fetching cities:', error);
       });
 
-    axios.get('https://apiforcorners.cubisysit.com/api/api-fetch-statemaster.php')
+    axios.get('https://apiforcornershost.cubisysit.com/api/api-fetch-statemaster.php')
       .then(response => {
         if (response.data.status === 'Success') {
           setStates(response.data.data);
@@ -75,7 +75,7 @@ const UpdateCompanyMaster = ({ show, rowData }) => {
     const fetchData = async () => {
       try {
         const companyId = rowData?.CompanyID;
-        const apiUrl = `https://apiforcorners.cubisysit.com/api/api-singel-companymaster.php?CompanyID=${companyId}`;
+        const apiUrl = `https://apiforcornershost.cubisysit.com/api/api-singel-companymaster.php?CompanyID=${companyId}`;
 
         const response = await axios.get(apiUrl);
         if (response.data.status === 'Success') {
@@ -184,7 +184,7 @@ const UpdateCompanyMaster = ({ show, rowData }) => {
   const getCityData = (stateID) => {
     debugger;
     axios
-      .get("https://apiforcorners.cubisysit.com/api/api-singel-citymaster.php?StateID= " + stateID)
+      .get("https://apiforcornershost.cubisysit.com/api/api-singel-citymaster.php?StateID= " + stateID)
       .then((response) => {
         // debugger;
         if (response.data.status === "Success") {
@@ -238,7 +238,7 @@ const UpdateCompanyMaster = ({ show, rowData }) => {
     //  debugger;
       console.log(submitData, 'ALL DATAAAAAAA');
 
-      axios.post('https://ideacafe-backend.vercel.app/api/proxy/api-update-companymaster.php', submitData, {
+      axios.post('https://proxy-forcorners.vercel.app/api/proxy/api-update-companymaster.php', submitData, {
         headers: {
           'Content-Type': 'application/json',
         },

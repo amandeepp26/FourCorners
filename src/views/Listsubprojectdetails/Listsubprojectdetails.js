@@ -32,7 +32,7 @@ const Listsubprojectdetails = ({ rows, setRows, onEdit }) => {
 
     try {
       const response = await axios.post(
-        "https://ideacafe-backend.vercel.app/api/proxy/api-delete-subprojectmaster.php",
+        "https://proxy-forcorners.vercel.app/api/proxy/api-delete-subprojectmaster.php",
         body,
         {
           headers: {

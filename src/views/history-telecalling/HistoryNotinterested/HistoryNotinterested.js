@@ -79,7 +79,7 @@ export default function HistoryNotinterested({ item }) {
   const fetchDataCurrent = async () => {
     try {
       const response = await axios.get(
-        "https://apiforcorners.cubisysit.com/api/api-fetch-currentupdate.php"
+        "https://apiforcornershost.cubisysit.com/api/api-fetch-currentupdate.php"
       );
       setCurrentUpdate(response.data.data || []);
     } catch (error) {
@@ -91,7 +91,7 @@ export default function HistoryNotinterested({ item }) {
     const fetchData = async () => {
       if (!item) return;
       try {
-        const apiUrl = `https://apiforcorners.cubisysit.com/api/api-fetch-nextfollowup.php?Tid=${item.Tid}`;
+        const apiUrl = `https://apiforcornershost.cubisysit.com/api/api-fetch-nextfollowup.php?Tid=${item.Tid}`;
         const response = await axios.get(apiUrl);
         if (response.data.status === "Success") {
           console.log(
@@ -130,7 +130,7 @@ export default function HistoryNotinterested({ item }) {
       Tid: item.Tid,
     };
     const url =
-      "https://ideacafe-backend.vercel.app/api/proxy/api-insert-nextfollowup.php";
+      "https://proxy-forcorners.vercel.app/api/proxy/api-insert-nextfollowup.php";
     try {
       const response = await axios.post(url, formDataWithTid, {
         headers: {

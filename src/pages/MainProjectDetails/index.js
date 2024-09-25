@@ -61,7 +61,7 @@ const MainProjectDetails = () => {
     const userid = cookies.amr?.UserID || 25;
     try {
       const response = await axios.get(
-        `https://apiforcorners.cubisysit.com/api/api-graph-lead.php?UserID=${userid}`
+        `https://apiforcornershost.cubisysit.com/api/api-graph-lead.php?UserID=${userid}`
       );
       console.log("API Response:", response.data);
       setRows(response.data.data || []);

@@ -89,7 +89,7 @@ const [amountsUpcoming, setAmountsUpcoming] = useState([]);
       setLoading(true);
   
       // Construct API URL based on whether percentage is provided
-      let apiUrl = `https://apiforcorners.cubisysit.com/api/api-project-networth.php?ProjectID=${item}&fromdate=${formattedFromDate}&todate=${formattedToDate}`;
+      let apiUrl = `https://apiforcornershost.cubisysit.com/api/api-project-networth.php?ProjectID=${item}&fromdate=${formattedFromDate}&todate=${formattedToDate}`;
       if (percentage) {
         apiUrl += `&percentage=${percentage}`;
       }

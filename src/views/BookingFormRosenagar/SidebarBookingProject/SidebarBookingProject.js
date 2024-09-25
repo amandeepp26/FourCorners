@@ -60,7 +60,7 @@ const SidebarBookingProject = ({ onEdit, onItemClick, onCreate }) => {
   const fetchData = async () => {
     try {
       const response = await axios.get(
-        "https://apiforcorners.cubisysit.com/api/api-fetch-projectmaster.php"
+        "https://apiforcornershost.cubisysit.com/api/api-fetch-projectmaster.php"
       );
       console.log("API Response:", response.data);
       setRows(response.data.data || []);
@@ -112,7 +112,7 @@ const SidebarBookingProject = ({ onEdit, onItemClick, onCreate }) => {
   const handleDelete = async () => {
     try {
       const response = await axios.post(
-        "https://ideacafe-backend.vercel.app/api/proxy/api-delete-telecalling.php",
+        "https://proxy-forcorners.vercel.app/api/proxy/api-delete-telecalling.php",
         {
           Tid: deleteId,
           DeleteUID: 1,

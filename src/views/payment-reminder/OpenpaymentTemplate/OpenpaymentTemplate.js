@@ -65,7 +65,7 @@ const InvoiceBox = styled(Box)({
       const fetchData = async () => {
         if (!item) return; // Exit if no item is provided
         try {
-          const apiUrl = `https://apiforcorners.cubisysit.com/api/api-singel-bookingremark.php?BookingID=${item?.BookingID}`;
+          const apiUrl = `https://apiforcornershost.cubisysit.com/api/api-singel-bookingremark.php?BookingID=${item?.BookingID}`;
           const response = await axios.get(apiUrl);
   
           if (response.data.status === "Success") {
@@ -94,7 +94,7 @@ const InvoiceBox = styled(Box)({
   
       try {
         const response = await axios.get(
-          `https://apiforcorners.cubisysit.com/api/api-dropdown-bookingremark.php?BookingID=${item?.BookingID}`
+          `https://apiforcornershost.cubisysit.com/api/api-dropdown-bookingremark.php?BookingID=${item?.BookingID}`
         );
         if (response.data.status === "Success") {
           console.log(response.data.data, 'aagaya daata remakrs');
@@ -116,7 +116,7 @@ const InvoiceBox = styled(Box)({
     const fetchBookingRemarkDetails = async (bookingRemarkID) => {
       try {
         const response = await axios.get(
-          `https://apiforcorners.cubisysit.com/api/api-dropdown-bookingremarkdetails.php?BookingremarkID=${bookingRemarkID}`
+          `https://apiforcornershost.cubisysit.com/api/api-dropdown-bookingremarkdetails.php?BookingremarkID=${bookingRemarkID}`
         );
         if (response.data.status === "Success") {
           setBookingRemarkDetails(response.data.data[0]);
@@ -153,7 +153,7 @@ const InvoiceBox = styled(Box)({
     
       console.log(payload, "Payload to be sent to the API<<<<<<>>>>>>>>>>");
     
-      const url = "https://ideacafe-backend.vercel.app/api/proxy/api-insert-paymentreminder.php";
+      const url = "https://proxy-forcorners.vercel.app/api/proxy/api-insert-paymentreminder.php";
     
       try {
         const response = await axios.post(url, payload, {

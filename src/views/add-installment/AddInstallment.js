@@ -38,7 +38,7 @@ const AddInstallment = ({ show, editData }) => {
   const fetchData = async () => {
     try {
       const response = await axios.get(
-        "https://apiforcorners.cubisysit.com/api/api-dropdown-projectmaster.php"
+        "https://apiforcornershost.cubisysit.com/api/api-dropdown-projectmaster.php"
       );
       setRows(response.data.data || []);
     } catch (error) {
@@ -108,7 +108,7 @@ const AddInstallment = ({ show, editData }) => {
   const insertInstallment = (formData) => {
     axios
       .post(
-        "https://ideacafe-backend.vercel.app/api/proxy/api-insert-installmentdetails.php",
+        "https://proxy-forcorners.vercel.app/api/proxy/api-insert-installmentdetails.php",
         formData,
         {
           headers: {
@@ -130,7 +130,7 @@ const AddInstallment = ({ show, editData }) => {
   const updateInstallment = (formData) => {
     axios
       .post(
-        "https://ideacafe-backend.vercel.app/api/proxy/api-update-installmentdetails.php",
+        "https://proxy-forcorners.vercel.app/api/proxy/api-update-installmentdetails.php",
         formData,
         {
           headers: {

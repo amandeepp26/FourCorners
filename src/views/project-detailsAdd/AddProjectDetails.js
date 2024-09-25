@@ -61,7 +61,7 @@ const AddProjectDetails = ({ show, setShowUploadExcel, editData }) => {
 
   const fetchCompany = () => {
     axios
-      .get("https://apiforcorners.cubisysit.com/api/api-fetch-companymaster.php")
+      .get("https://apiforcornershost.cubisysit.com/api/api-fetch-companymaster.php")
       .then((response) => {
         if (response.data.status === "Success") {
           setCompanyTypeData(response.data.data);
@@ -74,7 +74,7 @@ const AddProjectDetails = ({ show, setShowUploadExcel, editData }) => {
 
   const fetchProject = () => {
     axios
-      .get("https://apiforcorners.cubisysit.com/api/api-fetch-projectmaster.php")
+      .get("https://apiforcornershost.cubisysit.com/api/api-fetch-projectmaster.php")
       .then((response) => {
         if (response.data.status === "Success") {
           setProjectTypeData(response.data.data);
@@ -88,8 +88,8 @@ const AddProjectDetails = ({ show, setShowUploadExcel, editData }) => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     const url = editData
-      ? "https://ideacafe-backend.vercel.app/api/proxy/api-update-telecalling.php"
-      : "https://ideacafe-backend.vercel.app/api/proxy/api-insert-projectinfo.php";
+      ? "https://proxy-forcorners.vercel.app/api/proxy/api-update-telecalling.php"
+      : "https://proxy-forcorners.vercel.app/api/proxy/api-insert-projectinfo.php";
 
     try {
       const response = await axios.post(url, formData, {

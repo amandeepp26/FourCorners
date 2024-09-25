@@ -72,7 +72,7 @@ const Reciept = ({ bookingID }) => {
   const fetchData = async () => {
     try {
       const response = await axios.get(
-        `https://apiforcorners.cubisysit.com/api/api-fetch-chequereceipt.php?BookingID=${bookingID}`
+        `https://apiforcornershost.cubisysit.com/api/api-fetch-chequereceipt.php?BookingID=${bookingID}`
       );
       console.log("data aaya dekh", response.data);
       setData(response.data.data[0]);

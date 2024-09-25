@@ -40,7 +40,7 @@ const AddContact = ({ show, editData }) => {
 
   const fetchTemplateTypes = async () => {
     try {
-      const response = await axios.get("https://apiforcorners.cubisysit.com/api/api-fetch-templatetype.php");
+      const response = await axios.get("https://apiforcornershost.cubisysit.com/api/api-fetch-templatetype.php");
       if (response.data.status === "Success") {
         setTemplateTypes(response.data.data);
       }
@@ -75,8 +75,8 @@ const AddContact = ({ show, editData }) => {
     }
 
     const url = editData
-      ? "https://ideacafe-backend.vercel.app/api/proxy/api-update-contacts.php"
-      : "https://ideacafe-backend.vercel.app/api/proxy/api-insert-contacts.php";
+      ? "https://proxy-forcorners.vercel.app/api/proxy/api-update-contacts.php"
+      : "https://proxy-forcorners.vercel.app/api/proxy/api-insert-contacts.php";
 
     // Prepare form data to send
     const formDataToSend = new FormData();

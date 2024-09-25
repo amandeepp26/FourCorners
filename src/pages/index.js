@@ -184,7 +184,7 @@ const Dashboard = ({ onHistoryClick }) => {
       console.log(params.toString(), "Request Parameters");
   
       const response = await fetch(
-        `https://apiforcorners.cubisysit.com/api/api-fetch-admindashboard.php?${params}`
+        `https://apiforcornershost.cubisysit.com/api/api-fetch-admindashboard.php?${params}`
       );
   
       if (!response.ok) {
@@ -249,7 +249,7 @@ const Dashboard = ({ onHistoryClick }) => {
   useEffect(() => {
     // Fetch the data from the API
     axios
-      .get("https://apiforcorners.cubisysit.com/api/api-fetch-telesales.php")
+      .get("https://apiforcornershost.cubisysit.com/api/api-fetch-telesales.php")
       .then((response) => {
         if (response.data.status === "Success") {
           setUsers(response.data.data);
@@ -262,7 +262,7 @@ const Dashboard = ({ onHistoryClick }) => {
 
   useEffect(() => {
     axios
-      .get("https://apiforcorners.cubisysit.com/api/api-fetch-source.php")
+      .get("https://apiforcornershost.cubisysit.com/api/api-fetch-source.php")
       .then((response) => {
         if (response.data.status === "Success") {
           setSource(response.data.data);
@@ -274,7 +274,7 @@ const Dashboard = ({ onHistoryClick }) => {
   }, []);
   const fetchDataForModal = async (Tid) => {
     try {
-      const apiUrl = `https://apiforcorners.cubisysit.com/api/api-singel-telecalling.php?Tid=${Tid}`;
+      const apiUrl = `https://apiforcornershost.cubisysit.com/api/api-singel-telecalling.php?Tid=${Tid}`;
       const response = await axios.get(apiUrl);
 
       if (response.data.status === "Success") {
@@ -305,7 +305,7 @@ const Dashboard = ({ onHistoryClick }) => {
     console.log("CID AAYA", Cid);
     console.log("press");
     try {
-      const apiUrl = `https://apiforcorners.cubisysit.com/api/api-singel-contacts.php?Cid=${Cid}`;
+      const apiUrl = `https://apiforcornershost.cubisysit.com/api/api-singel-contacts.php?Cid=${Cid}`;
       const response = await axios.get(apiUrl);
 
       if (response.data.status === "Success") {
@@ -325,7 +325,7 @@ const Dashboard = ({ onHistoryClick }) => {
     console.log("Oid AAYA", Oid);
     console.log("press");
     try {
-      const apiUrl = `https://apiforcorners.cubisysit.com/api/api-singel-opportunity.php?Oid=${Oid}`;
+      const apiUrl = `https://apiforcornershost.cubisysit.com/api/api-singel-opportunity.php?Oid=${Oid}`;
       const response = await axios.get(apiUrl);
 
       if (response.data.status === "Success") {
@@ -349,7 +349,7 @@ const Dashboard = ({ onHistoryClick }) => {
     debugger;
     const fetchData = async () => {
       try {
-        const apiUrl = `https://apiforcorners.cubisysit.com/api/api-singel-opportunityfollowup.php?Oid=${selectedOpportunity?.Oid}`;
+        const apiUrl = `https://apiforcornershost.cubisysit.com/api/api-singel-opportunityfollowup.php?Oid=${selectedOpportunity?.Oid}`;
         const response = await axios.get(apiUrl);
         if (response.data.status === "Success") {
           console.log(response.data, "aagaayaa oid dataaaa<<<<<>>>>>>>>>>>");
@@ -367,7 +367,7 @@ const Dashboard = ({ onHistoryClick }) => {
   const handleHistoryClickLead = async () => {
     try {
       debugger;
-      const apiUrl = `https://apiforcorners.cubisysit.com/api/api-fetch-nextfollowup.php?Tid=${selectedTelecaller?.Tid}`;
+      const apiUrl = `https://apiforcornershost.cubisysit.com/api/api-fetch-nextfollowup.php?Tid=${selectedTelecaller?.Tid}`;
       const response = await axios.get(apiUrl);
       if (response.data.status === "Success") {
         console.log(response.data, "TID dataaaa<<<<<>>>>>>>>>>>");
@@ -389,7 +389,7 @@ const Dashboard = ({ onHistoryClick }) => {
   const handleHistoryClickOppo = async () => {
     try {
       debugger;
-      const apiUrl = `https://apiforcorners.cubisysit.com/api/api-singel-opportunityfollowup.php?Oid=${selectedOpportunity?.Oid}`;
+      const apiUrl = `https://apiforcornershost.cubisysit.com/api/api-singel-opportunityfollowup.php?Oid=${selectedOpportunity?.Oid}`;
       const response = await axios.get(apiUrl);
       if (response.data.status === "Success") {
         console.log(response.data, "OID OID OID ODI  OID dataaaa<<<<<>>>>>>>>>>>");

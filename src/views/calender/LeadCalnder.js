@@ -24,7 +24,7 @@ const LeadCalnder = () => {
       const userid = cookies.amr?.UserID || 'Role';
       try {
         const response = await fetch(
-          `https://apiforcorners.cubisysit.com/api/api-fetch-telecalender.php?UserID=${userid}`
+          `https://apiforcornershost.cubisysit.com/api/api-fetch-telecalender.php?UserID=${userid}`
         );
         const result = await response.json();
         if (result.code === 200) {
@@ -86,7 +86,7 @@ const LeadCalnder = () => {
   async function fetchAppointmentDetails(Nid) {
     try {
       const response = await fetch(
-        `https://ideacafe-backend.vercel.app/api/proxy/api-singel-telecalender.php?Nid=${Nid}`
+        `https://proxy-forcorners.vercel.app/api/proxy/api-singel-telecalender.php?Nid=${Nid}`
       );
       const result = await response.json();
       if (result.code === 200) {

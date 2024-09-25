@@ -40,7 +40,7 @@ const Updateenquirysource  = () => {
 
   const fetchData = async () => {
     try {
-      const response = await axios.post(`https://ideacafe-backend.vercel.app/api/proxy/api-singel-enquirysource.php?enquirysourceid=${id}`);
+      const response = await axios.post(`https://proxy-forcorners.vercel.app/api/proxy/api-singel-enquirysource.php?enquirysourceid=${id}`);
       if (response.data.status === 'Success') {
         const enquiry = response.data.data[0];
         setFormData({
@@ -96,7 +96,7 @@ const Updateenquirysource  = () => {
 
     try {
       const response = await axios.post(
-        'https://ideacafe-backend.vercel.app/api/proxy/api-update-enquirysource.php',
+        'https://proxy-forcorners.vercel.app/api/proxy/api-update-enquirysource.php',
         body,
         {
           headers: {

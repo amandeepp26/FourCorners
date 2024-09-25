@@ -44,7 +44,7 @@ const Addcarparkingdetails = ({ show }) => {
   const fetchData = async () => {
     try {
       const response = await axios.get(
-        "https://apiforcorners.cubisysit.com/api/api-fetchsubprojectdetails.php"
+        "https://apiforcornershost.cubisysit.com/api/api-fetchsubprojectdetails.php"
       );
       console.log("API Response:", response.data);
       setRows(response.data.data || []);
@@ -73,7 +73,7 @@ const Addcarparkingdetails = ({ show }) => {
 
     try {
       const response = await axios.post(
-        "https://apiforcorners.cubisysit.com/api/api-insert-carparkingdetails.php",
+        "https://apiforcornershost.cubisysit.com/api/api-insert-carparkingdetails.php",
         body,
         {
           headers: {

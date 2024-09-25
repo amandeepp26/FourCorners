@@ -46,7 +46,7 @@ const NotInterested = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get(`https://apiforcorners.cubisysit.com/api/api-graph-oppo.php?UserID=${userid}`);
+      const response = await axios.get(`https://apiforcornershost.cubisysit.com/api/api-graph-oppo.php?UserID=${userid}`);
       setRows(response.data.data || []);
       setCounts(response.data.counts || {});
     } catch (error) {

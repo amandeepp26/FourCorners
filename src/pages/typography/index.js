@@ -52,7 +52,7 @@ const ProjectMaster = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get('https://apiforcorners.cubisysit.com/api/api-fetch-projecttotal.php');
+      const response = await axios.get('https://apiforcornershost.cubisysit.com/api/api-fetch-projecttotal.php');
       console.log(response.data); // Verify API response
       setRows(response.data.data || []);
       setTotalProjects(response.data.totalProjects || 0); // Ensure totalProjects is set

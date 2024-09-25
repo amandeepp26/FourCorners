@@ -67,7 +67,7 @@ const Sidebar = ({ onEdit, onItemClick, onCreate }) => {
     const userid = cookies.amr?.UserID || 'Role';
     try {
       const response = await axios.get(
-        `https://apiforcorners.cubisysit.com/api/api-fetch-template.php?UserID=${userid}`
+        `https://apiforcornershost.cubisysit.com/api/api-fetch-template.php?UserID=${userid}`
       );
       console.log("API Response:", response.data);
       setRows(response.data.data || []);
@@ -119,7 +119,7 @@ const Sidebar = ({ onEdit, onItemClick, onCreate }) => {
   const handleDelete = async () => {
     try {
       const response = await axios.post(
-        "https://ideacafe-backend.vercel.app/api/proxy/api-delete-telecalling.php",
+        "https://proxy-forcorners.vercel.app/api/proxy/api-delete-telecalling.php",
         {
           Tid: deleteId,
           DeleteUID: 1,

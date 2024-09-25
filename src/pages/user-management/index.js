@@ -16,7 +16,7 @@ const UserManager = () => {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get('https://apiforcorners.cubisysit.com/api/api-fetch-usermaster.php');
+      const response = await axios.get('https://apiforcornershost.cubisysit.com/api/api-fetch-usermaster.php');
       console.log('API Response:', response.data);
       setRows(response.data.data || []);
       setLoading(false);
@@ -51,7 +51,7 @@ const UserManager = () => {
   const handleDelete = async (id) => {
     console.log(id, 'id aayaaaaaaa');
     try {
-      const response = await axios.post('https://ideacafe-backend.vercel.app/api/proxy/api-delete-telecalling.php', {
+      const response = await axios.post('https://proxy-forcorners.vercel.app/api/proxy/api-delete-telecalling.php', {
         telecallingID: id,
         DeleteUID: 1
       });

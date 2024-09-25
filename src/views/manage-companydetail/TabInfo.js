@@ -53,7 +53,7 @@ const TabInfo = ({ setShowTabAccount , onEdit }) => {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get('https://apiforcorners.cubisysit.com/api/api-fetch-companymaster.php');
+      const response = await axios.get('https://apiforcornershost.cubisysit.com/api/api-fetch-companymaster.php');
       setRows(response.data.data || []);
       setLoading(false);
     } catch (error) {
@@ -86,7 +86,7 @@ const TabInfo = ({ setShowTabAccount , onEdit }) => {
 
     try {
       const response = await axios.post(
-        "https://ideacafe-backend.vercel.app/api/proxy/api-delete-companymaster.php",
+        "https://proxy-forcorners.vercel.app/api/proxy/api-delete-companymaster.php",
         body,
         {
           headers: {

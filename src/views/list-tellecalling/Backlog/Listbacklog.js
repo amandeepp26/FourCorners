@@ -74,7 +74,7 @@ console.log(item, "seet<<<<<<<>>>>>>>></>");
   const fetchDataCurrent = async () => {
     try {
       const response = await axios.get(
-        "https://apiforcorners.cubisysit.com/api/api-fetch-currentupdate.php"
+        "https://apiforcornershost.cubisysit.com/api/api-fetch-currentupdate.php"
       );
       setCurrentUpdate(response.data.data || []);
     } catch (error) {
@@ -92,7 +92,7 @@ console.log(item, "seet<<<<<<<>>>>>>>></>");
   const fetchUserMasterData = async () => {
     try {
       const response = await axios.get(
-        "https://apiforcorners.cubisysit.com/api/api-fetch-usersales.php"
+        "https://apiforcornershost.cubisysit.com/api/api-fetch-usersales.php"
       );
       if (response.data.status === "Success") {
         setUserMaster(response.data.data);
@@ -127,7 +127,7 @@ console.log(item, "seet<<<<<<<>>>>>>>></>");
     console.log(formData, "COVERT TO OPPORTUNITY Data 1");
 
     const url =
-      "https://ideacafe-backend.vercel.app/api/proxy/api-insert-convtoppo.php";
+      "https://proxy-forcorners.vercel.app/api/proxy/api-insert-convtoppo.php";
 
     try {
       const response = await axios.post(url, formData, {
@@ -202,7 +202,7 @@ console.log(item, "seet<<<<<<<>>>>>>>></>");
     const fetchData = async () => {
       if (!item) return; // Exit if no item is provided
       try {
-        const apiUrl = `https://apiforcorners.cubisysit.com/api/api-singel-backlog.php?Nid=${item.Nid}`;
+        const apiUrl = `https://apiforcornershost.cubisysit.com/api/api-singel-backlog.php?Nid=${item.Nid}`;
 
         const response = await axios.get(apiUrl);
 
@@ -234,7 +234,7 @@ console.log(item, "seet<<<<<<<>>>>>>>></>");
     };
 
     const url =
-      "https://ideacafe-backend.vercel.app/api/proxy/api-insert-nextfollowup.php";
+      "https://proxy-forcorners.vercel.app/api/proxy/api-insert-nextfollowup.php";
 
     try {
       const response = await axios.post(url, formDataWithNid, {

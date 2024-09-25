@@ -56,7 +56,7 @@ const Tellecalling = () => {
     const userid = cookies.amr?.UserID || 25;
     try {
       const response = await axios.get(
-        `https://apiforcorners.cubisysit.com/api/api-graph-lead.php?UserID=${userid}`
+        `https://apiforcornershost.cubisysit.com/api/api-graph-lead.php?UserID=${userid}`
       );
       console.log("API Response:", response.data);
       setRows(response.data.data || []);
@@ -71,7 +71,7 @@ const Tellecalling = () => {
 
   const handleDelete = async (id) => {
     try {
-      const response = await axios.post('https://ideacafe-backend.vercel.app/api/proxy/api-delete-telecalling.php', {
+      const response = await axios.post('https://proxy-forcorners.vercel.app/api/proxy/api-delete-telecalling.php', {
         Tid: id,
         DeleteUID: 1
       });

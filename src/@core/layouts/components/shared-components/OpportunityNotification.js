@@ -136,7 +136,7 @@ const OpportunityNotification = () => {
 
     try {
       const response = await axios.get(
-        `https://apiforcorners.cubisysit.com/api/api-fetch-convtooppo.php?UserID=${userid}`
+        `https://apiforcornershost.cubisysit.com/api/api-fetch-convtooppo.php?UserID=${userid}`
       );
       console.log("Response:", response.data);
 

@@ -60,7 +60,7 @@ const Contact = () => {
     const userid = cookies.amr?.UserID || 25;
     try {
       const response = await axios.get(
-        `https://apiforcorners.cubisysit.com/api/api-graph-contact.php?UserID=${userid}`
+        `https://apiforcornershost.cubisysit.com/api/api-graph-contact.php?UserID=${userid}`
       );
       console.log("API Response:", response.data.count);
       setRows(response.data.data || []);
@@ -227,7 +227,7 @@ const Contact = () => {
     setError(null);
     try {
       const response = await axios.get(
-        `https://apiforcorners.cubisysit.com/api/api-fetch-contacts.php?UserID=${userid}`
+        `https://apiforcornershost.cubisysit.com/api/api-fetch-contacts.php?UserID=${userid}`
       );
       console.log(response.data.data, "aagaya data userid wise");
       setRows(response.data.data || []);

@@ -76,7 +76,7 @@ const ListContact = ({ item, onDelete, onEdit , onHistoryClick }) => {
   const fetchDataCurrent = async () => {
     try {
       const response = await axios.get(
-        "https://apiforcorners.cubisysit.com/api/api-fetch-currentupdate.php"
+        "https://apiforcornershost.cubisysit.com/api/api-fetch-currentupdate.php"
       );
       setCurrentUpdate(response.data.data || []);
     } catch (error) {
@@ -138,7 +138,7 @@ const handleNavigation = () => {
     const fetchData = async () => {
       if (!item) return; // Exit if no item is provided
       try {
-        const apiUrl = `https://apiforcorners.cubisysit.com/api/api-singel-contacts.php?Cid=${item.Cid}`;
+        const apiUrl = `https://apiforcornershost.cubisysit.com/api/api-singel-contacts.php?Cid=${item.Cid}`;
 
         const response = await axios.get(apiUrl);
 
@@ -169,7 +169,7 @@ const handleNavigation = () => {
       Tid: item.Tid
     };
   
-    const url = "https://ideacafe-backend.vercel.app/api/proxy/api-insert-nextfollowup.php";
+    const url = "https://proxy-forcorners.vercel.app/api/proxy/api-insert-nextfollowup.php";
   
     try {
       const response = await axios.post(url, formDataWithTid, {

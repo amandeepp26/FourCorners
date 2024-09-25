@@ -52,7 +52,7 @@ const TodayPayment = ({ onItemClick, onCreate }) => {
     const userid = cookies.amr?.UserID || 'Role';
     try {
       const response = await axios.get(
-        `https://apiforcorners.cubisysit.com/api/api-fetch-todayereminder.php?UserID=${userid}`,
+        `https://apiforcornershost.cubisysit.com/api/api-fetch-todayereminder.php?UserID=${userid}`,
        
       );
       console.log("API Response:", response.data);

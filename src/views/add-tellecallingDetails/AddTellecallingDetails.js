@@ -124,7 +124,7 @@ const AddTellecallingDetails = ({
 
   useEffect(() => {
     axios
-      .get("https://apiforcorners.cubisysit.com/api/api-fetch-source.php")
+      .get("https://apiforcornershost.cubisysit.com/api/api-fetch-source.php")
       .then((response) => {
         if (response.data.status === "Success") {
           setSource(response.data.data);
@@ -137,7 +137,7 @@ const AddTellecallingDetails = ({
 
   useEffect(() => {
     axios
-      .get("https://apiforcorners.cubisysit.com/api/api-fetch-cid.php")
+      .get("https://apiforcornershost.cubisysit.com/api/api-fetch-cid.php")
       .then((response) => {
         if (response.data.status === "Success") {
           setCNames(response.data.data);
@@ -151,7 +151,7 @@ const AddTellecallingDetails = ({
   useEffect(() => {
     axios
       .get(
-        "https://apiforcorners.cubisysit.com/api/api-dropdown-estimatedbudget.php"
+        "https://apiforcornershost.cubisysit.com/api/api-dropdown-estimatedbudget.php"
       )
       .then((response) => {
         if (response.data.status === "Success") {
@@ -165,7 +165,7 @@ const AddTellecallingDetails = ({
 
   useEffect(() => {
     axios
-      .get("https://apiforcorners.cubisysit.com/api/api-fetch-leadstatus.php")
+      .get("https://apiforcornershost.cubisysit.com/api/api-fetch-leadstatus.php")
       .then((response) => {
         if (response.data.status === "Success") {
           setLeadStatus(response.data.data);
@@ -178,7 +178,7 @@ const AddTellecallingDetails = ({
 
   useEffect(() => {
     axios
-      .get("https://apiforcorners.cubisysit.com/api/api-fetch-usermaster.php")
+      .get("https://apiforcornershost.cubisysit.com/api/api-fetch-usermaster.php")
       .then((response) => {
         if (response.data.status === "Success") {
           setUserMaster(response.data.data);
@@ -192,7 +192,7 @@ const AddTellecallingDetails = ({
   const fetchDataBhk = async () => {
     try {
       const response = await axios.get(
-        "https://apiforcorners.cubisysit.com/api/api-fetch-unittype.php"
+        "https://apiforcornershost.cubisysit.com/api/api-fetch-unittype.php"
       );
       setBhkOptions(response.data.data || []);
     } catch (error) {
@@ -203,7 +203,7 @@ const AddTellecallingDetails = ({
   const fetchData = async () => {
     try {
       const response = await axios.get(
-        "https://apiforcorners.cubisysit.com/api/api-dropdown-projectmaster.php"
+        "https://apiforcornershost.cubisysit.com/api/api-dropdown-projectmaster.php"
       );
       setProjectTypes(response.data.data || []);
     } catch (error) {
@@ -214,7 +214,7 @@ const AddTellecallingDetails = ({
   // const fetchDataTellecalling = async () => {
   //   try {
   //     const response = await axios.get(
-  //       "https://apiforcorners.cubisysit.com/api/api-fetch-telecalling.php"
+  //       "https://apiforcornershost.cubisysit.com/api/api-fetch-telecalling.php"
   //     );
   //     setTellecallingID(response.data.data || []);
   //   } catch (error) {
@@ -225,7 +225,7 @@ const AddTellecallingDetails = ({
   const fetchDataTitle = async () => {
     try {
       const response = await axios.get(
-        "https://apiforcorners.cubisysit.com/api/api-fetch-titleprefix.php"
+        "https://apiforcornershost.cubisysit.com/api/api-fetch-titleprefix.php"
       );
       setTitles(response.data.data || []);
     } catch (error) {
@@ -384,8 +384,8 @@ const AddTellecallingDetails = ({
     event.preventDefault();
 
     const url = editData
-      ? "https://ideacafe-backend.vercel.app/api/proxy/api-update-telecalling.php"
-      : "https://ideacafe-backend.vercel.app/api/proxy/api-insert-telecalling.php";
+      ? "https://proxy-forcorners.vercel.app/api/proxy/api-update-telecalling.php"
+      : "https://proxy-forcorners.vercel.app/api/proxy/api-insert-telecalling.php";
 
     const dataToSend = {
       ...formData,

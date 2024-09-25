@@ -76,7 +76,7 @@ const Reciept = ({ bookingID }) => {
   const fetchData = async (bookingID) => {
     try {
       const response = await axios.get(
-        `https://apiforcorners.cubisysit.com/api/api-fetch-chequereceipt.php?BookingID=${bookingID}`
+        `https://apiforcornershost.cubisysit.com/api/api-fetch-chequereceipt.php?BookingID=${bookingID}`
       );
       console.log("Data fetched successfully", response.data);
       const responseData = response.data.data;

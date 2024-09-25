@@ -74,7 +74,7 @@ const TemplatePayment = ({ bookingID, handleCancel }) => {
   const fetchData = async (selectedFilter) => {
     try {
       const response = await axios.get(
-        `https://apiforcorners.cubisysit.com/api/api-fetch-projectbooking.php?BookingID=${bookingID}&filter=${selectedFilter}`
+        `https://apiforcornershost.cubisysit.com/api/api-fetch-projectbooking.php?BookingID=${bookingID}&filter=${selectedFilter}`
       );
       console.log("data aaya dekh<<<<<>>>>>>>>>>>>>", response.data);
       setData(response.data.data);

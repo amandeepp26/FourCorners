@@ -67,7 +67,7 @@ console.log(item , 'dekh bhai ');
   const fetchUserMasterData = async () => {
     try {
       const response = await axios.get(
-        "https://apiforcorners.cubisysit.com/api/api-fetch-useradmin.php"
+        "https://apiforcornershost.cubisysit.com/api/api-fetch-useradmin.php"
       );
       if (response.data.status === "Success") {
         setUserMaster(response.data.data);
@@ -87,7 +87,7 @@ console.log(item , 'dekh bhai ');
   const fetchDataCurrent = async () => {
     try {
       const response = await axios.get(
-        "https://apiforcorners.cubisysit.com/api/api-fetch-currentupdate.php"
+        "https://apiforcornershost.cubisysit.com/api/api-fetch-currentupdate.php"
       );
       setCurrentUpdate(response.data.data || []);
     } catch (error) {
@@ -132,7 +132,7 @@ console.log(item , 'dekh bhai ');
     const fetchData = async () => {
       if (!item) return; // Exit if no item is provided
       try {
-        const apiUrl = `https://apiforcorners.cubisysit.com/api/api-singel-mylead.php?Oid=${item.Oid}`;
+        const apiUrl = `https://apiforcornershost.cubisysit.com/api/api-singel-mylead.php?Oid=${item.Oid}`;
 
         const response = await axios.get(apiUrl);
 
@@ -168,7 +168,7 @@ console.log(item , 'dekh bhai ');
       Oid: item.Oid
     };
   
-    const url = "https://ideacafe-backend.vercel.app/api/proxy/api-insert-opportunityfollowup.php";
+    const url = "https://proxy-forcorners.vercel.app/api/proxy/api-insert-opportunityfollowup.php";
   
     try {
       const response = await axios.post(url, formDataWithNid, {
@@ -240,7 +240,7 @@ console.log(item , 'dekh bhai ');
     console.log(formData, "COVERT TO Booking Data 1");
 
     const url =
-      "https://ideacafe-backend.vercel.app/api/proxy/api-insert-convertbooking.php";
+      "https://proxy-forcorners.vercel.app/api/proxy/api-insert-convertbooking.php";
 
     try {
       const response = await axios.post(url, formData, {

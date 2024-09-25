@@ -98,7 +98,7 @@ const LoginPage = () => {
   
       axios
         .post(
-          "https://ideacafe-backend.vercel.app/api/proxy/api-login.php",
+          "https://proxy-forcorners.vercel.app/api/proxy/api-login.php",
           formData,
           {
             headers: {

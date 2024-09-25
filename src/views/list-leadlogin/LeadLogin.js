@@ -56,7 +56,7 @@ const LeadLogin = ({ setShowTabAccount }) => {
   const fetchData = async () => {
     try {
       const response = await axios.get(
-        "https://apiforcorners.cubisysit.com/api/api-fetch-usermaster.php"
+        "https://apiforcornershost.cubisysit.com/api/api-fetch-usermaster.php"
       );
       setRows(response.data.data || []);
       setLoading(false);
@@ -126,7 +126,7 @@ const LeadLogin = ({ setShowTabAccount }) => {
       };
 
       const response = await axios.post(
-        "https://ideacafe-backend.vercel.app/api/proxy/api-data-login.php",
+        "https://proxy-forcorners.vercel.app/api/proxy/api-data-login.php",
         formData,
         {
           headers: {

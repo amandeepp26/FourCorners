@@ -83,7 +83,7 @@ const AddEnquiryDetails = ({ show }) => {
 
     try {
       const response = await axios.post(
-        "https://ideacafe-backend.vercel.app/api/proxy/api-insert-enquirydetails.php",
+        "https://proxy-forcorners.vercel.app/api/proxy/api-insert-enquirydetails.php",
         body,
         {
           headers: {

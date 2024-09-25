@@ -72,7 +72,7 @@ const Addadditionalcharges = ({ show }) => {
 
     try {
       const response = await axios.post(
-        "https://ideacafe-backend.vercel.app/api/proxy/api-insert-additionalcharges.php",
+        "https://proxy-forcorners.vercel.app/api/proxy/api-insert-additionalcharges.php",
         body,
         {
           headers: {

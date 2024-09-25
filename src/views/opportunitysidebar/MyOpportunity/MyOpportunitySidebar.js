@@ -42,7 +42,7 @@ const MyOpportunitySidebar = ({ onItemClick, onCreate }) => {
   const fetchData = async () => {
     try {
       const response = await axios.get(
-        `https://apiforcorners.cubisysit.com/api/api-fetch-opportunitymylead.php?UserID=${userid}`,
+        `https://apiforcornershost.cubisysit.com/api/api-fetch-opportunitymylead.php?UserID=${userid}`,
     
       );
       console.log("API Response:", response.data);

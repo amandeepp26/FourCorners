@@ -102,7 +102,7 @@ const NotificationDropdown = ({
   const fetchDataBooking = async () => {
     try {
       const response = await axios.get(
-        `https://apiforcorners.cubisysit.com/api/api-fetch-convertbooking.php?UserID=${userid}`
+        `https://apiforcornershost.cubisysit.com/api/api-fetch-convertbooking.php?UserID=${userid}`
       );
       if (Array.isArray(response.data.data)) {
         const newNotificationsBooking = response.data.data;
@@ -123,7 +123,7 @@ const NotificationDropdown = ({
   const fetchData = async () => {
     try {
       const response = await axios.get(
-        `https://apiforcorners.cubisysit.com/api/api-fetch-notification.php`
+        `https://apiforcornershost.cubisysit.com/api/api-fetch-notification.php`
       );
       if (Array.isArray(response.data.data)) {
         const newNotifications = response.data.data;

@@ -77,7 +77,7 @@ const ModifyHistoryTemplate = ({ bookingID, onGoBack }) => {
   const fetchData = async () => {
     try {
       const response = await axios.get(
-        `https://apiforcorners.cubisysit.com/api/api-singel-historybooking.php?BookingID=${bookingID}`
+        `https://apiforcornershost.cubisysit.com/api/api-singel-historybooking.php?BookingID=${bookingID}`
       );
       console.log("data received:", response.data);
       setData(response.data.data.historybooking);

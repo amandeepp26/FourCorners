@@ -72,7 +72,7 @@ console.log(item , "not interestedddd dataa<<<<<<<<<<<<a");
   const fetchDataCurrent = async () => {
     try {
       const response = await axios.get(
-        "https://apiforcorners.cubisysit.com/api/api-fetch-currentupdate.php"
+        "https://apiforcornershost.cubisysit.com/api/api-fetch-currentupdate.php"
       );
       setCurrentUpdate(response.data.data || []);
     } catch (error) {
@@ -103,7 +103,7 @@ console.log(item , "not interestedddd dataa<<<<<<<<<<<<a");
   console.log(formData , 'data aagaya');
     try {
       const response = await axios.post(
-        "https://ideacafe-backend.vercel.app/api/proxy/api-insert-convertolead.php",
+        "https://proxy-forcorners.vercel.app/api/proxy/api-insert-convertolead.php",
         formData, // Corrected: formData should be passed as the second argument
         {
           headers: {
@@ -154,7 +154,7 @@ console.log(item , "not interestedddd dataa<<<<<<<<<<<<a");
     const fetchData = async () => {
       if (!item) return; // Exit if no item is provided
       try {
-        const apiUrl = `https://apiforcorners.cubisysit.com/api/api-singel-mylead.php?Nid=${item.Nid}`;
+        const apiUrl = `https://apiforcornershost.cubisysit.com/api/api-singel-mylead.php?Nid=${item.Nid}`;
 
         const response = await axios.get(apiUrl);
 
@@ -186,7 +186,7 @@ console.log(item , "not interestedddd dataa<<<<<<<<<<<<a");
     };
 
     const url =
-      "https://ideacafe-backend.vercel.app/api/proxy/api-insert-nextfollowup.php";
+      "https://proxy-forcorners.vercel.app/api/proxy/api-insert-nextfollowup.php";
 
     try {
       const response = await axios.post(url, formDataWithNid, {

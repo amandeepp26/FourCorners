@@ -60,7 +60,7 @@ const AddUser = ({ show, editData, fetchDataUser }) => {
 
   useEffect(() => {
     axios
-      .get("https://apiforcorners.cubisysit.com/api/api-dropdown-userrolemaster.php")
+      .get("https://apiforcornershost.cubisysit.com/api/api-dropdown-userrolemaster.php")
       .then((response) => {
         if (response.data.status === "Success") {
           setDesignation(response.data.data);
@@ -75,8 +75,8 @@ const AddUser = ({ show, editData, fetchDataUser }) => {
     event.preventDefault();
 
     const url = editData
-      ? "https://ideacafe-backend.vercel.app/api/proxy/api-update-usermaster.php"
-      : "https://ideacafe-backend.vercel.app/api/proxy/api-insert-usermaster.php";
+      ? "https://proxy-forcorners.vercel.app/api/proxy/api-update-usermaster.php"
+      : "https://proxy-forcorners.vercel.app/api/proxy/api-insert-usermaster.php";
 
 
       console.log(formState , 'see this');

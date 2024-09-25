@@ -161,7 +161,7 @@ const AddOpportunityDetails = ({
     if (formData.CityID) {
       axios
         .get(
-          "https://apiforcorners.cubisysit.com/api/api-fetch-locationmaster.php",
+          "https://apiforcornershost.cubisysit.com/api/api-fetch-locationmaster.php",
           {
             params: { CityID: formData.CityID },
           }
@@ -179,7 +179,7 @@ const AddOpportunityDetails = ({
 
   useEffect(() => {
     axios
-      .get("https://apiforcorners.cubisysit.com/api/api-fetch-usermaster.php")
+      .get("https://apiforcornershost.cubisysit.com/api/api-fetch-usermaster.php")
       .then((response) => {
         if (response.data.status === "Success") {
           setUserMaster(response.data.data);
@@ -195,31 +195,31 @@ const AddOpportunityDetails = ({
     const fetchData = async () => {
       try {
         const lookingForRes = await axios.get(
-          "https://apiforcorners.cubisysit.com/api/api-fetch-lookingtype.php"
+          "https://apiforcornershost.cubisysit.com/api/api-fetch-lookingtype.php"
         );
         const estimatedBudgetsRes = await axios.get(
-          "https://apiforcorners.cubisysit.com/api/api-dropdown-estimatedbudget.php"
+          "https://apiforcornershost.cubisysit.com/api/api-dropdown-estimatedbudget.php"
         );
         const citiesRes = await axios.get(
-          "https://apiforcorners.cubisysit.com/api/api-fetch-citymaster.php"
+          "https://apiforcornershost.cubisysit.com/api/api-fetch-citymaster.php"
         );
         const unitsRes = await axios.get(
-          "https://apiforcorners.cubisysit.com/api/api-fetch-unittype.php"
+          "https://apiforcornershost.cubisysit.com/api/api-fetch-unittype.php"
         );
         const scalesRes = await axios.get(
-          "https://apiforcorners.cubisysit.com/api/api-fetch-scale.php"
+          "https://apiforcornershost.cubisysit.com/api/api-fetch-scale.php"
         );
         const propertyAgesRes = await axios.get(
-          "https://apiforcorners.cubisysit.com/api/api-fetch-propertyage.php"
+          "https://apiforcornershost.cubisysit.com/api/api-fetch-propertyage.php"
         );
         const purposesRes = await axios.get(
-          "https://apiforcorners.cubisysit.com/api/api-fetch-purpose.php"
+          "https://apiforcornershost.cubisysit.com/api/api-fetch-purpose.php"
         );
         const contactsRes = await axios.get(
-          `https://apiforcorners.cubisysit.com/api/api-fetch-convtooppo.php?UserID=${userid}`
+          `https://apiforcornershost.cubisysit.com/api/api-fetch-convtooppo.php?UserID=${userid}`
         );
         const sourcesRes = await axios.get(
-          "https://apiforcorners.cubisysit.com/api/api-fetch-source.php"
+          "https://apiforcornershost.cubisysit.com/api/api-fetch-source.php"
         );
 
         setLookingForOptions(lookingForRes.data.data);
@@ -247,7 +247,7 @@ const AddOpportunityDetails = ({
   //   setLoading(true);
   //   try {
   //     const response = await axios.get(
-  //       "https://apiforcorners.cubisysit.com/api/api-fetch-opportunity.php"
+  //       "https://apiforcornershost.cubisysit.com/api/api-fetch-opportunity.php"
   //     );
   //     setRows(response.data.data || []);
   //   } catch (error) {
@@ -272,7 +272,7 @@ const AddOpportunityDetails = ({
 
     axios
       .get(
-        `https://apiforcorners.cubisysit.com/api/api-fetch-sourcetype.php?SourceID=${selectedSourceId}`
+        `https://apiforcornershost.cubisysit.com/api/api-fetch-sourcetype.php?SourceID=${selectedSourceId}`
       )
       .then((response) => {
         setSourceTypes(response.data.data);
@@ -340,8 +340,8 @@ const AddOpportunityDetails = ({
 
     const payload = createPayload();
     const url = editData
-      ? "https://ideacafe-backend.vercel.app/api/proxy/api-update-opportunity.php"
-      : "https://ideacafe-backend.vercel.app/api/proxy/api-insert-opportunity.php";
+      ? "https://proxy-forcorners.vercel.app/api/proxy/api-update-opportunity.php"
+      : "https://proxy-forcorners.vercel.app/api/proxy/api-insert-opportunity.php";
 
     try {
       const response = await axios.post(url, payload, {

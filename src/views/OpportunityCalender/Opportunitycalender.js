@@ -24,7 +24,7 @@ const Opportunitycalender = () => {
       const userid = cookies.amr?.UserID || 'Role';
       try {
         const response = await fetch(
-          `https://apiforcorners.cubisysit.com/api/api-fetch-opportunityfollowup.php?UserID=${userid}`
+          `https://apiforcornershost.cubisysit.com/api/api-fetch-opportunityfollowup.php?UserID=${userid}`
         );
         const result = await response.json();
         if (result.code === 200) {
@@ -86,7 +86,7 @@ const Opportunitycalender = () => {
   async function fetchAppointmentDetails(fid) {
     try {
       const response = await fetch(
-        `https://ideacafe-backend.vercel.app/api/proxy/api-singel-oppocalender.php?fid=${fid}`
+        `https://proxy-forcorners.vercel.app/api/proxy/api-singel-oppocalender.php?fid=${fid}`
       );
       const result = await response.json();
       if (result.code === 200) {

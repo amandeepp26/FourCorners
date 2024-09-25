@@ -40,7 +40,7 @@ const StatisticsCard = () => {
       setLoading(true);
       try {
         const response = await fetch(
-          `https://apiforcorners.cubisysit.com/api/api-graph-admin.php?UserID=${userid}`
+          `https://apiforcornershost.cubisysit.com/api/api-graph-admin.php?UserID=${userid}`
         );
         if (!response.ok) {
           throw new Error("Network response was not ok");

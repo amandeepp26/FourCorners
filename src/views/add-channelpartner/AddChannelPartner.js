@@ -82,7 +82,7 @@ const AddChannelPartner = ({ show }) => {
   const fetchData = async () => {
     try {
       const response = await axios.get(
-        "https://apiforcorners.cubisysit.com/api/api-fetch-subprojectdetails.php"
+        "https://apiforcornershost.cubisysit.com/api/api-fetch-subprojectdetails.php"
       );
       console.log("API Response:", response.data);
       setRows(response.data.data || []);
@@ -96,7 +96,7 @@ const AddChannelPartner = ({ show }) => {
 
   useEffect(() => {
     axios
-      .get("https://apiforcorners.cubisysit.com/api/api-fetch-citymaster.php")
+      .get("https://apiforcornershost.cubisysit.com/api/api-fetch-citymaster.php")
       .then((response) => {
         if (response.data.status === "Success") {
           console.log(response.data.data, "DATAA AAGAYAAAAAAAAAA");
@@ -110,7 +110,7 @@ const AddChannelPartner = ({ show }) => {
 
   useEffect(() => {
     axios
-      .get("https://apiforcorners.cubisysit.com/api/api-fetch-statemaster.php")
+      .get("https://apiforcornershost.cubisysit.com/api/api-fetch-statemaster.php")
       .then((response) => {
         if (response.data.status === "Success") {
           setStates(response.data.data);
@@ -125,7 +125,7 @@ const AddChannelPartner = ({ show }) => {
 
   useEffect(() => {
     axios
-      .get("https://apiforcorners.cubisysit.com/api/api-fetch-companystatus.php")
+      .get("https://apiforcornershost.cubisysit.com/api/api-fetch-companystatus.php")
       .then((response) => {
         if (response.data.status === "Success") {
           console.log(response.data.data , 'dataa aayaaaa');
@@ -193,7 +193,7 @@ const AddChannelPartner = ({ show }) => {
 
     try {
       const response = await axios.post(
-        "https://ideacafe-backend.vercel.app/api/proxy/api-insert-chanelpartner.php",
+        "https://proxy-forcorners.vercel.app/api/proxy/api-insert-chanelpartner.php",
         body,
         {
           headers: {

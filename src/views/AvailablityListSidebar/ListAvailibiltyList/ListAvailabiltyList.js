@@ -38,7 +38,7 @@ const ListAvailabiltyList = ({ item }) => {
     const fetchData = async () => {
       if (!item) return;
       try {
-        const apiUrl = `https://apiforcorners.cubisysit.com/api/api-fetch-projectwings.php?ProjectID=${item.ProjectID}`;
+        const apiUrl = `https://apiforcornershost.cubisysit.com/api/api-fetch-projectwings.php?ProjectID=${item.ProjectID}`;
         const response = await axios.get(apiUrl);
         if (response.data.status === "Success") {
           setWings(response.data.data);
@@ -53,7 +53,7 @@ const ListAvailabiltyList = ({ item }) => {
   const handleWingClick = async (wing) => {
     try {
       setLoading(true);
-      const apiUrl = `https://apiforcorners.cubisysit.com/api/api-fetch-avilability.php?WingID=${wing.WingID}&ProjectID=${item.ProjectID}`;
+      const apiUrl = `https://apiforcornershost.cubisysit.com/api/api-fetch-avilability.php?WingID=${wing.WingID}&ProjectID=${item.ProjectID}`;
       const response = await axios.get(apiUrl);
 
       if (response.data.status === "Success") {
@@ -106,7 +106,7 @@ const ListAvailabiltyList = ({ item }) => {
   const fetchSkuOptions = async () => {
     try {
       const response = await axios.get(
-        "https://apiforcorners.cubisysit.com/api/api-singel-projectskuid.php"
+        "https://apiforcornershost.cubisysit.com/api/api-singel-projectskuid.php"
       );
       if (response.data.status === "Success") {
         setSkuOptions(response.data.data);
@@ -151,7 +151,7 @@ const ListAvailabiltyList = ({ item }) => {
     if (result.isConfirmed) {
       try {
         const response = await axios.post(
-          "https://ideacafe-backend.vercel.app/api/proxy/api-update-projectsku.php",
+          "https://proxy-forcorners.vercel.app/api/proxy/api-update-projectsku.php",
           requestData
         );
   

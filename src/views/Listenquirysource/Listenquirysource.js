@@ -62,7 +62,7 @@ const Listenquirysource = ({ rows, onEdit, onDelete }) => {
 
   useEffect(() => {
     axios
-      .get("https://apiforcorners.cubisysit.com/api/api-dropdown-projectinfo.php")
+      .get("https://apiforcornershost.cubisysit.com/api/api-dropdown-projectinfo.php")
       .then((response) => {
         if (response.data.status === "Success") {
           setProjectMaster(response.data.data);
@@ -76,7 +76,7 @@ const Listenquirysource = ({ rows, onEdit, onDelete }) => {
   useEffect(() => {
     if (formData.ProjectID) {
       axios
-        .get(`https://apiforcorners.cubisysit.com/api/api-fetch-projectwings.php?ProjectID=${formData.ProjectID}`)
+        .get(`https://apiforcornershost.cubisysit.com/api/api-fetch-projectwings.php?ProjectID=${formData.ProjectID}`)
         .then((response) => {
           if (response.data.status === "Success") {
             setWingData(response.data.data);
@@ -95,7 +95,7 @@ const Listenquirysource = ({ rows, onEdit, onDelete }) => {
         WingID: formData.WingID,
       });
       const response = await fetch(
-        `https://apiforcorners.cubisysit.com/api/api-fetch-projectroom.php?${params}`
+        `https://apiforcornershost.cubisysit.com/api/api-fetch-projectroom.php?${params}`
       );
 
       if (!response.ok) {

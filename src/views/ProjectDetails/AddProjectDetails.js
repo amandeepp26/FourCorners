@@ -66,7 +66,7 @@ const AddProjectDetails = ({ show, editData }) => {
   useEffect(() => {
     axios
       .get(
-        "https://apiforcorners.cubisysit.com/api/api-fetch-companymaster.php"
+        "https://apiforcornershost.cubisysit.com/api/api-fetch-companymaster.php"
       )
       .then((response) => {
         if (response.data.status === "Success") {
@@ -84,7 +84,7 @@ const AddProjectDetails = ({ show, editData }) => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          "https://apiforcorners.cubisysit.com/api/api-dropdown-projectmaster.php"
+          "https://apiforcornershost.cubisysit.com/api/api-dropdown-projectmaster.php"
         );
         setProjectTypes(response.data.data || []);
       } catch (error) {
@@ -95,7 +95,7 @@ const AddProjectDetails = ({ show, editData }) => {
   }, []);
 
   useEffect(() => {
-    axios.get('https://apiforcorners.cubisysit.com/api/api-fetch-amenities.php')
+    axios.get('https://apiforcornershost.cubisysit.com/api/api-fetch-amenities.php')
       .then(response => {
         if (response.data.status === 'Success') {
           setAmenities(response.data.data);
@@ -171,8 +171,8 @@ const AddProjectDetails = ({ show, editData }) => {
     }
 
     const url = editData
-      ? "https://ideacafe-backend.vercel.app/api/proxy/api-update-projectmaster.php"
-      : "https://ideacafe-backend.vercel.app/api/proxy/api-insert-projectdetails.php";
+      ? "https://proxy-forcorners.vercel.app/api/proxy/api-update-projectmaster.php"
+      : "https://proxy-forcorners.vercel.app/api/proxy/api-insert-projectdetails.php";
 
     axios
       .post(url, formDataToSubmit, {

@@ -68,7 +68,7 @@ console.log(item  , 'aagaya dataa oid ');
   const fetchDataCurrent = async () => {
     try {
       const response = await axios.get(
-        "https://apiforcorners.cubisysit.com/api/api-fetch-currentupdate.php"
+        "https://apiforcornershost.cubisysit.com/api/api-fetch-currentupdate.php"
       );
       setCurrentUpdate(response.data.data || []);
     } catch (error) {
@@ -80,7 +80,7 @@ console.log(item  , 'aagaya dataa oid ');
     const fetchData = async () => {
       if (!item) return;
       try {
-        const apiUrl = `https://apiforcorners.cubisysit.com/api/api-singel-opportunityfollowup.php?Oid=${item.Oid}`;
+        const apiUrl = `https://apiforcornershost.cubisysit.com/api/api-singel-opportunityfollowup.php?Oid=${item.Oid}`;
         const response = await axios.get(apiUrl);
         if (response.data.status === 'Success') {
           console.log(response.data , 'history checkkk karrr<<<<<<>>>>>>');
@@ -115,7 +115,7 @@ console.log(item  , 'aagaya dataa oid ');
       ...formData,
       Oid: item.Oid
     };
-    const url = "https://ideacafe-backend.vercel.app/api/proxy/api-insert-opportunityfollowup.php";
+    const url = "https://proxy-forcorners.vercel.app/api/proxy/api-insert-opportunityfollowup.php";
     try {
       const response = await axios.post(url, formDataWithOid, {
         headers: {

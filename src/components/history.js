@@ -64,7 +64,7 @@ const HistoryComponent = ({ item, type }) => {
         debugger;
         if (!item) return;
         try {
-            const apiUrl = type == "sales" ? `https://apiforcorners.cubisysit.com/api/api-singel-opportunityfollowup.php?Oid=${item}` :  `https://apiforcorners.cubisysit.com/api/api-fetch-nextfollowup.php?Tid=${item}`;
+            const apiUrl = type == "sales" ? `https://apiforcornershost.cubisysit.com/api/api-singel-opportunityfollowup.php?Oid=${item}` :  `https://apiforcornershost.cubisysit.com/api/api-fetch-nextfollowup.php?Tid=${item}`;
             const response = await axios.get(apiUrl);
             if (response.data.status === 'Success') {
 

@@ -34,7 +34,7 @@ const UploadExcel = ({ show, rowData }) => {
   // Fetch project data on component mount
   useEffect(() => {
     axios
-      .get("https://apiforcorners.cubisysit.com/api/api-dropdown-projectinfo.php")
+      .get("https://apiforcornershost.cubisysit.com/api/api-dropdown-projectinfo.php")
       .then(response => {
         if (response.data.status === "Success") {
           setProjectMaster(response.data.data);
@@ -47,7 +47,7 @@ const UploadExcel = ({ show, rowData }) => {
   useEffect(() => {
     if (formData.ProjectID) {
       axios
-        .get(`https://apiforcorners.cubisysit.com/api/api-fetch-projectwings.php?ProjectID=${formData.ProjectID}`)
+        .get(`https://apiforcornershost.cubisysit.com/api/api-fetch-projectwings.php?ProjectID=${formData.ProjectID}`)
         .then(response => {
           if (response.data.status === "Success") {
             setWingData(response.data.data);
@@ -113,7 +113,7 @@ const UploadExcel = ({ show, rowData }) => {
     Object.keys(formData).forEach(key => formDataFile.append(key, formData[key]));
     
     handleFormSubmit(
-      "https://apiforcorners.cubisysit.com/api/api-excel-parking.php",
+      "https://apiforcornershost.cubisysit.com/api/api-excel-parking.php",
       formDataFile,
       setLoading
     );
@@ -131,7 +131,7 @@ const UploadExcel = ({ show, rowData }) => {
     Object.keys(formData).forEach(key => formDataFile.append(key, formData[key]));
 
     handleFormSubmit(
-      "https://apiforcorners.cubisysit.com/api/api-update-projectroomexcel.php",
+      "https://apiforcornershost.cubisysit.com/api/api-update-projectroomexcel.php",
       formDataFile,
       setLoadingEdit
     );

@@ -23,7 +23,7 @@ const ListStampDuty = () => {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get('https://apiforcorners.cubisysit.com/api/api-fetch-stampdutymaster.php');
+      const response = await axios.get('https://apiforcornershost.cubisysit.com/api/api-fetch-stampdutymaster.php');
       console.log('API Response:', response.data);
       setRows(response.data.data || []);
       setLoading(false);

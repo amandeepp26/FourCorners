@@ -167,7 +167,7 @@ const FormRosenagar = ({ onFormSubmitSuccess, show, editData }) => {
   const fetchDataTitle = async () => {
     try {
       const response = await axios.get(
-        "https://apiforcorners.cubisysit.com/api/api-fetch-titleprefix.php"
+        "https://apiforcornershost.cubisysit.com/api/api-fetch-titleprefix.php"
       );
       setTitles(response.data.data || []);
     } catch (error) {
@@ -392,7 +392,7 @@ const FormRosenagar = ({ onFormSubmitSuccess, show, editData }) => {
     if (formData.WingID) {
       axios
         .get(
-          `https://apiforcorners.cubisysit.com/api/api-booking-floor.php?WingID=${formData.WingID}`
+          `https://apiforcornershost.cubisysit.com/api/api-booking-floor.php?WingID=${formData.WingID}`
         )
         .then((response) => {
           if (response.data.status === "Success") {
@@ -410,7 +410,7 @@ const FormRosenagar = ({ onFormSubmitSuccess, show, editData }) => {
     const fetchAmountTypes = async () => {
       try {
         const response = await axios.get(
-          "https://apiforcorners.cubisysit.com/api/api-dropdown-amountype.php"
+          "https://apiforcornershost.cubisysit.com/api/api-dropdown-amountype.php"
         );
         setAmountTypes(response.data.data);
         setLoading(false);
@@ -426,7 +426,7 @@ const FormRosenagar = ({ onFormSubmitSuccess, show, editData }) => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          "https://apiforcorners.cubisysit.com/api/api-fetch-usersales.php"
+          "https://apiforcornershost.cubisysit.com/api/api-fetch-usersales.php"
         );
         if (response.data && response.data.data) {
           setBookedByOptions(response.data.data); // Use response.data.data to set the options
@@ -442,7 +442,7 @@ const FormRosenagar = ({ onFormSubmitSuccess, show, editData }) => {
   }, []);
   useEffect(() => {
     axios
-      .get("https://apiforcorners.cubisysit.com/api/api-fetch-bookingtype.php")
+      .get("https://apiforcornershost.cubisysit.com/api/api-fetch-bookingtype.php")
       .then((response) => {
         if (response.data.status === "Success") {
           setBookingTypes(response.data.data);
@@ -456,7 +456,7 @@ const FormRosenagar = ({ onFormSubmitSuccess, show, editData }) => {
   useEffect(() => {
     axios
       .get(
-        "https://apiforcorners.cubisysit.com/api/api-dropdown-projectinfo.php"
+        "https://apiforcornershost.cubisysit.com/api/api-dropdown-projectinfo.php"
       )
       .then((response) => {
         if (response.data.status === "Success") {
@@ -472,7 +472,7 @@ const FormRosenagar = ({ onFormSubmitSuccess, show, editData }) => {
     if (formData.ProjectID) {
       axios
         .get(
-          `https://apiforcorners.cubisysit.com/api/api-fetch-projectwings.php?ProjectID=${formData.ProjectID}`
+          `https://apiforcornershost.cubisysit.com/api/api-fetch-projectwings.php?ProjectID=${formData.ProjectID}`
         )
         .then((response) => {
           if (response.data.status === "Success") {
@@ -489,7 +489,7 @@ const FormRosenagar = ({ onFormSubmitSuccess, show, editData }) => {
     if (formData.ProjectID) {
       axios
         .get(
-          `https://apiforcorners.cubisysit.com/api/api-fetch-parking.php?ProjectID=${formData.ProjectID}`
+          `https://apiforcornershost.cubisysit.com/api/api-fetch-parking.php?ProjectID=${formData.ProjectID}`
         )
         .then((response) => {
           if (response.data.status === "Success") {
@@ -507,7 +507,7 @@ const FormRosenagar = ({ onFormSubmitSuccess, show, editData }) => {
     if (formData.WingID && formData.ProjectID && formData.FloorNo) {
       axios
         .get(
-          `https://apiforcorners.cubisysit.com/api/api-booking-flat.php?WingID=${formData.WingID}&ProjectID=${formData.ProjectID}&FloorNo=${formData.FloorNo}`
+          `https://apiforcornershost.cubisysit.com/api/api-booking-flat.php?WingID=${formData.WingID}&ProjectID=${formData.ProjectID}&FloorNo=${formData.FloorNo}`
         )
         .then((response) => {
           if (response.data.status === "Success") {
@@ -531,7 +531,7 @@ const FormRosenagar = ({ onFormSubmitSuccess, show, editData }) => {
     ) {
       axios
         .get(
-          `https://apiforcorners.cubisysit.com/api/api-booking-area.php?ProjectID=${formData.ProjectID}&WingID=${formData.WingID}&FloorNo=${formData.FloorNo}&FlatNo=${formData.FlatNo}&UnittypeID=${formData.UnittypeID}`
+          `https://apiforcornershost.cubisysit.com/api/api-booking-area.php?ProjectID=${formData.ProjectID}&WingID=${formData.WingID}&FloorNo=${formData.FloorNo}&FlatNo=${formData.FlatNo}&UnittypeID=${formData.UnittypeID}`
         )
         .then((response) => {
           if (response.data.status === "Success") {
@@ -562,7 +562,7 @@ const FormRosenagar = ({ onFormSubmitSuccess, show, editData }) => {
     const fetchUnitTypeData = async () => {
       try {
         const response = await axios.get(
-          `https://apiforcorners.cubisysit.com/api/api-booking-type.php`,
+          `https://apiforcornershost.cubisysit.com/api/api-booking-type.php`,
 
           {
             params: {
@@ -598,7 +598,7 @@ const FormRosenagar = ({ onFormSubmitSuccess, show, editData }) => {
 
     axios
       .get(
-        `https://apiforcorners.cubisysit.com/api/api-fetch-convertbooking.php?UserID=${userid}`
+        `https://apiforcornershost.cubisysit.com/api/api-fetch-convertbooking.php?UserID=${userid}`
       )
       .then((response) => {
         if (response.data.status === "Success") {
@@ -624,8 +624,8 @@ const FormRosenagar = ({ onFormSubmitSuccess, show, editData }) => {
     event.preventDefault();
 
     const url = editData
-      ? "https://ideacafe-backend.vercel.app/api/proxy/api-update-telecalling.php"
-      : "https://ideacafe-backend.vercel.app/api/proxy/api-insert-projectbooking.php";
+      ? "https://proxy-forcorners.vercel.app/api/proxy/api-update-telecalling.php"
+      : "https://proxy-forcorners.vercel.app/api/proxy/api-insert-projectbooking.php";
 
     const formattedRemarks = remarks.map((remark, index) => ({
       ...remark,
@@ -711,7 +711,7 @@ const FormRosenagar = ({ onFormSubmitSuccess, show, editData }) => {
     setSelectedCid(selectedCid);
 
     try {
-      const apiUrl = `https://apiforcorners.cubisysit.com/api/api-singel-convertbooking.php?Cid=${selectedCid}`;
+      const apiUrl = `https://apiforcornershost.cubisysit.com/api/api-singel-convertbooking.php?Cid=${selectedCid}`;
       const response = await axios.get(apiUrl);
 
       if (response.data.status === "Success") {

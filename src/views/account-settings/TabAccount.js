@@ -63,8 +63,8 @@ const TabAccount = ({ show, editData }) => {
       };
 
       const apiUrl = editData
-        ? "https://ideacafe-backend.vercel.app/api/proxy/api-update-companymaster.php"
-        : "https://ideacafe-backend.vercel.app/api/proxy/api-insert-companymaster.php";
+        ? "https://proxy-forcorners.vercel.app/api/proxy/api-update-companymaster.php"
+        : "https://proxy-forcorners.vercel.app/api/proxy/api-insert-companymaster.php";
 
       axios
         .post(apiUrl, { ...formData, CompanyID: editData?.CompanyID }, {

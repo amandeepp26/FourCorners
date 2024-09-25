@@ -37,7 +37,7 @@ const AddStampDuty = ({ show }) => {
   const fetchData = async () => {
     try {
       const response = await axios.get(
-        "https://apiforcorners.cubisysit.com/api/api-fetch-subprojectdetails.php"
+        "https://apiforcornershost.cubisysit.com/api/api-fetch-subprojectdetails.php"
       );
       console.log("API Response:", response.data);
     } catch (error) {
@@ -66,7 +66,7 @@ const AddStampDuty = ({ show }) => {
 
     try {
       const response = await axios.post(
-        "https://ideacafe-backend.vercel.app/api/proxy/api-insert-stampdutymaster.php",
+        "https://proxy-forcorners.vercel.app/api/proxy/api-insert-stampdutymaster.php",
         body,
         {
           headers: {

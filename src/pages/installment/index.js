@@ -16,7 +16,7 @@ const Installment = () => {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get('https://apiforcorners.cubisysit.com/api/api-fetch-installmentdetails.php');
+      const response = await axios.get('https://apiforcornershost.cubisysit.com/api/api-fetch-installmentdetails.php');
       console.log('API Response:', response.data);
       setRows(response.data.data || []);
       setLoading(false);
@@ -38,7 +38,7 @@ const Installment = () => {
     console.log(id, 'id aayaaaaaaa');
     debugger;
     try {
-      const response = await axios.post('https://ideacafe-backend.vercel.app/api/proxy/api-delete-installmentdetails.php', {
+      const response = await axios.post('https://proxy-forcorners.vercel.app/api/proxy/api-delete-installmentdetails.php', {
         InstallmentID: id,
         DeleteUID: 1
      

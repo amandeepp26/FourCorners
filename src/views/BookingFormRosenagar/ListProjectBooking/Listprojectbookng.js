@@ -139,7 +139,7 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
     const fetchData = async () => {
       if (!item) return;
       try {
-        const apiUrl = `https://apiforcorners.cubisysit.com/api/api-fetch-projectwings.php?ProjectID=${item.ProjectID}`;
+        const apiUrl = `https://apiforcornershost.cubisysit.com/api/api-fetch-projectwings.php?ProjectID=${item.ProjectID}`;
         const response = await axios.get(apiUrl);
         if (response.data.status === "Success") {
           setWings(response.data.data);
@@ -154,7 +154,7 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
   useEffect(() => {
     axios
       .get(
-        "https://apiforcorners.cubisysit.com/api/api-dropdown-paymenttype.php"
+        "https://apiforcornershost.cubisysit.com/api/api-dropdown-paymenttype.php"
       )
       .then((response) => {
         if (response.data.code === 200) {
@@ -176,7 +176,7 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
     const fetchAmountTypes = async () => {
       try {
         const response = await axios.get(
-          "https://apiforcorners.cubisysit.com/api/api-dropdown-amountype.php"
+          "https://apiforcornershost.cubisysit.com/api/api-dropdown-amountype.php"
         );
         setAmountTypes(response.data.data);
         setLoading(false);
@@ -192,7 +192,7 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
   const handleWingClick = async (wing) => {
     try {
       setLoading(true);
-      const apiUrl = `https://apiforcorners.cubisysit.com/api/api-fetch-wing.php?WingID=${wing.WingID}&ProjectID=${item.ProjectID}`;
+      const apiUrl = `https://apiforcornershost.cubisysit.com/api/api-fetch-wing.php?WingID=${wing.WingID}&ProjectID=${item.ProjectID}`;
       const response = await axios.get(apiUrl);
       if (response.data.status === "Success") {
         console.log(response.data, "wing dataaaaaaa,<<<<<<<<<<<<>>>>>>>>>>>>>...");
@@ -249,7 +249,7 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
     setTotalCost(0); // Assuming TotalCost needs to be reset
     try {
       const response = await axios.get(
-        `https://apiforcorners.cubisysit.com/api/api-dropdown-bookingremark.php?BookingID=${bookingID}`
+        `https://apiforcornershost.cubisysit.com/api/api-dropdown-bookingremark.php?BookingID=${bookingID}`
       );
       if (response.data.status === "Success") {
         console.log(response.data.data, "aagaya daata remakrs");
@@ -270,7 +270,7 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
   const fetchBookingRemarkDetails = async (bookingRemarkID) => {
     try {
       const response = await axios.get(
-        `https://apiforcorners.cubisysit.com/api/api-dropdown-bookingremarkdetails.php?BookingremarkID=${bookingRemarkID}`
+        `https://apiforcornershost.cubisysit.com/api/api-dropdown-bookingremarkdetails.php?BookingremarkID=${bookingRemarkID}`
       );
       if (response.data.status === "Success") {
         setBookingRemarkDetails(response.data.data[0]);
@@ -475,7 +475,7 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
   const handleDateSearch = async () => {
     try {
       const response = await axios.get(
-        `https://ideacafe-backend.vercel.app/api/proxy/api-fetch-paymentreceived.php`,
+        `https://proxy-forcorners.vercel.app/api/proxy/api-fetch-paymentreceived.php`,
         {
           params: {
             BookingID: bookingID,
@@ -560,7 +560,7 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
   
     try {
       const response = await axios.post(
-        "https://ideacafe-backend.vercel.app/api/proxy/api-insert-payment.php",
+        "https://proxy-forcorners.vercel.app/api/proxy/api-insert-payment.php",
         payload
       );
       console.log('API Response:', response.data);

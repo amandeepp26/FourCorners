@@ -21,7 +21,7 @@ const TypographyPage = () => {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get('https://apiforcorners.cubisysit.com/api/api-fetch-projectdetails.php');
+      const response = await axios.get('https://apiforcornershost.cubisysit.com/api/api-fetch-projectdetails.php');
       console.log('API Response:', response.data);
       setRows(response.data.data || []);
       setLoading(false);

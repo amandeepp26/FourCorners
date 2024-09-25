@@ -25,7 +25,7 @@ const ListProjectFinance = ({ setShowTabAccount }) => {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get('https://apiforcorners.cubisysit.com/api/api-fetch-projectfinanceapprovals.php');
+      const response = await axios.get('https://apiforcornershost.cubisysit.com/api/api-fetch-projectfinanceapprovals.php');
       console.log('API Response:', response.data);
       setRows(response.data.data || []);
       setLoading(false);
@@ -47,7 +47,7 @@ const ListProjectFinance = ({ setShowTabAccount }) => {
 
   const handleDelete = async (financeID) => {
     try {
-      const response = await axios.post('https://apiforcorners.cubisysit.com/api/api-delete-projectfinanceapprovals.php', {
+      const response = await axios.post('https://apiforcornershost.cubisysit.com/api/api-delete-projectfinanceapprovals.php', {
         ProjectFinanceID: financeID,
         DeleteUID: 1,
       });

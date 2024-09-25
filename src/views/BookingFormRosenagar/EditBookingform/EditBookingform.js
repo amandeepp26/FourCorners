@@ -127,7 +127,7 @@ const EditBookingform = ({ show, bookingID, goBack , handleCloseEditForm}) => {
 
     try {
       const response = await axios.get(
-        `https://apiforcorners.cubisysit.com/api/api-edit-projectbooking.php?BookingID=${bookingID}`
+        `https://apiforcornershost.cubisysit.com/api/api-edit-projectbooking.php?BookingID=${bookingID}`
       );
       console.log("Data received:<<<<<>>>>>>>>", response.data);
       const res = response.data.data;
@@ -387,7 +387,7 @@ const EditBookingform = ({ show, bookingID, goBack , handleCloseEditForm}) => {
     if (formData.WingID) {
       axios
         .get(
-          `https://apiforcorners.cubisysit.com/api/api-booking-floor.php?WingID=${formData.WingID}`
+          `https://apiforcornershost.cubisysit.com/api/api-booking-floor.php?WingID=${formData.WingID}`
         )
         .then((response) => {
           if (response.data.status === "Success") {
@@ -405,7 +405,7 @@ const EditBookingform = ({ show, bookingID, goBack , handleCloseEditForm}) => {
     const fetchAmountTypes = async () => {
       try {
         const response = await axios.get(
-          "https://apiforcorners.cubisysit.com/api/api-dropdown-amountype.php"
+          "https://apiforcornershost.cubisysit.com/api/api-dropdown-amountype.php"
         );
         setAmountTypes(response.data.data);
         setLoading(false);
@@ -421,7 +421,7 @@ const EditBookingform = ({ show, bookingID, goBack , handleCloseEditForm}) => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          "https://apiforcorners.cubisysit.com/api/api-fetch-usersales.php"
+          "https://apiforcornershost.cubisysit.com/api/api-fetch-usersales.php"
         );
         if (response.data && response.data.data) {
           setBookedByOptions(response.data.data);
@@ -437,7 +437,7 @@ const EditBookingform = ({ show, bookingID, goBack , handleCloseEditForm}) => {
   }, []);
   useEffect(() => {
     axios
-      .get("https://apiforcorners.cubisysit.com/api/api-fetch-bookingtype.php")
+      .get("https://apiforcornershost.cubisysit.com/api/api-fetch-bookingtype.php")
       .then((response) => {
         if (response.data.status === "Success") {
           setBookingTypes(response.data.data);
@@ -451,7 +451,7 @@ const EditBookingform = ({ show, bookingID, goBack , handleCloseEditForm}) => {
   useEffect(() => {
     axios
       .get(
-        "https://apiforcorners.cubisysit.com/api/api-dropdown-projectinfo.php"
+        "https://apiforcornershost.cubisysit.com/api/api-dropdown-projectinfo.php"
       )
       .then((response) => {
         if (response.data.status === "Success") {
@@ -467,7 +467,7 @@ const EditBookingform = ({ show, bookingID, goBack , handleCloseEditForm}) => {
     if (formData.ProjectID) {
       axios
         .get(
-          `https://apiforcorners.cubisysit.com/api/api-fetch-projectwings.php?ProjectID=${formData.ProjectID}`
+          `https://apiforcornershost.cubisysit.com/api/api-fetch-projectwings.php?ProjectID=${formData.ProjectID}`
         )
         .then((response) => {
           if (response.data.status === "Success") {
@@ -484,7 +484,7 @@ const EditBookingform = ({ show, bookingID, goBack , handleCloseEditForm}) => {
     if (formData.ProjectID) {
       axios
         .get(
-          `https://apiforcorners.cubisysit.com/api/api-fetch-parking.php?ProjectID=${formData.ProjectID}`
+          `https://apiforcornershost.cubisysit.com/api/api-fetch-parking.php?ProjectID=${formData.ProjectID}`
         )
         .then((response) => {
           if (response.data.status === "Success") {
@@ -502,7 +502,7 @@ const EditBookingform = ({ show, bookingID, goBack , handleCloseEditForm}) => {
     if (formData.WingID && formData.ProjectID && formData.FloorNo) {
       axios
         .get(
-          `https://apiforcorners.cubisysit.com/api/api-booking-flat.php?WingID=${formData.WingID}&ProjectID=${formData.ProjectID}&FloorNo=${formData.FloorNo}`
+          `https://apiforcornershost.cubisysit.com/api/api-booking-flat.php?WingID=${formData.WingID}&ProjectID=${formData.ProjectID}&FloorNo=${formData.FloorNo}`
         )
         .then((response) => {
           if (response.data.status === "Success") {
@@ -526,7 +526,7 @@ const EditBookingform = ({ show, bookingID, goBack , handleCloseEditForm}) => {
     ) {
       axios
         .get(
-          `https://apiforcorners.cubisysit.com/api/api-booking-area.php?ProjectID=${formData.ProjectID}&WingID=${formData.WingID}&FloorNo=${formData.FloorNo}&FlatNo=${formData.FlatNo}&UnittypeID=${formData.UnittypeID}`
+          `https://apiforcornershost.cubisysit.com/api/api-booking-area.php?ProjectID=${formData.ProjectID}&WingID=${formData.WingID}&FloorNo=${formData.FloorNo}&FlatNo=${formData.FlatNo}&UnittypeID=${formData.UnittypeID}`
         )
         .then((response) => {
           if (response.data.status === "Success") {
@@ -558,7 +558,7 @@ const EditBookingform = ({ show, bookingID, goBack , handleCloseEditForm}) => {
     const fetchUnitTypeData = async () => {
       try {
         const response = await axios.get(
-          `https://apiforcorners.cubisysit.com/api/api-booking-type.php`,
+          `https://apiforcornershost.cubisysit.com/api/api-booking-type.php`,
 
           {
             params: {
@@ -594,7 +594,7 @@ const EditBookingform = ({ show, bookingID, goBack , handleCloseEditForm}) => {
 
     axios
       .get(
-        `https://apiforcorners.cubisysit.com/api/api-fetch-convertbooking.php?UserID=${userid}`
+        `https://apiforcornershost.cubisysit.com/api/api-fetch-convertbooking.php?UserID=${userid}`
       )
       .then((response) => {
         if (response.data.status === "Success") {
@@ -620,7 +620,7 @@ const EditBookingform = ({ show, bookingID, goBack , handleCloseEditForm}) => {
     event.preventDefault();
   
     // URL for the API request
-    const url = `https://ideacafe-backend.vercel.app/api/proxy/api-update-projectbooking.php`;
+    const url = `https://proxy-forcorners.vercel.app/api/proxy/api-update-projectbooking.php`;
   
     // Format remarks to match the API format and include BookingRemarkID
     const formattedRemarks = remarks.map((remark) => ({
@@ -712,7 +712,7 @@ const EditBookingform = ({ show, bookingID, goBack , handleCloseEditForm}) => {
     setSelectedCid(selectedCid);
 
     try {
-      const apiUrl = `https://apiforcorners.cubisysit.com/api/api-singel-convertbooking.php?Cid=${selectedCid}`;
+      const apiUrl = `https://apiforcornershost.cubisysit.com/api/api-singel-convertbooking.php?Cid=${selectedCid}`;
       const response = await axios.get(apiUrl);
 
       if (response.data.status === "Success") {

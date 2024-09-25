@@ -50,7 +50,7 @@ const MyOpportunity = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get(`https://apiforcorners.cubisysit.com/api/api-graph-oppo.php?UserID=${userid}`);
+      const response = await axios.get(`https://apiforcornershost.cubisysit.com/api/api-graph-oppo.php?UserID=${userid}`);
       setRows(response.data.data || []);
       setCounts(response.data.counts || {});
     } catch (error) {
@@ -197,7 +197,7 @@ const WelcomeScreen = () => {
 
   const handleDelete = async (id) => {
     try {
-      const response = await axios.post('https://ideacafe-backend.vercel.app/api/proxy/api-delete-telecalling.php', {
+      const response = await axios.post('https://proxy-forcorners.vercel.app/api/proxy/api-delete-telecalling.php', {
         Tid: id,
         DeleteUID: 1
       });

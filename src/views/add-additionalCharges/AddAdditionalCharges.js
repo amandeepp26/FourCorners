@@ -59,7 +59,7 @@ const AddAdditionalCharges = ({ show }) => {
   const fetchData = async () => {
     try {
       const response = await axios.get(
-        "https://apiforcorners.cubisysit.com/api/api-fetch-subprojectdetails.php"
+        "https://apiforcornershost.cubisysit.com/api/api-fetch-subprojectdetails.php"
       );
       console.log("API Response:", response.data);
       setRows(response.data.data || []);
@@ -95,7 +95,7 @@ const AddAdditionalCharges = ({ show }) => {
 
     try {
       const response = await axios.post(
-        "https://ideacafe-backend.vercel.app/api/proxy/api-insert-additionalcharges.php",
+        "https://proxy-forcorners.vercel.app/api/proxy/api-insert-additionalcharges.php",
         body,
         {
           headers: {

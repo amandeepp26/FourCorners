@@ -188,7 +188,7 @@ const BacklogPayment = () => {
     setError(null);
     try {
       const response = await axios.get(
-        `https://apiforcorners.cubisysit.com/api/api-graph-oppo.php?UserID=${userid}`
+        `https://apiforcornershost.cubisysit.com/api/api-graph-oppo.php?UserID=${userid}`
       );
       setRows(response.data.data || []);
       setCounts(response.data.counts || {});
@@ -210,7 +210,7 @@ const BacklogPayment = () => {
     setError(null);
     try {
       const response = await axios.get(
-        `https://apiforcorners.cubisysit.com/api/api-fetch-opportunitybacklog.php?UserID=${userid}`
+        `https://apiforcornershost.cubisysit.com/api/api-fetch-opportunitybacklog.php?UserID=${userid}`
       );
       setRows(response.data.data || []);
     } catch (error) {
@@ -223,7 +223,7 @@ const BacklogPayment = () => {
   const handleDelete = async (id) => {
     try {
       const response = await axios.post(
-        "https://ideacafe-backend.vercel.app/api/proxy/api-delete-telecalling.php",
+        "https://proxy-forcorners.vercel.app/api/proxy/api-delete-telecalling.php",
         {
           Tid: id,
           DeleteUID: 1,

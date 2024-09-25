@@ -115,7 +115,7 @@ const Listprojectmaster = ({ item, onDelete, onEdit , onHistoryClick }) => {
 
     console.log(formDataWithTid , 'sdf');
   
-    const url = "https://ideacafe-backend.vercel.app/api/proxy/api-insert-nextfollowup.php";
+    const url = "https://proxy-forcorners.vercel.app/api/proxy/api-insert-nextfollowup.php";
   
     try {
       const response = await axios.post(url, formDataWithTid, {

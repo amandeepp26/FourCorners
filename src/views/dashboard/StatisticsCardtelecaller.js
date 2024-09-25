@@ -28,7 +28,7 @@ const StatisticsCardtelecaller = () => {
     const fetchApiData = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`https://apiforcorners.cubisysit.com/api/api-graph-lead.php?UserID=${userid}`);
+        const response = await fetch(`https://apiforcornershost.cubisysit.com/api/api-graph-lead.php?UserID=${userid}`);
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }

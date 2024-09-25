@@ -195,7 +195,7 @@ const [bookingIDReport, setBookingIDReport] = useState(null);
   const fetchData = async () => {
     try {
       const response = await axios.get(
-        `https://apiforcorners.cubisysit.com/api/api-fetch-telecalling.php?UserID=${userid}`
+        `https://apiforcornershost.cubisysit.com/api/api-fetch-telecalling.php?UserID=${userid}`
       );
       console.log("API Response:", response.data);
       setRows(response.data.data || []);
@@ -209,7 +209,7 @@ const [bookingIDReport, setBookingIDReport] = useState(null);
 
   const handleDelete = async (id) => {
     try {
-      const response = await axios.post('https://ideacafe-backend.vercel.app/api/proxy/api-delete-telecalling.php', {
+      const response = await axios.post('https://proxy-forcorners.vercel.app/api/proxy/api-delete-telecalling.php', {
         Tid: id,
         DeleteUID: 1
       });

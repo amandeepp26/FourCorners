@@ -73,7 +73,7 @@ const TodaysLoanRemidnerSidebar = ({
 
     try {
       const response = await axios.get(
-        `https://apiforcorners.cubisysit.com/api/api-fetch-todayloan.php?UserID=${userid}`
+        `https://apiforcornershost.cubisysit.com/api/api-fetch-todayloan.php?UserID=${userid}`
       );
       console.log("API Response:", response.data);
       setRows(response.data.data || []);

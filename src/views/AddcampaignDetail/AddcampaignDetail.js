@@ -129,7 +129,7 @@ const AddcampaignDetails = ({ show, editData }) => {
 
   useEffect(() => {
     axios
-      .get("https://apiforcorners.cubisysit.com/api/api-fetch-source.php")
+      .get("https://apiforcornershost.cubisysit.com/api/api-fetch-source.php")
       .then((response) => {
         if (response.data.status === "Success") {
           setSource(response.data.data);
@@ -142,7 +142,7 @@ const AddcampaignDetails = ({ show, editData }) => {
 
   useEffect(() => {
     axios
-      .get("https://apiforcorners.cubisysit.com/api/api-fetch-cid.php")
+      .get("https://apiforcornershost.cubisysit.com/api/api-fetch-cid.php")
       .then((response) => {
         if (response.data.status === "Success") {
           setCNames(response.data.data);
@@ -156,7 +156,7 @@ const AddcampaignDetails = ({ show, editData }) => {
   useEffect(() => {
     axios
       .get(
-        "https://apiforcorners.cubisysit.com/api/api-dropdown-estimatedbudget.php"
+        "https://apiforcornershost.cubisysit.com/api/api-dropdown-estimatedbudget.php"
       )
       .then((response) => {
         if (response.data.status === "Success") {
@@ -170,7 +170,7 @@ const AddcampaignDetails = ({ show, editData }) => {
 
   useEffect(() => {
     axios
-      .get("https://apiforcorners.cubisysit.com/api/api-fetch-leadstatus.php")
+      .get("https://apiforcornershost.cubisysit.com/api/api-fetch-leadstatus.php")
       .then((response) => {
         if (response.data.status === "Success") {
           setLeadStatus(response.data.data);
@@ -183,7 +183,7 @@ const AddcampaignDetails = ({ show, editData }) => {
 
   useEffect(() => {
     axios
-      .get("https://apiforcorners.cubisysit.com/api/api-fetch-usermaster.php")
+      .get("https://apiforcornershost.cubisysit.com/api/api-fetch-usermaster.php")
       .then((response) => {
         if (response.data.status === "Success") {
           setUserMaster(response.data.data);
@@ -197,7 +197,7 @@ const AddcampaignDetails = ({ show, editData }) => {
   const fetchDataBhk = async () => {
     try {
       const response = await axios.get(
-        "https://apiforcorners.cubisysit.com/api/api-fetch-unittype.php"
+        "https://apiforcornershost.cubisysit.com/api/api-fetch-unittype.php"
       );
       setBhkOptions(response.data.data || []);
     } catch (error) {
@@ -208,7 +208,7 @@ const AddcampaignDetails = ({ show, editData }) => {
   const fetchData = async () => {
     try {
       const response = await axios.get(
-        "https://apiforcorners.cubisysit.com/api/api-dropdown-projectmaster.php"
+        "https://apiforcornershost.cubisysit.com/api/api-dropdown-projectmaster.php"
       );
       setProjectTypes(response.data.data || []);
     } catch (error) {
@@ -219,7 +219,7 @@ const AddcampaignDetails = ({ show, editData }) => {
   const fetchDataTellecalling = async () => {
     try {
       const response = await axios.get(
-        "https://apiforcorners.cubisysit.com/api/api-fetch-telecalling.php"
+        "https://apiforcornershost.cubisysit.com/api/api-fetch-telecalling.php"
       );
       setTellecallingID(response.data.data || []);
     } catch (error) {
@@ -230,7 +230,7 @@ const AddcampaignDetails = ({ show, editData }) => {
   const fetchDataTitle = async () => {
     try {
       const response = await axios.get(
-        "https://apiforcorners.cubisysit.com/api/api-fetch-titleprefix.php"
+        "https://apiforcornershost.cubisysit.com/api/api-fetch-titleprefix.php"
       );
       setTitles(response.data.data || []);
     } catch (error) {
@@ -243,7 +243,7 @@ const AddcampaignDetails = ({ show, editData }) => {
     setSelectedCid(selectedCid);
 
     try {
-      const apiUrl = `https://apiforcorners.cubisysit.com/api/api-singel-contacts.php?Cid=${selectedCid}`;
+      const apiUrl = `https://apiforcornershost.cubisysit.com/api/api-singel-contacts.php?Cid=${selectedCid}`;
       const response = await axios.get(apiUrl);
 
       if (response.data.status === "Success") {
@@ -298,7 +298,7 @@ const AddcampaignDetails = ({ show, editData }) => {
   //   const fetchData = async () => {
   //     if (!item) return; // Exit if no item is provided
   //     try {
-  //       const apiUrl = `https://apiforcorners.cubisysit.com/api/api-singel-contacts.php?Cid=${item.Cid}`;
+  //       const apiUrl = `https://apiforcornershost.cubisysit.com/api/api-singel-contacts.php?Cid=${item.Cid}`;
   //       const response = await axios.get(apiUrl);
 
   //       console.log("seee this", response.data); // Log the API response to debug
@@ -386,7 +386,7 @@ const AddcampaignDetails = ({ show, editData }) => {
 
   const fetchCompaignType = () => {
     axios
-      .get("https://apiforcorners.cubisysit.com/api/api-fetch-campaigntype.php")
+      .get("https://apiforcornershost.cubisysit.com/api/api-fetch-campaigntype.php")
       .then((response) => {
         console.warn("response of campaign type---->", response);
         if (response.data.status === "Success") {
@@ -400,7 +400,7 @@ const AddcampaignDetails = ({ show, editData }) => {
 
   const fetchTemplate = () => {
     axios
-      .get("https://apiforcorners.cubisysit.com/api/api-dropdown-template.php")
+      .get("https://apiforcornershost.cubisysit.com/api/api-dropdown-template.php")
       .then((response) => {
         console.warn("response of template type---->", response);
         if (response.data.status === "Success") {
@@ -414,7 +414,7 @@ const AddcampaignDetails = ({ show, editData }) => {
 
   const fetchCustomers = () => {
     axios
-      .get("https://apiforcorners.cubisysit.com/api/api-fetch-customertype.php")
+      .get("https://apiforcornershost.cubisysit.com/api/api-fetch-customertype.php")
       .then((response) => {
         console.warn("response of customers type---->", response);
         if (response.data.status === "Success") {
@@ -428,7 +428,7 @@ const AddcampaignDetails = ({ show, editData }) => {
 
   const fetchSchedule = () => {
     axios
-      .get("https://apiforcorners.cubisysit.com/api/api-dropdown-schedule.php")
+      .get("https://apiforcornershost.cubisysit.com/api/api-dropdown-schedule.php")
       .then((response) => {
         console.warn("response of customers type---->", response);
         if (response.data.status === "Success") {
@@ -443,7 +443,7 @@ const AddcampaignDetails = ({ show, editData }) => {
   const fetchContactType = (e) => {
     axios
       .get(
-        `https://apiforcorners.cubisysit.com/api/api-fetch-contacttype.php?CustomerTypeID=${e}`
+        `https://apiforcornershost.cubisysit.com/api/api-fetch-contacttype.php?CustomerTypeID=${e}`
       )
       .then((response) => {
         console.warn("response of customers type---->", response);
@@ -458,7 +458,7 @@ const AddcampaignDetails = ({ show, editData }) => {
 
   const fetchSource = () => {
     axios
-      .get("https://apiforcorners.cubisysit.com/api/api-fetch-source.php")
+      .get("https://apiforcornershost.cubisysit.com/api/api-fetch-source.php")
       .then((response) => {
         console.warn("response of customers type---->", response);
         if (response.data.status === "Success") {
@@ -473,7 +473,7 @@ const AddcampaignDetails = ({ show, editData }) => {
   const fetchSourceType = (e) => {
     axios
       .get(
-        `https://apiforcorners.cubisysit.com/api/api-fetch-sourcetype.php?SourceID=${e}`
+        `https://apiforcornershost.cubisysit.com/api/api-fetch-sourcetype.php?SourceID=${e}`
       )
       .then((response) => {
         console.warn("response of customers type---->", response);
@@ -488,7 +488,7 @@ const AddcampaignDetails = ({ show, editData }) => {
 
   const fetchCity = () => {
     axios
-      .get("https://apiforcorners.cubisysit.com/api/api-fetch-citymaster.php")
+      .get("https://apiforcornershost.cubisysit.com/api/api-fetch-citymaster.php")
       .then((response) => {
         console.warn("response of customers type---->", response);
         if (response.data.status === "Success") {
@@ -503,7 +503,7 @@ const AddcampaignDetails = ({ show, editData }) => {
   const fetchLocation = () => {
     axios
       .get(
-        "https://apiforcorners.cubisysit.com/api/api-fetch-locationmaster.php"
+        "https://apiforcornershost.cubisysit.com/api/api-fetch-locationmaster.php"
       )
       .then((response) => {
         console.warn("response of customers type---->", response);
@@ -518,7 +518,7 @@ const AddcampaignDetails = ({ show, editData }) => {
 
   const fetchSubmittedBy = () => {
     axios
-      .get("https://apiforcorners.cubisysit.com/api/api-fetch-usermaster.php")
+      .get("https://apiforcornershost.cubisysit.com/api/api-fetch-usermaster.php")
       .then((response) => {
         console.warn("response of customers type---->", response);
         if (response.data.status === "Success") {
@@ -645,8 +645,8 @@ const AddcampaignDetails = ({ show, editData }) => {
 
     // if (isValid) {
     const url = editData
-      ? "https://ideacafe-backend.vercel.app/api/proxy/api-update-telecalling.php"
-      : "https://ideacafe-backend.vercel.app/api/proxy/api-insert-telecalling.php";
+      ? "https://proxy-forcorners.vercel.app/api/proxy/api-update-telecalling.php"
+      : "https://proxy-forcorners.vercel.app/api/proxy/api-insert-telecalling.php";
 
     console.log(formData, "ALL the data of telecalling");
     try {

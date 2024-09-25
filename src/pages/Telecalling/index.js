@@ -117,7 +117,7 @@ const TeleDashboard = () => {
         todate: formData?.todate?.toISOString(),
       });
       const response = await fetch(
-        `https://apiforcorners.cubisysit.com/api/api-fetch-telecallingdashboard.php?${params}`
+        `https://apiforcornershost.cubisysit.com/api/api-fetch-telecallingdashboard.php?${params}`
       );
 
       if (!response.ok) {
@@ -148,7 +148,7 @@ const TeleDashboard = () => {
   
   useEffect(() => {
     axios
-      .get("https://apiforcorners.cubisysit.com/api/api-fetch-source.php")
+      .get("https://apiforcornershost.cubisysit.com/api/api-fetch-source.php")
       .then((response) => {
         if (response.data.status === "Success") {
           setSource(response.data.data);
@@ -160,7 +160,7 @@ const TeleDashboard = () => {
   }, []);
   const fetchDataForModal = async (Tid) => {
     try {
-      const apiUrl = `https://apiforcorners.cubisysit.com/api/api-singel-telecalling.php?Tid=${Tid}`;
+      const apiUrl = `https://apiforcornershost.cubisysit.com/api/api-singel-telecalling.php?Tid=${Tid}`;
       const response = await axios.get(apiUrl);
 
       if (response.data.status === "Success") {
@@ -193,7 +193,7 @@ const TeleDashboard = () => {
     console.log("CID AAYA", Cid);
     console.log("press");
     try {
-      const apiUrl = `https://apiforcorners.cubisysit.com/api/api-singel-contacts.php?Cid=${Cid}`;
+      const apiUrl = `https://apiforcornershost.cubisysit.com/api/api-singel-contacts.php?Cid=${Cid}`;
       const response = await axios.get(apiUrl);
 
       if (response.data.status === "Success") {
@@ -212,7 +212,7 @@ const TeleDashboard = () => {
   const handleHistoryClickLead = async () => {
     try {
       debugger;
-      const apiUrl = `https://apiforcorners.cubisysit.com/api/api-fetch-nextfollowup.php?Tid=${selectedTelecaller?.Tid}`;
+      const apiUrl = `https://apiforcornershost.cubisysit.com/api/api-fetch-nextfollowup.php?Tid=${selectedTelecaller?.Tid}`;
       const response = await axios.get(apiUrl);
       if (response.data.status === "Success") {
         console.log(response.data, "TID dataaaa<<<<<>>>>>>>>>>>");

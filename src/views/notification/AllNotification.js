@@ -68,7 +68,7 @@ const AllNotifications = ({ onEdit }) => {
   const fetchData = async () => {
     try {
       const response = await axios.get(
-        `https://apiforcorners.cubisysit.com/api/api-fetch-notification.php`
+        `https://apiforcornershost.cubisysit.com/api/api-fetch-notification.php`
       );
       console.log("RESPONSE:", response.data);
   
@@ -109,7 +109,7 @@ const AllNotifications = ({ onEdit }) => {
 
     try {
       const response = await axios.post(
-        'https://apiforcorners.cubisysit.com/api/api-delete-notification.php',
+        'https://apiforcornershost.cubisysit.com/api/api-delete-notification.php',
         body,
         {
           headers: {

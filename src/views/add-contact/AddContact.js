@@ -145,7 +145,7 @@ const AddContact = ({ show, editData  , onDashboardClick}) => {
   const fetchDataCustomerType = async () => {
     try {
       const response = await axios.get(
-        "https://apiforcorners.cubisysit.com/api/api-fetch-customertype.php"
+        "https://apiforcornershost.cubisysit.com/api/api-fetch-customertype.php"
       );
       if (response.data.status === "Success") {
         setCustomerType(response.data.data);
@@ -158,7 +158,7 @@ const AddContact = ({ show, editData  , onDashboardClick}) => {
   const fetchContactTypes = async (customerTypeID) => {
     try {
       const response = await axios.get(
-        `https://apiforcorners.cubisysit.com/api/api-fetch-contacttype.php?CustomerTypeID=${customerTypeID}`
+        `https://apiforcornershost.cubisysit.com/api/api-fetch-contacttype.php?CustomerTypeID=${customerTypeID}`
       );
       if (response.data.status === "Success") {
         setContactTypes(response.data.data);
@@ -172,7 +172,7 @@ const AddContact = ({ show, editData  , onDashboardClick}) => {
 
   useEffect(() => {
     axios
-      .get("https://apiforcorners.cubisysit.com/api/api-fetch-countrycode.php")
+      .get("https://apiforcornershost.cubisysit.com/api/api-fetch-countrycode.php")
       .then((response) => {
         if (response.data.status === "Success") {
           setCountryCodes(response.data.data);
@@ -185,7 +185,7 @@ const AddContact = ({ show, editData  , onDashboardClick}) => {
   
 
   useEffect(() => {
-    axios.get("https://apiforcorners.cubisysit.com/api/api-fetch-citymaster.php")
+    axios.get("https://apiforcornershost.cubisysit.com/api/api-fetch-citymaster.php")
       .then(response => {
         if (response.data.status === "Success") {
           setCities(response.data.data);
@@ -198,7 +198,7 @@ const AddContact = ({ show, editData  , onDashboardClick}) => {
 
     useEffect(() => {
     axios
-      .get("https://apiforcorners.cubisysit.com/api/api-fetch-source.php")
+      .get("https://apiforcornershost.cubisysit.com/api/api-fetch-source.php")
       .then((response) => {
         if (response.data.status === "Success") {
           setSource(response.data.data);
@@ -213,7 +213,7 @@ const AddContact = ({ show, editData  , onDashboardClick}) => {
 
   useEffect(() => {
     axios
-      .get("https://apiforcorners.cubisysit.com/api/api-fetch-usermaster.php")
+      .get("https://apiforcornershost.cubisysit.com/api/api-fetch-usermaster.php")
       .then((response) => {
         if (response.data.status === "Success") {
           setUserMaster(response.data.data);
@@ -227,7 +227,7 @@ const AddContact = ({ show, editData  , onDashboardClick}) => {
   const fetchDataBhk = async () => {
     try {
       const response = await axios.get(
-        "https://apiforcorners.cubisysit.com/api/api-fetch-unittype.php"
+        "https://apiforcornershost.cubisysit.com/api/api-fetch-unittype.php"
       );
       setBhkOptions(response.data.data || []);
     } catch (error) {
@@ -238,7 +238,7 @@ const AddContact = ({ show, editData  , onDashboardClick}) => {
   const fetchData = async () => {
     try {
       const response = await axios.get(
-        "https://apiforcorners.cubisysit.com/api/api-dropdown-projectmaster.php"
+        "https://apiforcornershost.cubisysit.com/api/api-dropdown-projectmaster.php"
       );
       setProjectTypes(response.data.data || []);
     } catch (error) {
@@ -254,7 +254,7 @@ const AddContact = ({ show, editData  , onDashboardClick}) => {
   const fetchId = async () => {
     try {
       const response = await axios.get(
-        "https://apiforcorners.cubisysit.com/api/api-fetch-contacts.php"
+        "https://apiforcornershost.cubisysit.com/api/api-fetch-contacts.php"
       );
       console.log("API Response:", response.data);
       setRows(response.data.data || []);
@@ -270,7 +270,7 @@ const AddContact = ({ show, editData  , onDashboardClick}) => {
     if (formData.CityID) {
       axios
         .get(
-          "https://apiforcorners.cubisysit.com/api/api-fetch-locationmaster.php",
+          "https://apiforcornershost.cubisysit.com/api/api-fetch-locationmaster.php",
           {
             params: { CityID: formData.CityID },
           }
@@ -288,7 +288,7 @@ const AddContact = ({ show, editData  , onDashboardClick}) => {
 
   useEffect(() => {
     if (dynamicSourceID) {
-      axios.get(`https://apiforcorners.cubisysit.com/api/api-fetch-sourcetype.php?SourceID=${dynamicSourceID}`)
+      axios.get(`https://apiforcornershost.cubisysit.com/api/api-fetch-sourcetype.php?SourceID=${dynamicSourceID}`)
         .then((response) => {
           if (response.data.status === "Success") {
             console.log(response.data.data , 'Source name');
@@ -307,7 +307,7 @@ const AddContact = ({ show, editData  , onDashboardClick}) => {
   const fetchDataTitle = async () => {
     try {
       const response = await axios.get(
-        "https://apiforcorners.cubisysit.com/api/api-fetch-titleprefix.php"
+        "https://apiforcornershost.cubisysit.com/api/api-fetch-titleprefix.php"
       );
       setTitles(response.data.data || []);
     } catch (error) {
@@ -494,8 +494,8 @@ const handleSubmit = async (event) => {
   
     // Prepare API URL based on editData flag
     const url = editData
-      ? "https://ideacafe-backend.vercel.app/api/proxy/api-update-contacts.php"
-      : "https://ideacafe-backend.vercel.app/api/proxy/api-insert-contacts.php";
+      ? "https://proxy-forcorners.vercel.app/api/proxy/api-update-contacts.php"
+      : "https://proxy-forcorners.vercel.app/api/proxy/api-insert-contacts.php";
   
 
 

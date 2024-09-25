@@ -46,7 +46,7 @@ const ProjectManage = ({ show, editData }) => {
 
   useEffect(() => {
     axios
-      .get("https://apiforcorners.cubisysit.com/api/api-fetch-companymaster.php")
+      .get("https://apiforcornershost.cubisysit.com/api/api-fetch-companymaster.php")
       .then((response) => {
         if (response.data.status === "Success") {
           setUserMaster(response.data.data);
@@ -83,8 +83,8 @@ const ProjectManage = ({ show, editData }) => {
     };
 
     const url = editData
-      ? "https://ideacafe-backend.vercel.app/api/proxy/api-update-projectmaster.php"
-      : "https://ideacafe-backend.vercel.app/api/proxy/api-insert-projectmaster.php";
+      ? "https://proxy-forcorners.vercel.app/api/proxy/api-update-projectmaster.php"
+      : "https://proxy-forcorners.vercel.app/api/proxy/api-insert-projectmaster.php";
 
     axios
       .post(url, body)
