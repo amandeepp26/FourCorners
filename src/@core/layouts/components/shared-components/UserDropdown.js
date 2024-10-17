@@ -70,9 +70,7 @@ const UserDropdown = () => {
   const roleName = cookies.amr?.RoleName || "Admin"; // Assuming the name is stored in the "amr" cookie
   const userID = cookies.amr;
 
-  console.warn(userID);
-  console.log(userName, "ye dekh username");
-  console.log(roleName, "ye dekh rolname");
+ 
 
   return (
     <Fragment>

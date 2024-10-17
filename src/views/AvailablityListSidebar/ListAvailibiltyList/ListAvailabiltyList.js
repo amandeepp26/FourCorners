@@ -33,6 +33,7 @@ const ListAvailabiltyList = ({ item }) => {
   const [maxFlats, setMaxFlats] = useState(0);
   const [editingCell, setEditingCell] = useState(null);
   const [skuOptions, setSkuOptions] = useState([]);
+  const [parkingData, setParkingData] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -115,7 +116,23 @@ const ListAvailabiltyList = ({ item }) => {
       console.error("Error fetching SKU options:", error);
     }
   };
-
+  useEffect(() => {
+    console.log("Item:", item); // Add this to check if item exists
+    const fetchParkingData = async () => {
+      if (!item) return;
+      try {
+        const apiUrl = `https://apiforcornershost.cubisysit.com/api/api-fetch-parkingdata.php?ProjectID=${item.ProjectID}`;
+        const response = await axios.get(apiUrl);
+        if (response.data.status === "Success") {
+          setParkingData(response.data.data);
+        }
+      } catch (error) {
+        console.error("Error fetching parking data:", error);
+      }
+    };
+    fetchParkingData();
+  }, [item]);
+  
   const handleCellClick = (floorNo, flatNo) => {
     setEditingCell({ floorNo, flatNo });
     fetchSkuOptions();
@@ -126,7 +143,7 @@ const ListAvailabiltyList = ({ item }) => {
     const { floorNo, flatNo } = editingCell;
     const currentFlat = wingDetails[floorNo] && wingDetails[floorNo][flatNo - 1];
     const statusSkuID = currentFlat.skuID === 1 ? 2 : 1;
-  
+
     const requestData = {
       skuID: statusSkuID,
       ModifyUID: 1,
@@ -135,9 +152,9 @@ const ListAvailabiltyList = ({ item }) => {
       FloorNo: floorNo,
       FlatNo: currentFlat.FlatNo,  // Pass only the FlatNo
     };
-  
+
     console.log("Sending the following data:", requestData);
-  
+
     const result = await Swal.fire({
       title: 'Are you sure?',
       text: `Do you want to update?`,
@@ -147,14 +164,14 @@ const ListAvailabiltyList = ({ item }) => {
       cancelButtonColor: '#d33',
       confirmButtonText: 'Yes, update it!',
     });
-  
+
     if (result.isConfirmed) {
       try {
         const response = await axios.post(
           "https://proxy-forcorners.vercel.app/api/proxy/api-update-projectsku.php",
           requestData
         );
-  
+
         if (response.data.status === "Success") {
           setWingDetails((prevDetails) => ({
             ...prevDetails,
@@ -185,8 +202,8 @@ const ListAvailabiltyList = ({ item }) => {
       }
     }
   };
-  
-  
+
+
 
   const countStatuses = () => {
     const counts = { Avl: 0, HLD: 0, RFG: 0, SLD: 0 };
@@ -202,7 +219,7 @@ const ListAvailabiltyList = ({ item }) => {
 
     return counts;
   };
-
+  const totalParking = parkingData.length;
   const ProjectRoomTable = ({ data, maxFlats }) => {
     const headers = Array.from({ length: maxFlats }, (_, i) => `FlatNo ${i + 1}`);
 
@@ -218,9 +235,9 @@ const ListAvailabiltyList = ({ item }) => {
         </thead>
         <tbody>
           {Object.keys(data).map((floorNo) => {
-            console.log(data , 'aagaya dataatatatatatatatatata');
+            console.log(data, 'aagaya dataatatatatatatatatata');
             const flats = data[floorNo];
-            console.log(flats , 'floor number dekh');
+            console.log(flats, 'floor number dekh');
             return (
               <tr key={floorNo}>
                 <td style={{ border: '1px solid black', padding: '8px' }}>{floorNo}</td>
@@ -248,7 +265,7 @@ const ListAvailabiltyList = ({ item }) => {
                           >
                             {skuOptions.map((option) => (
                               <MenuItem key={option.skuID} value={option.skuID}>
-                                {option.skuName}                          
+                                {option.skuName}
                               </MenuItem>
                             ))}
                           </Select>
@@ -306,51 +323,67 @@ const ListAvailabiltyList = ({ item }) => {
           {dataAvailable ? (
             <>
               <ProjectRoomTable data={wingDetails} maxFlats={maxFlats} />
-
-              {/* Status Counts Card */}
               <Grid container spacing={2} justifyContent="center" style={{ marginTop: '20px' }}>
-          
-       
-                <Grid>
-                  <Card sx={{ marginTop: 4, padding: 2 }}>
-                    <CardContent>
-                    <Typography variant="body2">Sold : {statusCounts.SLD}</Typography>
-                    </CardContent>
-                  </Card>
-                </Grid>
-                <Grid>
-                  <Card sx={{ marginTop: 4, padding: 2 }}>
-                    <CardContent>
-                    <Typography variant="body2">Available : {statusCounts.Avl}</Typography>
-                    </CardContent>
-                  </Card>
-                </Grid>
-                <Grid>
-                  <Card sx={{ marginTop: 4, padding: 2 }}>
-                    <CardContent>
-                   
-                  <Typography variant="body2">Hold : {statusCounts.HLD}</Typography>
-                    </CardContent>
-                  </Card>
-                </Grid>
-                <Grid>
-                  <Card sx={{ marginTop: 4, padding: 2 }}>
-                    <CardContent>
-                    <Typography variant="body2">REFUGE (RFG): {statusCounts.RFG}</Typography>
-                    </CardContent>
-                  </Card>
-                </Grid>
-             
-          
-
-              </Grid>
-              
-             
-              
-                 
 
 
+<Grid>
+  <Card sx={{ marginTop: 4, padding: 2, border: '2px solid #d4edda', borderRadius: '8px',  }}>
+    <CardContent>
+      <Typography variant="body2">Sold : {statusCounts.SLD}</Typography>
+    </CardContent>
+  </Card>
+</Grid>
+<Grid>
+  <Card sx={{ marginTop: 4, padding: 2  , border: '2px solid #d4edda', borderRadius: '8px', }}>
+    <CardContent>
+      <Typography variant="body2">Available : {statusCounts.Avl}</Typography>
+    </CardContent>
+  </Card>
+</Grid>
+<Grid>
+  <Card sx={{ marginTop: 4, padding: 2, border: '2px solid #d4edda', borderRadius: '8px',  }}>
+    <CardContent>
 
+      <Typography variant="body2">Hold : {statusCounts.HLD}</Typography>
+    </CardContent>
+  </Card>
+</Grid>
+<Grid>
+  <Card sx={{ marginTop: 4, padding: 2, border: '2px solid #d4edda', borderRadius: '8px',   }}>
+    <CardContent>
+      <Typography variant="body2">REFUGE (RFG): {statusCounts.RFG}</Typography>
+    </CardContent>
+  </Card>
+</Grid>
+<Grid>
+  <Card sx={{ marginTop: 4, padding: 2, border: '2px solid #d4edda', borderRadius: '8px',  }}>
+    <CardContent>
+      <Typography variant="body2">Total Parking : {totalParking}
+      </Typography>
+    </CardContent>
+  </Card>
+</Grid>
+</Grid>
+              <Typography variant="h6" sx={{ mt: 3, mb: 2 }}>
+            
+              </Typography>
+              <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid black' }}>
+                <thead>
+                  <tr style={{ borderBottom: '2px solid black' }}>
+                    <th style={{ border: '1px solid black', padding: '8px' }}>Parking No</th>
+                    <th style={{ border: '1px solid black', padding: '8px' }}>Parking avilability</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {parkingData.map((parking, index) => (
+                  <tr key={index}>
+                      <td style={{ border: '1px solid black', padding: '8px' }}>{index+1}</td>
+                      <td style={{ border: '1px solid black', padding: '8px', backgroundColor: parking.CProcess === 1 ? '#f8d7da' : '#d4edda' }}>{parking.ParkingAvilability}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            
             </>
           ) : (
             <NoDataIcon />

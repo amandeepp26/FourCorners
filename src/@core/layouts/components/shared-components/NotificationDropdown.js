@@ -109,12 +109,10 @@ const NotificationDropdown = ({
         if (newNotificationsBooking.length > notificationsBooking.length) {
           setNotificationsBooking(newNotificationsBooking);
         }
-      } else {
-        console.error("Expected an array of notifications for booking");
-      }
+      } 
       setLoading(false);
     } catch (error) {
-      console.error("Error fetching booking data:", error);
+      // console.error("Error fetching booking data:", error);
       setError(error);
       setLoading(false);
     }
@@ -135,7 +133,7 @@ const NotificationDropdown = ({
       }
       setLoading(false);
     } catch (error) {
-      console.error("Error fetching data:", error);
+      // console.error("Error fetching data:", error);
       setError(error);
       setLoading(false);
     }

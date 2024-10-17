@@ -208,7 +208,7 @@ const [amountsUpcoming, setAmountsUpcoming] = useState([]);
                 {amountsReceived.length > 0 && (
                   <Box mt={2}>
                     <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                      Received Loan Amount:
+                      Upcoming Loan Amount:
                     </Typography>
                     {amountsReceived.map((amount, index) => (
                       <Typography key={index} variant="body2">
@@ -442,7 +442,7 @@ const [amountsUpcoming, setAmountsUpcoming] = useState([]);
                 <SortableTableCell label="Wing Name" />
                 <SortableTableCell label="Flat No" />
                 <SortableTableCell label="RemarkAmount" />
-                <TableCell>Actions</TableCell>
+                <SortableTableCell label="Remark Date" />
               </TableRow>
             </TableHead>
             <TableBody>
@@ -453,14 +453,7 @@ const [amountsUpcoming, setAmountsUpcoming] = useState([]);
       <TableCell>{row.WingName}</TableCell>
       <TableCell>{row.FlatNo}</TableCell>
       <TableCell>{row.Remarkamount}</TableCell>
-      <TableCell>
-        <IconButton
-          color="primary"
-          onClick={() => handleAddPayment(row)}
-        >
-          <PaymentIcon />
-        </IconButton>
-      </TableCell>
+      <TableCell>{row.RemarkDate}</TableCell>
     </TableRow>
   ))}
 </TableBody>

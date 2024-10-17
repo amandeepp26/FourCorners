@@ -104,6 +104,7 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
   const [selectedRow, setSelectedRow] = useState(null);
   const [cashPaid, setCashPaid] = useState("");
   const [chequePaid, setChequePaid] = useState("");
+  const [currentRow, setCurrentRow] = useState(null);
   const [chequePayments, setChequePayments] = useState([
     {
       chequePaid: "",
@@ -288,12 +289,12 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
 
   const handleMenuOpen = (event, row) => {
     setAnchorEl(event.currentTarget);
-    setSelectedRowMenu(row);
+    setCurrentRow(row);
   };
-
+  
   const handleMenuClose = () => {
     setAnchorEl(null);
-    setSelectedRowMenu(null);
+    setCurrentRow(null); // Clear the current row
   };
 
   const handleReportClick = (row) => {
@@ -304,7 +305,7 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
   };
 
   const handleTemplateClick = (row) => {
-    console.log(row, "Selected row data"); // Log the selected row data
+    console.log(row, "Selected row data"); 
 
     setBookingID(row.BookingID); // Set the selected BookingID
     setOpenTemplate(true); // Open the modal
@@ -754,19 +755,19 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
                               open={Boolean(anchorEl)}
                               onClose={handleMenuClose}
                             >
-                              <MenuItem onClick={() => handleReportClick(row)}>
+                              <MenuItem onClick={() => handleReportClick(currentRow)}>
                                 Report
                               </MenuItem>
                               <MenuItem
-                                onClick={() => handleTemplateClick(row)}
+                                onClick={() => handleTemplateClick(currentRow)}
                               >
-                                Template
+                                Template 
                               </MenuItem>
 
-                              <MenuItem onClick={() => onCheque(row)}>
-                                Cheque Receipt
+                              <MenuItem onClick={() => onCheque(currentRow)}>
+                                Cheque Receipt 
                               </MenuItem>
-                              <MenuItem onClick={() => onEdit(row)}>
+                              <MenuItem onClick={() => onEdit(currentRow)}>
                                 Edit details
                               </MenuItem>
                             </Menu>
@@ -777,7 +778,7 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
                               variant="outlined"
                               color="primary"
                             >
-                              <PaymentIcon />
+                              <PaymentIcon /> 
                             </IconButton>
                           </TableCell>
                         </TableRow>
