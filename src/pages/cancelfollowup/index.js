@@ -2,9 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Grid, CircularProgress, Alert, Typography, Box } from '@mui/material';
 import axios from 'axios';
 import AddOpportunityDetails from 'src/views/add-opportunitydetails/AddOpportunityDetails';
-import Sidebar from 'src/views/cancelfollowup/AllBookingCancel/Sidebar';
-import ListCancel from 'src/views/cancelfollowup/AllBookingCancel/ListCancel';
-import HistoryOpportunity from 'src/views/history-apportunity/HistoryOpportunity';
+import Sidebar from 'src/views/opportunitysidebar/Sidebar';
+import ListOpportunity from 'src/views/list-opportunity/ListOpportunity';
 import PieChartIcon from '@mui/icons-material/PieChart';
 import Card from '@mui/material/Card';
 import TrendingUp from 'mdi-material-ui/TrendingUp';
@@ -13,7 +12,6 @@ import CellphoneLink from 'mdi-material-ui/CellphoneLink';
 import AccountOutline from 'mdi-material-ui/AccountOutline';
 import CardContent from '@mui/material/CardContent';
 import CardHeader from '@mui/material/CardHeader';
-import IconButton from '@mui/material/IconButton';
 import Avatar from '@mui/material/Avatar';
 import { useRouter } from 'next/router';
 
@@ -182,7 +180,7 @@ const WelcomeScreen = () => {
       <Box sx={{ textAlign: 'center', marginTop: '20px' }}>
         <PieChartIcon sx={{ fontSize: 60, color: "#333" }} />
         <Typography variant="h5" sx={{ marginTop: 2, fontWeight: "bold" }}>
-          Welcome to Opportunity Dashboard
+          Welcome to Booking Cancel Dashboard
         </Typography>
         <Grid variant="body1" sx={{ marginTop: 10, marginLeft: 20 }}>
           <StatisticsCard />
@@ -215,19 +213,15 @@ useEffect(() => {
     setShowAddDetails(false);
   }
 
-  // If the route query has showAddDetails parameter, set the state
   if (router.query.showAddDetails) {
     setShowAddDetails(true);
     setFirstVisit(false);
   }
 
   // Log route query parameters
-  console.log('Router Query:>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', router.query);
+  console.log('Router Query:>', router.query);
 
 }, [router.query]);
-
-
-
 
   const handleDelete = async (id) => {
     try {
@@ -325,7 +319,7 @@ useEffect(() => {
      
 
         {!loading && !error && rowDataToUpdate && !showHistory && !showAddDetails && !showDashboard && (
-          <ListCancel
+          <ListOpportunity
             item={rowDataToUpdate}
             onDelete={handleDelete}
             onHistoryClick={handleShowHistory}

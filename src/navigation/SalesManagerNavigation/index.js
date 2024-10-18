@@ -62,6 +62,32 @@ const SalesManagerNavigation = () => {
         },
       ],
     },
+    
+    {
+      title: "Booking Cancel",
+      icon: TrendingUpIcon,
+      path: "/#",
+      children: [
+        {
+          title: "All Followup",
+          icon: CubeOutlineIcon,
+          path: "/#",
+        },
+        {
+          title: "Todays Followup",
+          icon: CubeOutlineIcon,
+          path: "/#",
+        },  {
+          title: "Next Followup",
+          icon: CubeOutlineIcon,
+          path: "/#",
+        },  {
+          title: "Backlog Followup",
+          icon: CubeOutlineIcon,
+          path: "/#",
+        },
+      ],
+    },
     {
       title: "Availibilty List",
       icon: TrendingUpIcon,

@@ -39,7 +39,7 @@ import GetAppIcon from "@mui/icons-material/GetApp";
 import SortIcon from "@mui/icons-material/Sort";
 
 
-const SidebarBookingProject = ({ onEdit, onItemClick, onCreate }) => {
+const SidebarBookingCancel = ({ onEdit, onItemClick, onCreate }) => {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -467,4 +467,4 @@ const SidebarBookingProject = ({ onEdit, onItemClick, onCreate }) => {
 };
 
 
-export default SidebarBookingProject;
+export default SidebarBookingCancel;

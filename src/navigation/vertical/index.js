@@ -250,8 +250,39 @@ const navigation = () => {
       ],
     },
 
-
-
+    {
+      sectionTitle: "All Booking Cancel",
+    },
+    {
+      icon: PaymentsIcon,
+      title: "Projects Booking Cancel",
+      path: "/bookingcancel",
+    },
+    {
+      title: "Followup Booking Cancel",
+      icon: TrendingUpIcon,
+      path: "/cancelfollowup",
+      children: [
+        {
+          title: "All Followup",
+          icon: CubeOutlineIcon,
+          path: "/cancelfollowup",
+        },
+        {
+          title: "Todays Followup",
+          icon: CubeOutlineIcon,
+          path: "/cancelfollowup/Todaycancelfollowup",
+        },  {
+          title: "Next Followup",
+          icon: CubeOutlineIcon,
+          path: "/cancelfollowup/Nextcancelfollowup",
+        },  {
+          title: "Backlog Followup",
+          icon: CubeOutlineIcon,
+          path: "/cancelfollowup/Backlogcancelfollowup",
+        },
+      ],
+    },
     {
       sectionTitle: "Enquiries",
     },

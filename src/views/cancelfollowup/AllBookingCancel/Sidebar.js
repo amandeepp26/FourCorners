@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import {
   List,
   ListItem,
@@ -18,18 +19,14 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  Chip,
   Button,
   Menu,
   ListItemIcon,
   Popover,
 } from "@mui/material";
-import axios from "axios";
-import { Chip } from '@mui/material';
 import PersonIcon from "@mui/icons-material/Person";
-import FaceIcon from '@mui/icons-material/Face';
-
 import { Divider } from "@mui/material";
-import ApartmentIcon from '@mui/icons-material/Apartment';
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -37,9 +34,11 @@ import AddIcon from "@mui/icons-material/Add";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import GetAppIcon from "@mui/icons-material/GetApp";
 import SortIcon from "@mui/icons-material/Sort";
+import { useCookies } from "react-cookie";
+import { Dashboard } from "@mui/icons-material";
 
 
-const SidebarBookingProject = ({ onEdit, onItemClick, onCreate }) => {
+const Sidebar = ({ onEdit, onItemClick, onCreate , onDashboardClick}) => {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -52,6 +51,8 @@ const SidebarBookingProject = ({ onEdit, onItemClick, onCreate }) => {
   const [anchorElFilter, setAnchorElFilter] = useState(null);
   const [anchorElDots, setAnchorElDots] = useState(null);
   const [sortOption, setSortOption] = useState("");
+  const [cookies, setCookie] = useCookies(["amr"]);
+  const userid = cookies.amr?.UserID || 'Role';
 
   useEffect(() => {
     fetchData();
@@ -60,7 +61,7 @@ const SidebarBookingProject = ({ onEdit, onItemClick, onCreate }) => {
   const fetchData = async () => {
     try {
       const response = await axios.get(
-        "https://apiforcornershost.cubisysit.com/api/api-fetch-projectmaster.php"
+        `https://apiforcornershost.cubisysit.com/api/api-fetch-opportunity.php?UserID=${userid}`
       );
       console.log("API Response:", response.data);
       setRows(response.data.data || []);
@@ -83,8 +84,8 @@ const SidebarBookingProject = ({ onEdit, onItemClick, onCreate }) => {
     } else {
       const filteredData = rows.filter(
         (item) =>
-          item?.ProjectName?.toLowerCase().includes(lowerCaseQuery) ||
-          item?.CompanyName?.toLowerCase().includes(lowerCaseQuery)
+          item?.CName?.toLowerCase().includes(lowerCaseQuery) ||
+          item?.Mobile?.toLowerCase().includes(lowerCaseQuery)
       );
       setFilteredRows(filteredData);
     }
@@ -112,7 +113,7 @@ const SidebarBookingProject = ({ onEdit, onItemClick, onCreate }) => {
   const handleDelete = async () => {
     try {
       const response = await axios.post(
-        "https://proxy-forcorners.vercel.app/api/proxy/api-delete-telecalling.php",
+        "https://proxy-forcorners.vercel.app/api/proxy/api-delete-opportunity.php",
         {
           Tid: deleteId,
           DeleteUID: 1,
@@ -128,26 +129,12 @@ const SidebarBookingProject = ({ onEdit, onItemClick, onCreate }) => {
       setError(error);
     }
   };
+
   const handleOpenConfirmDelete = (id) => {
     setDeleteId(id);
     setConfirmDelete(true);
   };
-  const getDateStatus = (contactCreateDate) => {
-    const date = new Date(contactCreateDate);
-    const now = new Date();
-    
-    const isCurrentMonth = date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
-    const isPreviousMonth = date.getMonth() === now.getMonth() - 1 && date.getFullYear() === now.getFullYear();
-  
-    if (isCurrentMonth) {
-      return "New";
-    } else if (isPreviousMonth) {
-      return "In Progress";
-    } else {
-      return null;
-    }
-  };
-  
+
   const handleListItemClick = (item) => {
     onItemClick(item);
   };
@@ -173,6 +160,22 @@ const SidebarBookingProject = ({ onEdit, onItemClick, onCreate }) => {
     setAnchorElDots(null);
   };
 
+  const getDateStatus = (contactCreateDate) => {
+    const date = new Date(contactCreateDate);
+    const now = new Date();
+    
+    const isCurrentMonth = date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
+    const isPreviousMonth = date.getMonth() === now.getMonth() - 1 && date.getFullYear() === now.getFullYear();
+  
+    if (isCurrentMonth) {
+      return "New";
+    } else if (isPreviousMonth) {
+      return "In Progress";
+    } else {
+      return null;
+    }
+  };
+
   const handleSortOptionChange = (option) => {
     setSortOption(option);
     setAnchorElFilter(null);
@@ -195,10 +198,10 @@ const SidebarBookingProject = ({ onEdit, onItemClick, onCreate }) => {
         );
         break;
       case "a-z":
-        sortedRows.sort((a, b) => a.PartyName.localeCompare(b.PartyName));
+        sortedRows.sort((a, b) => a?.CName?.localeCompare(b.CName));
         break;
       case "z-a":
-        sortedRows.sort((a, b) => b.PartyName.localeCompare(a.PartyName));
+        sortedRows.sort((a, b) => b?.CName?.localeCompare(a.CName));
         break;
       default:
         break;
@@ -229,31 +232,25 @@ const SidebarBookingProject = ({ onEdit, onItemClick, onCreate }) => {
   return (
     <Card
       sx={{
-        width: 410,
+        width: 390,
         padding: 5,
-        height: 800,
+        height: 700,
         overflowY: "auto",
-        "&::-webkit-scrollbar": {
-          width: "2px",
-        },
-        "&::-webkit-scrollbar-thumb": {
-          backgroundColor: "#cccccc", // Change the color as needed
-          borderRadius: "10px",
-        },
-        "&::-webkit-scrollbar-thumb:hover": {
-          backgroundColor: "#cccccc", // Change the color on hover
-        },
-        "&::-webkit-scrollbar-track": {
-          backgroundColor: "transparent",
-        },
       }}
     >
       <Grid item xs={12} sx={{ marginBottom: 3 }}>
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Typography variant="body2" sx={{ fontWeight: "bold", fontSize: 20 }}>
-            All Projects
+            All Cancel Booking
           </Typography>
           <Box display="flex" alignItems="center">
+          <IconButton
+              aria-label="filter"
+              sx={{ color: "grey" }}
+              onClick={onDashboardClick}
+            >
+              <Dashboard />
+            </IconButton>
           {/* <IconButton
               aria-label="filter"
               sx={{ color: "grey" }}
@@ -293,6 +290,37 @@ const SidebarBookingProject = ({ onEdit, onItemClick, onCreate }) => {
               </MenuItem>
               <MenuItem onClick={() => handleSortOptionChange("z-a")}>
                 Name Z-A
+              </MenuItem>
+            </Popover>
+
+            {/* <IconButton
+              aria-label="more"
+              aria-controls="menu"
+              aria-haspopup="true"
+              onClick={handleDotsMenuOpen}
+              sx={{ color: "grey" }}
+            >
+              <MoreVertIcon />
+            </IconButton> */}
+            <Popover
+              id="menu"
+              anchorEl={anchorElDots}
+              open={Boolean(anchorElDots)}
+              onClose={handleDotsMenuClose}
+              anchorOrigin={{
+                vertical: "bottom",
+                horizontal: "right",
+              }}
+              transformOrigin={{
+                vertical: "top",
+                horizontal: "right",
+              }}
+            >
+              <MenuItem onClick={handleDownload}>
+                <ListItemIcon>
+                  <GetAppIcon fontSize="small" />
+                </ListItemIcon>
+                Download All Data
               </MenuItem>
             </Popover>
           </Box>
@@ -349,67 +377,62 @@ const SidebarBookingProject = ({ onEdit, onItemClick, onCreate }) => {
             onClick={onCreate}
             sx={{ mt: 2 }}
           >
-            Create Project
+            Create Opportunity
           </Button>
         </Box>
       ) : (
         <>
           <List>
             {filteredRows
-             
+              
               .map((item) => (
-                <React.Fragment key={item.ProjectID}>
+                 <React.Fragment key={item.Oid}>
                   <Card sx={{marginBottom:2}}>
                    <ListItem disablePadding onClick={() => handleListItemClick(item)}>
-                   <ListItemAvatar>
- 
-        <ApartmentIcon style={{ width: 40, height: 40, margin: 2 ,color: '#b187fd' }} />
-
-    </ListItemAvatar>
+                      <ListItemAvatar>
+                        <Avatar
+                          alt="John Doe"
+                          sx={{ width: 40, height: 40, margin: 2 }}
+                          src="/images/avatars/1.png"
+                        />
+                      </ListItemAvatar>
                       <ListItemText
-                       primary={
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                          <Typography
-                            variant="subtitle1"
-                            style={{ fontWeight: 600, fontSize: 13 }}         
-                          >
-                         {item.ProjectName}
-                          </Typography>
-                          {item.leadstatusName && (
-                            <Chip
-                              label={item.leadstatusName}
-                              size="small"
-                              style={{
-                                fontSize: 8,
-                                marginLeft: 8,
-                                height: 12,
-                                p: 3,
-                                backgroundColor: getChipColor(item.leadstatusName),
-                                color: "#000000", // Adjust text color for better contrast if needed
-                              }}
-                            />
-                          )}
-                          
-                        </div>
-                      }
+                        primary={
+                          <div style={{ display: 'flex', alignItems: 'center' }}>
+                            <Typography
+                              variant="subtitle1"
+                              style={{ fontWeight: 600, fontSize: 13 }}
+                            >
+                             {item?.TitleName} {item.CName}
+                            </Typography>
+                            {item.leadstatusName && (
+                              <Chip
+                                label={item.leadstatusName}
+                                size="small"
+                                style={{
+                                  fontSize:8  ,
+                                  marginLeft: 8,
+                                  height:12,
+                                  p:3,
+                                  backgroundColor: getChipColor(item.leadstatusName),
+                                  color: "#000000",
+                                }}
+                              />
+                            )}
+                          </div>
+                        }
                         secondary={
-                          <>
-                      
+                           <>
                             <Typography variant="body2" style={{ fontSize: 10 }}>
-                            Company Name :{item.CompanyName} 
-                            
+                             Follow up: {item.NextFollowUpDate}
                             </Typography>
                             <Typography variant="body2" style={{ fontSize: 10 }}>
-                            Created By :{item?.Name}
-
-                            
+                              Assign By : {item.Name}
                             </Typography>
                             <Typography variant="body2" style={{ fontSize: 10 }}>
-                             Created Date : {item?.CreateDate}
-
-                            
+                              Source Name: {item.SourceName}
                             </Typography>
-                          </>
+                           </>
                         }
                         secondaryTypographyProps={{ variant: "body2" }}
                       />
@@ -420,10 +443,10 @@ const SidebarBookingProject = ({ onEdit, onItemClick, onCreate }) => {
                       >
                         <IconButton
                           aria-label="edit"
-                         
+                        
                           sx={{ color: "blue" }}
-                        >      
-                    {getDateStatus(item.ContactCreateDate) && (
+                        >
+                           {getDateStatus(item.ContactCreateDate) && (
                             <Chip
                               label={getDateStatus(item.ContactCreateDate)}
                               size="small"
@@ -435,12 +458,21 @@ const SidebarBookingProject = ({ onEdit, onItemClick, onCreate }) => {
                               }}
                             />
                           )}
-
                         </IconButton>
+                        {/* <IconButton
+                          aria-label="delete"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            handleOpenConfirmDelete(item.Tid);
+                          }}
+                          sx={{ color: "red" }}
+                        >
+                          <DeleteIcon />
+                        </IconButton> */}
                       </Box>
                     </ListItem>
                   </Card>
-                </React.Fragment>
+                </React.Fragment> 
               ))}
           </List>
         </>
@@ -466,5 +498,17 @@ const SidebarBookingProject = ({ onEdit, onItemClick, onCreate }) => {
   );
 };
 
-
-export default SidebarBookingProject;
+// Function to get chip color based on leadstatusName
+const getChipColor = (leadstatusName) => {
+  switch (leadstatusName) {
+    case "Warm":
+      return "#FFD700"; 
+    case "Hot":
+      return "#FF6347"; // Red
+    case "Cold":
+      return "#87CEEB"; 
+    default:
+      return "#FFFFFF"; 
+  }
+};
+export default Sidebar;

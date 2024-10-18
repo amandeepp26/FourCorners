@@ -1,41 +1,36 @@
 import React, { useState, useEffect } from 'react';
 import { Grid, CircularProgress, Alert, Typography, Box } from '@mui/material';
 import axios from 'axios';
-import AddOpportunityDetails from 'src/views/add-opportunitydetails/AddOpportunityDetails';
-import Sidebar from 'src/views/cancelfollowup/AllBookingCancel/Sidebar';
-import ListCancel from 'src/views/cancelfollowup/AllBookingCancel/ListCancel';
-import HistoryOpportunity from 'src/views/history-apportunity/HistoryOpportunity';
+import AddTellecallingDetails from 'src/views/add-tellecallingDetails/AddTellecallingDetails';
+import OpenOpportunitySidebar from 'src/views/opportunitysidebar/OpenOpportunity/OpenOpportunitySidebar';
+import ListOpenOpportunity from 'src/views/list-opportunity/OpenOpportunity/ListOpenOpportunity';
+import HistoryTelecalling from 'src/views/history-telecalling/HistoryTelecalling';
 import PieChartIcon from '@mui/icons-material/PieChart';
 import Card from '@mui/material/Card';
-import TrendingUp from 'mdi-material-ui/TrendingUp';
-import CurrencyUsd from 'mdi-material-ui/CurrencyUsd';
-import CellphoneLink from 'mdi-material-ui/CellphoneLink';
-import AccountOutline from 'mdi-material-ui/AccountOutline';
 import CardContent from '@mui/material/CardContent';
 import CardHeader from '@mui/material/CardHeader';
-import IconButton from '@mui/material/IconButton';
 import Avatar from '@mui/material/Avatar';
-import { useRouter } from 'next/router';
-
 import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer } from 'recharts';
+import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
+import ScheduleIcon from '@mui/icons-material/Schedule';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import CancelIcon from '@mui/icons-material/Cancel';
 import { useCookies } from 'react-cookie';
-
-const opportunity = () => {
+import TrendingUp from 'mdi-material-ui/TrendingUp'
+import CellphoneLink from 'mdi-material-ui/CellphoneLink'
+import AccountOutline from 'mdi-material-ui/AccountOutline'
+import CurrencyUsd from 'mdi-material-ui/CurrencyUsd'
+import HistoryOpenOpportunity from 'src/views/history-apportunity/HistoryOpenOpportunity/HistoryOpenOpportunity';
+const OpenOpportunity = () => {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [editData, setEditData] = useState(null);
-  const [leadData, setLeadData] = useState(null);
-
-  
   const [rowDataToUpdate, setRowDataToUpdate] = useState(null);
-  const [showAddDetails, setShowAddDetails] = useState(false);
-  const [showHistory, setShowHistory] = useState(false);
-  const [firstVisit, setFirstVisit] = useState(true);
-  const [showDashboard, setShowDashboard] = useState(false); 
+  const [view, setView] = useState('welcome'); // Manage view state
+  const [cookies] = useCookies(['amr']);
+  const userid = cookies.amr?.UserID || 'Role';
   const [counts, setCounts] = useState(null);
-  const [cookies, setCookie] = useCookies(["amr"]);
-
 
 
   useEffect(() => {
@@ -56,7 +51,6 @@ const opportunity = () => {
       setLoading(false);
     }
   };
-  const router = useRouter();
 
   const renderStats = () => {
     console.log(counts, 'dekh>>>>>>>>>>>>>>>>>>');
@@ -193,52 +187,16 @@ const WelcomeScreen = () => {
 };
 
 
-
-
-useEffect(() => {
-  // Fetch data on initial render
-  fetchData();
-
-  // Retrieve the notification flag and selected notification from localStorage
-  const showAddDetailsFlag = localStorage.getItem('showAddDetails');
-  const selectedNotification = localStorage.getItem('selectedNotification');
-  
-  // Log the retrieved data
-  console.log('showAddDetailsFlag:>>>>>>>>>>>>>>>>>>', showAddDetailsFlag);
-  console.log('selectedNotification:>>>>>>>>>>>>>>>>>>>>>>>>>>>', selectedNotification ? JSON.parse(selectedNotification) : null);
-
-  if (showAddDetailsFlag === 'true') {
-    setShowAddDetails(true);
-    setLeadData(selectedNotification ? JSON.parse(selectedNotification) : null);
-    localStorage.removeItem('showAddDetails'); // Clear flag
-  } else {
-    setShowAddDetails(false);
-  }
-
-  // If the route query has showAddDetails parameter, set the state
-  if (router.query.showAddDetails) {
-    setShowAddDetails(true);
-    setFirstVisit(false);
-  }
-
-  // Log route query parameters
-  console.log('Router Query:>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', router.query);
-
-}, [router.query]);
-
-
-
-
   const handleDelete = async (id) => {
     try {
-      const response = await axios.post('https://proxy-forcorners.vercel.app/api/proxy/api-delete-opportunity.php', {
+      const response = await axios.post('https://proxy-forcorners.vercel.app/api/proxy/api-delete-telecalling.php', {
         Tid: id,
         DeleteUID: 1
       });
       if (response.data.status === 'Success') {
         setRows(rows.filter(row => row.Tid !== id));
         setRowDataToUpdate(null);
-        setShowAddDetails(false);
+        setView('welcome');
       }
     } catch (error) {
       setError(error);
@@ -247,96 +205,70 @@ useEffect(() => {
 
   const handleBack = () => {
     setEditData(null);
-    setShowAddDetails(false);
-    setShowHistory(false);
     setRowDataToUpdate(null);
-    setShowDashboard(false); // Reset showDashboard when navigating back
+    setView('welcome');
     fetchData();
   };
 
   const handleEdit = (row) => {
     setEditData(row);
     setRowDataToUpdate(null);
-    setShowAddDetails(true);
-    setShowHistory(false);
-    setShowDashboard(false); // Reset showDashboard when editing
-    setFirstVisit(false);
+    setView('addDetails');
   };
 
   const handleShow = (item) => {
     setRowDataToUpdate(item);
-    setShowAddDetails(false);
-    setShowHistory(false);
-    setShowDashboard(false); // Reset showDashboard when showing details
-    setFirstVisit(false);
+    setView('details');
   };
 
   const handleAddTelecaller = () => {
     setEditData(null);
-    setShowAddDetails(false);
     setRowDataToUpdate(null);
-    setShowHistory(false);
-    setShowDashboard(false); // Ensure dashboard is hidden when adding a contact
-    setFirstVisit(false);
-    setTimeout(() => {
-      setShowAddDetails(true);
-    }, 0);
+    setView('addDetails');
   };
 
   const handleShowHistory = () => {
-    setShowHistory(true);
-    setShowAddDetails(false);
-    setShowDashboard(false); // Reset showDashboard when showing history
-    setFirstVisit(false);
-  };
-
-  const handleNavigation = () => {
-    setShowDashboard(true);
-    setShowAddDetails(false); // Ensure the AddOpportunityDetails form is hidden when navigating to the dashboard
+    setView('history');
   };
 
   return (
     <Grid container spacing={6}>
       <Grid item xs={4}>
-        <Sidebar 
-          rows={rows} 
-          onItemClick={handleShow} 
-          onEdit={handleEdit} 
-          onCreate={handleAddTelecaller} 
-          onDashboardClick={handleNavigation} 
+        <OpenOpportunitySidebar
+          rows={rows}
+          onItemClick={handleShow}
+          onEdit={handleEdit}
+          onCreate={handleAddTelecaller}
+          onDashboardClick={() => setView('welcome')}
         />
       </Grid>
       <Grid item xs={8}>
         {loading && <CircularProgress />}
         {error && <Alert severity="error">Error fetching data: {error.message}</Alert>}
 
-        {showAddDetails && !loading && !error && (
-          <AddOpportunityDetails 
-            show={handleBack} 
-            editData={editData} 
-            leadData={leadData}
-          />
-        )}
-
-        {showDashboard && !loading && !error && (
-         <WelcomeScreen/>
-        )}
-
-     
-
-        {!loading && !error && rowDataToUpdate && !showHistory && !showAddDetails && !showDashboard && (
-          <ListCancel
+        {view === 'welcome' && !loading && !error && <WelcomeScreen />}
+        {view === 'details' && !loading && !error && rowDataToUpdate && (
+          <ListOpenOpportunity
             item={rowDataToUpdate}
             onDelete={handleDelete}
             onHistoryClick={handleShowHistory}
             onEdit={handleEdit}
           />
         )}
-
+        {view === 'addDetails' && (
+          <AddTellecallingDetails
+            editData={editData}
+            onBack={handleBack}
+            onSave={() => {
+              fetchData();
+              setView('welcome');
+            }}
+          />
+        )}
        
       </Grid>
     </Grid>
   );
 };
 
-export default opportunity;
+export default OpenOpportunity;

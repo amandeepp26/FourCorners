@@ -44,6 +44,7 @@ import { useRouter } from "next/router";
 import TemplatePayment from "../TemplatePayment/TemplatePayment";
 import Reciept from "../Reciept/Reciept";
 import EditBookingform from "../EditBookingform/EditBookingform";
+import Cancelform from "../../../components/Cancelform"
 import { FlaskEmpty } from "mdi-material-ui";
 
 const NoDataIcon = () => (
@@ -73,7 +74,7 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
   const [openEdit, setOpenEdit] = useState(false);
 
   const [openCheque, setOpenCheque] = useState(false);
-
+  const [opencancel, setopencancel] = useState(false);
   const [upcomingPayments, setUpcomingPayments] = React.useState([]);
   const [receivedPayments, setReceivedPayments] = React.useState([]);
   const [amountType, setAmountType] = useState("");
@@ -196,7 +197,7 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
       const apiUrl = `https://apiforcornershost.cubisysit.com/api/api-fetch-wing.php?WingID=${wing.WingID}&ProjectID=${item.ProjectID}`;
       const response = await axios.get(apiUrl);
       if (response.data.status === "Success") {
-        console.log(response.data, "wing dataaaaaaa,<<<<<<<<<<<<>>>>>>>>>>>>>...");
+        
         setWingDetails(response.data.data);
         setSelectedWing(wing);
         setDataAvailable(response.data.data.length > 0);
@@ -253,7 +254,7 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
         `https://apiforcornershost.cubisysit.com/api/api-dropdown-bookingremark.php?BookingID=${bookingID}`
       );
       if (response.data.status === "Success") {
-        console.log(response.data.data, "aagaya daata remakrs");
+      
         const bookingRemarksData = response.data.data;
         setBookingRemarks(bookingRemarksData);
 
@@ -305,8 +306,6 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
   };
 
   const handleTemplateClick = (row) => {
-    console.log(row, "Selected row data"); 
-
     setBookingID(row.BookingID); // Set the selected BookingID
     setOpenTemplate(true); // Open the modal
     handleMenuClose(); // Close the menu if it's open
@@ -316,12 +315,17 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
   };
 
   const onCheque = (row) => {
-    console.log(row, "Selected row data"); // Log the selected row data
-
-    setBookingID(row.BookingID); // Set the selected BookingID
-    setOpenCheque(true); // Open the modal
-    handleMenuClose(); // Close the menu if it's open
+    setBookingID(row.BookingID); 
+    setOpenCheque(true); 
+    handleMenuClose(); 
   };
+
+  const onCancel = (row) => {
+    setBookingID(row.BookingID); 
+    setopencancel(true); 
+    handleMenuClose(); 
+  };
+
   const onEdit = (row) => {
     console.log(row, "Selected row data EDit"); // Log the selected row data
 
@@ -467,10 +471,13 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
     setBookingID(null); // Reset the booking ID (optional)
   };
   const handleCloseRecipt = () => {
-    setOpenCheque(false); // Close the modal
-    setBookingID(null); // Reset the booking ID (optional)
+    setOpenCheque(false); 
+    setBookingID(null); 
   };
-
+  const handleCancel = () => {
+    setopencancel(false); 
+    setBookingID(null); 
+  };
   const handleCloseReport = () => setOpen(false);
 
   const handleDateSearch = async () => {
@@ -769,6 +776,9 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
                               </MenuItem>
                               <MenuItem onClick={() => onEdit(currentRow)}>
                                 Edit details
+                              </MenuItem>
+                              <MenuItem onClick={() => onCancel(currentRow)}>
+                                Cancel Booking
                               </MenuItem>
                             </Menu>
                           </TableCell>
@@ -1213,6 +1223,28 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
           />
         </Card>
       </Modal>
+      <Modal open={opencancel} onClose={handleCancel}>
+  <Card
+    style={{
+      maxWidth: "800px",
+      margin: "auto",
+      marginTop: "50px",
+      height: "90vh",
+      padding: "20px",
+      overflowY: "auto",
+    }}
+  >
+    <IconButton
+      aria-label="cancel"
+      onClick={handleCancel}
+      sx={{ position: "absolute", top: 6, right: 10 }}
+    >
+      <CancelIcon sx={{ color: "red" }} />
+    </IconButton>
+
+    <Cancelform bookingID={bookingID} />
+  </Card>
+</Modal>
 
       <Modal open={openTemplate} onClose={handleCloseTemplate}>
         <Card

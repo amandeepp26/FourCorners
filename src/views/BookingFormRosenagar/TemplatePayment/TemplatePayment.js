@@ -908,22 +908,21 @@ const TemplatePayment = ({ bookingID, handleCancel }) => {
               </TableRow>
 
               <TableRow>
-                <StyledTableCell style={{ textAlign: "center" }}>
-                  DATE
+              <StyledTableCell style={{ textAlign: "center" }}>
+                 Sr No.
                 </StyledTableCell>
                 <StyledTableCell style={{ textAlign: "center" }}>
-                  A
+                 Date
                 </StyledTableCell>
+         
                 <StyledTableCell colSpan={4} style={{ textAlign: "center" }}>
-                  B
+                  Amount
                 </StyledTableCell>
-                <StyledTableCell style={{ textAlign: "center" }}>
-                  A + B
-                </StyledTableCell>
+               
                 <StyledTableCell style={{ textAlign: "center" }}>
                   Balance
                 </StyledTableCell>
-                <StyledTableCell style={{ textAlign: "center" }}>
+                <StyledTableCell colSpan={2} style={{ textAlign: "center" }}>
                   Sign.
                 </StyledTableCell>
               </TableRow>
@@ -931,22 +930,20 @@ const TemplatePayment = ({ bookingID, handleCancel }) => {
               {/* Render Rows */}
               {finalRows?.map((row, index) => (
                 <TableRow key={index}>
+                   <StyledTableCell style={{ textAlign: "center" }}>
+                    {index+1}
+                  </StyledTableCell>
                   <StyledTableCell style={{ textAlign: "center" }}>
                     {row.Date}
                   </StyledTableCell>
-                  <StyledTableCell style={{ textAlign: "center" }}>
-                    {row.Cash}
-                  </StyledTableCell>
+            
                   <StyledTableCell colSpan={4} style={{ textAlign: "center" }}>
                     {row.ChequeAmount}
                   </StyledTableCell>
                   <StyledTableCell style={{ textAlign: "center" }}>
-                    {row.TotalAPlusB}
-                  </StyledTableCell>
-                  <StyledTableCell style={{ textAlign: "center" }}>
                     {row.Balance}
                   </StyledTableCell>
-                  <StyledTableCell style={{ textAlign: "center" }}>
+                  <StyledTableCell colSpan={2} style={{ textAlign: "center" }}>
                     {" "}
                     {/* Signature here */}{" "}
                   </StyledTableCell>
