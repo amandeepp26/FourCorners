@@ -33,6 +33,8 @@ import PaymentIcon from "@mui/icons-material/Payment";
 import axios from "axios";
 import { useRouter } from "next/router";
 import { useCookies } from "react-cookie";
+import DownloadIcon from '@mui/icons-material/Download';
+
 
 const NoDataIcon = () => (
   <Avatar alt="No Data" sx={{ width: 500, height: "auto" }} src="/images/avatars/nodata.svg" />
@@ -206,7 +208,7 @@ const ListBookingCancel = ({ onChequeReceiptClick, item }) => {
                           <TableCell>{row.bookingcancelFlatNo}</TableCell>
                           <TableCell>
                             <IconButton onClick={() => handleAddPayment(row.bookingcancelID)} color="primary">
-                              <PaymentIcon />
+                              <DownloadIcon />
                             </IconButton>
                           </TableCell>
                         </TableRow>

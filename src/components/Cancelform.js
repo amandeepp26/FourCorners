@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import {
@@ -62,52 +63,52 @@ const Cancelform = ({ bookingID }) => {
     newDetails[index][field] = value;
     setCancelDetails(newDetails);
   };
+
   const handleSubmit = async () => {
     const payload = {
       bookingcancelBookingID: bookingID,
-      bookingcancelCid: bookingData.Cid, // Adjust as necessary based on your booking data structure
-      bookingcancelBookingDate: bookingData.BookingDate, // Current date
-      bookingcancelBookedByID: bookingData.BookedByID, // Adjust as necessary
-      bookingcancelMobile: bookingData.Mobile, // Adjust as necessary
-      bookingcancelTitleID: bookingData.TitleID, // Adjust as necessary
-      bookingcancelName: bookingData.Name, // Adjust as necessary
-      bookingcancelAddress: bookingData.Address, // Adjust as necessary
-      bookingcancelAadhar: bookingData.Aadhar, // Adjust as necessary
-      bookingcancelPancard: bookingData.Pancard, // Adjust as necessary
-      bookingcancelEmail: bookingData.Email, // Adjust as necessary
-      bookingcancelProjectID: bookingData.ProjectID, // Adjust as necessary
-      bookingcancelWingID: bookingData.WingID, // Adjust as necessary
-      bookingcancelFloorNo: bookingData.FloorNo, // Adjust as necessary
-      bookingcancelFlatNo: bookingData.FlatNo, // Adjust as necessary
-      bookingcancelUnittypeID: bookingData.UnittypeID, // Adjust as necessary
-      bookingcancelBookingType: bookingData.BookingType, // Adjust as necessary
-      bookingcancelArea: bookingData.Area, // Adjust as necessary
-      bookingcancelRatesqft: bookingData.Ratesqft, // Adjust as necessary
-      bookingcancelTtlAmount: bookingData.TtlAmount, // Adjust as necessary
-      bookingcancelCharges: bookingData.Charges, // Adjust as necessary
-      bookingcancelParkingFacility: bookingData.ParkingFacility, // Adjust as necessary
-      bookingcancelParkingID: bookingData.ParkingID, // Adjust as necessary
-      bookingcancelFlatCost: bookingData.FlatCost, // Adjust as necessary
-      bookingcancelFlatCostInWords: bookingData.FlatCostInWords, // Adjust as necessary
-      bookingcancelGst: bookingData.Gst, // Adjust as necessary
-      bookingcancelStampDuty: bookingData.StampDuty, // Adjust as necessary
-      bookingcancelRegistration: bookingData.Registration, // Adjust as necessary
-      bookingcancelAdvocate: bookingData.Advocate, // Adjust as necessary
-      bookingcancelExtraCost: bookingData.ExtraCost, // Adjust as necessary
-      bookingcancelTotalCost: bookingData.TotalCost, // Adjust as necessary
-      bookingcancelUsableArea: bookingData.UsableArea, // Adjust as necessary
-      bookingcancelAgreementCarpet: bookingData.AgreementCarpet, // Adjust as necessary
-      bookingcancelSourceName: bookingData.SourceName, // Adjust as necessary
-      bookingcancelBookingRef: bookingData.BookingRef, // Adjust as necessary
-      bookingcancelAggrementAmount: bookingData.AggrementAmount, // Adjust as necessary
-      bookingcancelProccess: bookingData.Proccess, // Adjust as necessary
-      bookingcancelStatus: 1, // Set status to Cancelled
-      bookingcancelselfpercentage: bookingData.SelfPercentage, // Adjust as necessary
-      bookingcancelloanpercentage: bookingData.LoanPercentage, // Adjust as necessary
-      bookingcancelCreateUID: bookingData.CreateUID, // Adjust as necessary
-      
-      // Adjusted Remarks to match MySQL table fields
+      bookingcancelCid: bookingData.Cid,
+      bookingcancelBookingDate: bookingData.BookingDate,
+      bookingcancelBookedByID: bookingData.BookedByID,
+      bookingcancelMobile: bookingData.Mobile,
+      bookingcancelTitleID: bookingData.TitleID,
+      bookingcancelName: bookingData.Name,
+      bookingcancelAddress: bookingData.Address,
+      bookingcancelAadhar: bookingData.Aadhar,
+      bookingcancelPancard: bookingData.Pancard,
+      bookingcancelEmail: bookingData.Email,
+      bookingcancelProjectID: bookingData.ProjectID,
+      bookingcancelWingID: bookingData.WingID,
+      bookingcancelFloorNo: bookingData.FloorNo,
+      bookingcancelFlatNo: bookingData.FlatNo,
+      bookingcancelUnittypeID: bookingData.UnittypeID,
+      bookingcancelBookingType: bookingData.BookingType,
+      bookingcancelArea: bookingData.Area,
+      bookingcancelRatesqft: bookingData.Ratesqft,
+      bookingcancelTtlAmount: bookingData.TtlAmount,
+      bookingcancelCharges: bookingData.Charges,
+      bookingcancelParkingFacility: bookingData.ParkingFacility,
+      bookingcancelParkingID: bookingData.ParkingID,
+      bookingcancelFlatCost: bookingData.FlatCost,
+      bookingcancelFlatCostInWords: bookingData.FlatCostInWords,
+      bookingcancelGst: bookingData.Gst,
+      bookingcancelStampDuty: bookingData.StampDuty,
+      bookingcancelRegistration: bookingData.Registration,
+      bookingcancelAdvocate: bookingData.Advocate,
+      bookingcancelExtraCost: bookingData.ExtraCost,
+      bookingcancelTotalCost: bookingData.TotalCost,
+      bookingcancelUsableArea: bookingData.UsableArea,
+      bookingcancelAgreementCarpet: bookingData.AgreementCarpet,
+      bookingcancelSourceName: bookingData.SourceName,
+      bookingcancelBookingRef: bookingData.BookingRef,
+      bookingcancelAggrementAmount: bookingData.AggrementAmount,
+      bookingcancelProccess: bookingData.Proccess,
+      bookingcancelStatus: 1,
+      bookingcancelselfpercentage: bookingData.SelfPercentage,
+      bookingcancelloanpercentage: bookingData.LoanPercentage,
+      bookingcancelCreateUID: bookingData.CreateUID,
       Remarks: cancelDetails.map((detail) => ({
+        bookingcancelremarksbookingcancelID: bookingID, // Make sure this matches your API
         bookingcancelremarksAmount: detail.cancelAmount,
         bookingcancelremarksRemark: detail.cancelRemark,
         bookingcancelremarksDate: detail.cancelDate,
@@ -115,13 +116,18 @@ const Cancelform = ({ bookingID }) => {
     };
   
     try {
-      const response = await axios.post('https://proxy-forcorners.vercel.app/api/proxy/api-insert-bookingcancel.php', payload);
+      const response = await axios.post(
+        'https://proxy-forcorners.vercel.app/api/proxy/api-insert-bookingcancel.php',
+        payload
+      );
+      console.log('API response:', response.data);
       Swal.fire({
         icon: 'success',
         title: 'Success',
         text: response.data.message,
       });
     } catch (error) {
+      console.error('API error:', error);
       Swal.fire({
         icon: 'error',
         title: 'Error',
@@ -129,8 +135,6 @@ const Cancelform = ({ bookingID }) => {
       });
     }
   };
-  
-
   if (loading) {
     return <CircularProgress />;
   }

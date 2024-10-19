@@ -92,9 +92,7 @@ const ListCancel = ({ item, onDelete, onEdit, onHistoryClick }) => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleCloseBooking = () => {
-    setAnchorElOpportunity(null);
-  };
+
   const handleHistoryClick = () => {
     if (onHistoryClick) {
       // toggleSidebar(false);
@@ -102,24 +100,12 @@ const ListCancel = ({ item, onDelete, onEdit, onHistoryClick }) => {
     }
   };
 
-  const fetchUserMasterData = async () => {
-    try {
-      const response = await axios.get(
-        "https://apiforcornershost.cubisysit.com/api/api-fetch-useradmin.php"
-      );
-      if (response.data.status === "Success") {
-        setUserMaster(response.data.data);
-      }
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
 
   useEffect(() => {
     const fetchData = async () => {
       if (!item) return; // Exit if no item is provided
       try {
-        const apiUrl = `https://apiforcornershost.cubisysit.com/api/api-singel-opportunity.php?Oid=${item.Oid}`;
+        const apiUrl = `https://apiforcornershost.cubisysit.com/api/api-singel-allbookingcancelrecords.php?UserID=${item.bookingcancelID}`;
 
         const response = await axios.get(apiUrl);
 
@@ -150,75 +136,7 @@ const ListCancel = ({ item, onDelete, onEdit, onHistoryClick }) => {
     }
   };
 
-  const handleMenuItemClick = async (event, userID) => {
-    const userid = cookies.amr?.UserID || "Role";
 
-    // console.log('press');
-    event.preventDefault();
-
-    // Ensure item and Tid are available
-    if (!item || !item.Oid) {
-      console.error("No valid item or Tid found.");
-      return;
-    }
-
-    // Add Tid to formData
-    const formData = {
-      UserID: userID,
-      Cid: item?.Cid,
-      Oid: item?.Oid,
-      CreateUID: cookies?.amr?.UserID || 1,
-    };
-
-    console.log(formData, "COVERT TO Booking Data 1");
-
-    const url = `https://proxy-forcorners.vercel.app/api/proxy/api-insert-convertbooking.php?UserID=${userid}`;
-
-    try {
-      const response = await axios.post(url, formData, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      console.log(formData, "COVERT TO Booking Data 2");
-
-      if (response.data.status === "Success") {
-        // setFormData(intialName);
-        setOpen(false);
-        setSubmitSuccess(true);
-        setSubmitError(false);
-        // Show success message using SweetAlert
-        Swal.fire({
-          icon: "success",
-          title: "Lead Converted to Booking Successfully",
-
-          showConfirmButton: false,
-          timer: 1000,
-        }).then(() => {
-          window.location.reload();
-        });
-      } else {
-        setSubmitSuccess(false);
-        setSubmitError(true);
-        // Show error message using SweetAlert
-        Swal.fire({
-          icon: "error",
-          title: "Oops...",
-          text: "Something went wrong! Please try again later.",
-        });
-      }
-    } catch (error) {
-      console.error("There was an error!", error);
-      setSubmitSuccess(false);
-      setSubmitError(true);
-      // Show error message using SweetAlert
-      Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: "Something went wrong! Please try again later.",
-      });
-    }
-  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -285,17 +203,6 @@ const ListCancel = ({ item, onDelete, onEdit, onHistoryClick }) => {
     }
   };
 
-  const handleClick = (event) => {
-    setAnchorElOpportunity(event.currentTarget);
-    fetchUserMasterData();
-  };
-
-  const handleEdit = () => {
-    if (onEdit) {
-      onEdit(item); // Pass item to parent component for editing
-    }
-  };
-
   return (
     <>
       <Grid
@@ -304,91 +211,8 @@ const ListCancel = ({ item, onDelete, onEdit, onHistoryClick }) => {
         spacing={2}
         sx={{ marginBottom: 5 }}
       >
-        <Grid item>
-          <Button
-            variant="contained"
-            onClick={handleEdit}
-            startIcon={<EditIcon />}
-            sx={{
-              // Light gray background color
-              color: "#333333", // Dark gray text color
-              fontSize: "0.6rem",
-              backgroundColor: "#f0f0f0",
-              minWidth: "auto",
-              minHeight: 20, // Decrease button height
-              "&:hover": {
-                backgroundColor: "#dcdcdc", // Darken background on hover
-              },
-            }}
-          >
-            Edit Details
-          </Button>
-        </Grid>
-        <Grid item>
-          <Button
-            variant="contained"
-            // onClick={downloadCSV}
-            startIcon={<GetAppIcon />}
-            sx={{
-              color: "#333333",
-              fontSize: "0.6rem",
-              backgroundColor: "#f0f0f0",
-              minWidth: "auto",
-              minHeight: 20,
-              "&:hover": {
-                backgroundColor: "#dcdcdc",
-              },
-            }}
-          >
-            Download
-          </Button>
-        </Grid>
-        <Grid item>
-          <Button
-            variant="contained"
-            startIcon={<ArrowForwardIosIcon />}
-            onClick={handleClick}
-            sx={{
-              color: "#333333",
-              backgroundColor: "#f0f0f0",
-              fontSize: "0.6rem",
-              minWidth: "auto",
-              minHeight: 20,
-              "&:hover": {
-                backgroundColor: "#dcdcdc",
-              },
-            }}
-          >
-            Booking
-          </Button>
-        </Grid>
-        <Menu
-          anchorEl={anchorElOpportunity}
-          open={Boolean(anchorElOpportunity)}
-          onClose={handleCloseBooking}
-          PaperProps={{
-            style: {
-              maxHeight: 300, // Set the desired height in pixels
-              overflowY: "auto", // Make the content scrollable if it exceeds the height
-            },
-          }}
-        >
-          <MenuItem disabled>
-            <Typography variant="subtitle1">Convert to Booking</Typography>
-          </MenuItem>
-          {userMaster.length > 0 ? (
-            userMaster.map((user, index) => (
-              <MenuItem
-                key={user.UserID}
-                onClick={(event) => handleMenuItemClick(event, user.UserID)}
-              >
-                {index + 1}. {user.Name}
-              </MenuItem>
-            ))
-          ) : (
-            <MenuItem disabled>No data available</MenuItem>
-          )}
-        </Menu>
+       
+       
         <Grid item>
           <Button
             variant="contained"
@@ -584,10 +408,10 @@ const ListCancel = ({ item, onDelete, onEdit, onHistoryClick }) => {
                 variant="h6"
                 sx={{ fontWeight: 500, fontSize: "1.0rem" }}
               >
-                {item?.CName}
+             {item?.TitleName}   {item?.bookingcancelName}
               </Typography>
               <Typography sx={{ fontSize: "0.8rem" }}>
-                {item?.Mobile}
+                {item?.bookingcancelMobile}
               </Typography>
             </Box>
           </Box>
@@ -618,7 +442,7 @@ const ListCancel = ({ item, onDelete, onEdit, onHistoryClick }) => {
                   },
                 }}
               >
-                Source Name: {item?.SourceName}
+                Source Name: {item?.bookingcancelSourceName}
               </Typography>
 
               <Typography
@@ -637,7 +461,7 @@ const ListCancel = ({ item, onDelete, onEdit, onHistoryClick }) => {
                   },
                 }}
               >
-                AlternateMobileNo: {item?.OtherNumbers}
+                Email: {item?.bookingcancelEmail}
               </Typography>
               <Typography
                 variant="body2"
@@ -656,11 +480,11 @@ const ListCancel = ({ item, onDelete, onEdit, onHistoryClick }) => {
                   },
                 }}
               >
-                Location: {item?.CityName}/{item.Location}
+                Aadhar Card: {item?.bookingcancelAadhar}
               </Typography>
             </Box>
             <Box sx={{ display: "flex", ml: 35, mt: 7 }}>
-              <a href={`tel:${item?.Mobile}`} style={{ marginRight: 40 }}>
+              <a href={`tel:${item?.bookingcancelMobile}`} style={{ marginRight: 40 }}>
                 <IconButton
                   aria-label="phone"
                   size="small"
@@ -677,24 +501,7 @@ const ListCancel = ({ item, onDelete, onEdit, onHistoryClick }) => {
                   <PhoneIcon />
                 </IconButton>
               </a>
-              <a style={{ marginRight: 10 }}>
-                <IconButton
-                  aria-label="share"
-                  size="small"
-                  sx={{
-                    color: "blue",
-                    backgroundColor: "#e3f2fd",
-                    borderRadius: "50%",
-                    padding: "10px",
-                    marginRight: 15,
-                    "&:hover": {
-                      backgroundColor: "#bbdefb",
-                    },
-                  }}
-                >
-                  <ShareIcon />
-                </IconButton>
-              </a>
+          
               <a style={{ marginRight: 30 }}>
                 <IconButton
                   aria-label="share"
@@ -714,46 +521,7 @@ const ListCancel = ({ item, onDelete, onEdit, onHistoryClick }) => {
                   <HistoryIcon />
                 </IconButton>
               </a>
-              <a href={`mailto:${item?.Email}`} style={{ marginRight: 35 }}>
-                <IconButton
-                  aria-label="email"
-                  size="small"
-                  sx={{
-                    color: "red",
-                    backgroundColor: "#ffebee",
-                    borderRadius: "50%",
-                    padding: "10px",
-                    "&:hover": {
-                      backgroundColor: "#ffcdd2",
-                    },
-                  }}
-                >
-                  <EmailIcon />
-                </IconButton>
-              </a>
-              <a
-                href={`https://wa.me/${item?.Mobile}?text=${encodeURIComponent(
-                  whatsappText
-                )}`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <IconButton
-                  aria-label="whatsapp"
-                  size="small"
-                  sx={{
-                    color: "green",
-                    backgroundColor: "#e8f5e9",
-                    borderRadius: "50%",
-                    padding: "10px",
-                    "&:hover": {
-                      backgroundColor: "#c8e6c9",
-                    },
-                  }}
-                >
-                  <WhatsAppIcon />
-                </IconButton>
-              </a>
+             
             </Box>
           </Box>
 
@@ -781,10 +549,10 @@ const ListCancel = ({ item, onDelete, onEdit, onHistoryClick }) => {
                     variant="body2"
                     sx={{ fontWeight: 600, fontSize: "0.8rem" }}
                   >
-                    Estimated Budget
+                    Project Name
                   </Typography>
                   <Typography variant="body2" sx={{ fontSize: "0.7rem" }}>
-                    {item?.EstimatedbudgetName}
+                    {item?.ProjectName}
                   </Typography>
                 </Card>
               </Grid>
@@ -802,10 +570,10 @@ const ListCancel = ({ item, onDelete, onEdit, onHistoryClick }) => {
                     variant="body2"
                     sx={{ fontWeight: 600, fontSize: "0.8rem" }}
                   >
-                    Purpose
+                    Wing Name
                   </Typography>
                   <Typography variant="body2" sx={{ fontSize: "0.7rem" }}>
-                    {item?.PurposeName}
+                    {item?.WingName}
                   </Typography>
                 </Card>
               </Grid>
@@ -823,10 +591,10 @@ const ListCancel = ({ item, onDelete, onEdit, onHistoryClick }) => {
                     variant="body2"
                     sx={{ fontWeight: 600, fontSize: "0.8rem" }}
                   >
-                   Looking For
+                   Flat No
                   </Typography>
                   <Typography variant="body2" sx={{ fontSize: "0.7rem" }}>
-                    {item?.LookingTypeName}
+                    {item?.bookingcancelFlatNo}
                   </Typography>
                 </Card>
               </Grid>
@@ -851,9 +619,14 @@ const ListCancel = ({ item, onDelete, onEdit, onHistoryClick }) => {
                     padding: "10px",
                   }}
                 >
-                 Email
+               <Typography
+                    variant="body2"
+                    sx={{ fontWeight: 600, fontSize: "0.8rem" }}
+                  >
+                 Unit Type
+                  </Typography>
                   <Typography variant="body2" sx={{ fontSize: "0.7rem" }}>
-                  {item?.Email}
+                  {item?.UnittypeName}
                   </Typography>
                 </Card>
               </Grid>
@@ -870,10 +643,10 @@ const ListCancel = ({ item, onDelete, onEdit, onHistoryClick }) => {
                     variant="body2"
                     sx={{ fontWeight: 600, fontSize: "0.8rem" }}
                   >
-                    Telecaller Name
+                 Booking Type
                   </Typography>
                   <Typography variant="body2" sx={{ fontSize: "0.7rem" }}>
-                    {item?.TeleName}
+                    {item?.BookingTypeName}
                   </Typography>
                 </Card>
               </Grid>
@@ -890,10 +663,10 @@ const ListCancel = ({ item, onDelete, onEdit, onHistoryClick }) => {
                     variant="body2"
                     sx={{ fontWeight: 600, fontSize: "0.8rem" }}
                   >
-                    Area from
+                    Area 
                   </Typography>
                   <Typography variant="body2" sx={{ fontSize: "0.7rem" }}>
-                    {item?.AreaFrom}
+                    {item?.bookingcancelArea}
                   </Typography>
                 </Card>
               </Grid>
@@ -924,10 +697,10 @@ const ListCancel = ({ item, onDelete, onEdit, onHistoryClick }) => {
                     variant="body2"
                     sx={{ fontWeight: 600, fontSize: "0.8rem" }}
                   >
-                    Area to
+                   FollowUp Remark
                   </Typography>
                   <Typography variant="body2" sx={{ fontSize: "0.7rem" }}>
-                    {item?.AreaTo}
+                    {item?.bookingcancelremarksRemark}
                   </Typography>
                 </Card>
               </Grid>
@@ -944,10 +717,10 @@ const ListCancel = ({ item, onDelete, onEdit, onHistoryClick }) => {
                     variant="body2"
                     sx={{ fontWeight: 600, fontSize: "0.8rem" }}
                   >
-                    Scale
+                   FollowUp Amount
                   </Typography>
                   <Typography variant="body2" sx={{ fontSize: "0.7rem" }}>
-                    {item?.ScaleName}
+                    {item?.bookingcancelremarksAmount}
                   </Typography>
                 </Card>
               </Grid>
@@ -964,10 +737,10 @@ const ListCancel = ({ item, onDelete, onEdit, onHistoryClick }) => {
                     variant="body2"
                     sx={{ fontWeight: 600, fontSize: "0.8rem" }}
                   >
-                    Description
+                    FollowUp Date
                   </Typography>
                   <Typography variant="body2" sx={{ fontSize: "0.7rem" }}>
-                    {item?.Description}
+                    {item?.bookingcancelremarksDate}
                   </Typography>
                 </Card>
               </Grid>

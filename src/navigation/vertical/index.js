@@ -255,7 +255,7 @@ const navigation = () => {
     },
     {
       icon: PaymentsIcon,
-      title: "Projects Booking Cancel",
+      title: "Cancel Bookings",
       path: "/bookingcancel",
     },
     {

@@ -5,6 +5,7 @@ import ContactPhoneIcon from "@mui/icons-material/ContactPhone";
 import HomeOutline from "mdi-material-ui/HomeOutline";
 import PhoneIcon from "@mui/icons-material/Phone";
 import AssignmentIcon from "@mui/icons-material/Assignment";
+import PaymentsIcon from "@mui/icons-material/Payments";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 const SalesManagerNavigation = () => {
   return [
@@ -64,29 +65,42 @@ const SalesManagerNavigation = () => {
     },
     
     {
-      title: "Booking Cancel",
+      sectionTitle: "All Booking Cancel",
+    },
+
+    {
+      icon: PaymentsIcon,
+      title: "Cancel Bookings",
+      path: "/bookingcancel",
+    },
+    {
+      title: "Followup Booking Cancel",
       icon: TrendingUpIcon,
-      path: "/#",
+      path: "/cancelfollowup",
       children: [
         {
           title: "All Followup",
           icon: CubeOutlineIcon,
-          path: "/#",
+          path: "/cancelfollowup",
         },
         {
           title: "Todays Followup",
           icon: CubeOutlineIcon,
-          path: "/#",
+          path: "/cancelfollowup/Todaycancelfollowup",
         },  {
           title: "Next Followup",
           icon: CubeOutlineIcon,
-          path: "/#",
+          path: "/cancelfollowup/Nextcancelfollowup",
         },  {
           title: "Backlog Followup",
           icon: CubeOutlineIcon,
-          path: "/#",
+          path: "/cancelfollowup/Backlogcancelfollowup",
         },
       ],
+    },
+      
+    {
+      sectionTitle: "Availibilty List",
     },
     {
       title: "Availibilty List",
