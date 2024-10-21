@@ -86,33 +86,6 @@ const OpportunityNotification = () => {
   const router = useRouter();
 
 
-  // useEffect(() => {
-  //   if (typeof window !== 'undefined' && messaging) {
-  //     async function requestPermission() {
-  //       try {
-  //         const permission = await Notification.requestPermission();
-  //         if (permission === 'granted') {
-  //           const token = await getToken(messaging, { vapidKey: 'BAbIhsXFZd4XZZfjVTiwZQmX2fw_9coO2ab3yWaxX6mVisfua4ypPRDr_D8tJW56Jj29V2kJLUIi0CcQHld-3IE' });
-  //           console.log('Generted Token: ??????????????', token);
-  //         } else if (permission === 'denied') {
-  //           alert('You denied the notification.');
-  //         }
-  //       } catch (error) {
-  //         console.error('Error getting token:', error);
-  //       }
-  //     }
-
-  //     requestPermission();
-
-  //     onMessage(messaging, (payload) => {
-  //       console.log('Message received:', payload);
-  //       new Notification(payload.notification.title, {
-  //         body: payload.notification.body,
-  //       });
-  //     });
-  //   }
-  // }, []);
-
   const playNotificationSound = () => {
     const audio = new Audio('/notification.mp3');
     audio.play();
@@ -148,13 +121,11 @@ const OpportunityNotification = () => {
         }
 
         setNotifications(newNotifications);
-      } else {
-        console.error("Expected an array of notifications");
-      }
+      } 
 
       setLoading(false);
     } catch (error) {
-      console.error("Error fetching data:", error);
+     
       setError(error);
       setLoading(false);
     }

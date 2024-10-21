@@ -33,50 +33,65 @@ import EmailIcon from "@mui/icons-material/Email";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 
 const ListCancel = ({ item, onDelete, onEdit, onHistoryClick }) => {
-  console.log(item, "item hasi ye");
-
-  const [cookies, setCookie, removeCookie] = useCookies(["amr"]);
-  const intialName = {
-    Oid: "",
-    CurrentUpdateID: "",
-    NextFollowUpDate: "",
-    NextFollowUpTime: "",
-    Interest: "",
-    Note: "",
+  const [cookies] = useCookies(['amr']);
+  const initialFormState = {
+    bookingcancelremarksbookingcancelID: '',
+    bookingcancelremarksAmount: '',
+    bookingcancelremarksRemark: '',
+    bookingcancelremarksDate: '',
+    cancelbookingupdateID: '',
+    bookingcancelremarksProccess: 0,
+    bookingcancelremarksID: '', // Adjust if needed
     CreateUID: cookies.amr?.UserID || 1,
   };
 
   const [open, setOpen] = useState(false);
-  const [formData, setFormData] = useState(intialName);
-  const [userMaster, setUserMaster] = useState([]);
-
-  const [submitSuccess, setSubmitSuccess] = useState(false);
-  const [submitError, setSubmitError] = useState(false);
-  const [anchorElOpportunity, setAnchorElOpportunity] = useState(null);
-  const [anchorElBooking, setAnchorElBooking] = useState(null);
+  const [formData, setFormData] = useState(initialFormState);
   const [currentUpdate, setCurrentUpdate] = useState([]);
-
-  const [setRowDataToUpdate] = useState(null);
-
+  const [currentRemark, setCurrentRemark] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
-  const handleDropdownClick = (event) => {
-    setAnchorEl(event.currentTarget);
+
+  // Fetch current updates on component mount
+  useEffect(() => {
+    fetchDataCurrent();
+    fetchDataRemark();
+  }, []);
+
+  const fetchDataCurrent = async () => {
+    try {
+      const response = await axios.get(
+        'https://apiforcornershost.cubisysit.com/api/api-dropdown-cancelbookingupdate.php'
+      );
+      console.log('Current Update Response: ', response.data);
+      if (response.data.status === 'Success') {
+        setCurrentUpdate(response.data.data || []);
+      }
+    } catch (error) {
+      console.error('Error fetching current updates:', error);
+    }
   };
 
-  const handleCurrentUpdate = (event) => {
-    setFormData({
-      ...formData,
-      CurrentUpdateID: event.target.value,
-    });
+  const fetchDataRemark = async () => {
+    try {
+      const response = await axios.get(
+        `https://apiforcornershost.cubisysit.com/api/api-fetch-cancelbookingremark.php?bookingcancelremarksbookingcancelID=${item?.bookingcancelID}`
+      );
+      console.log('Current Remark Response: ', response.data);
+      if (response.data.status === 'Success') {
+        setCurrentRemark(response.data.data || []);
+      }
+    } catch (error) {
+      console.error('Error fetching remarks:', error);
+    }
+  };
+
+  const handleDropdownClick = (event) => {
+    setAnchorEl(event.currentTarget);
   };
 
   const handleDropdownClose = () => {
     setAnchorEl(null);
   };
-
-  const whatsappText = encodeURIComponent(
-    `Hello, I wanted to discuss the following details:\n\nSource Name: ${item?.SourceName}\nLocation: ${item?.Location}\nAttended By: ${item?.TelecallAttendedByName}`
-  );
 
   const handleAddFollowUpClick = () => {
     handleDropdownClose();
@@ -85,6 +100,15 @@ const ListCancel = ({ item, onDelete, onEdit, onHistoryClick }) => {
 
   const handleClose = () => {
     setOpen(false);
+    setFormData(initialFormState); // Reset form data when closing
+  };
+
+  const handleCurrentUpdate = (event) => {
+    setFormData({ ...formData, cancelbookingupdateID: event.target.value });
+  };
+
+  const handleCurrentRemark = (event) => {
+    setFormData({ ...formData, bookingcancelremarksID: event.target.value });
   };
 
   const handleChange = (e) => {
@@ -92,157 +116,76 @@ const ListCancel = ({ item, onDelete, onEdit, onHistoryClick }) => {
     setFormData({ ...formData, [name]: value });
   };
 
-
-  const handleHistoryClick = () => {
-    if (onHistoryClick) {
-      // toggleSidebar(false);
-      onHistoryClick(item); // Pass item to parent component for showing history
-    }
-  };
-
-
-  useEffect(() => {
-    const fetchData = async () => {
-      if (!item) return; // Exit if no item is provided
-      try {
-        const apiUrl = `https://apiforcornershost.cubisysit.com/api/api-singel-allbookingcancelrecords.php?UserID=${item.bookingcancelID}`;
-
-        const response = await axios.get(apiUrl);
-
-        if (response.data.status === "Success") {
-          console.log(response.data.data[0], "Single telecalling data fetched");
-          // Update item state with fetched data
-          setRowDataToUpdate(response.data.data[0]);
-        }
-      } catch (error) {
-        console.error("Error fetching single telecalling data:", error);
-      }
-    };
-    fetchData();
-  }, [item]);
-
-  useEffect(() => {
-    fetchDataCurrent();
-  }, []);
-
-  const fetchDataCurrent = async () => {
-    try {
-      const response = await axios.get(
-        "https://apiforcornershost.cubisysit.com/api/api-fetch-currentupdate.php"
-      );
-      setCurrentUpdate(response.data.data || []);
-    } catch (error) {
-      console.error("Error fetching Bhk data:", error);
-    }
-  };
-
-
-
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    // Ensure item and Tid are available
-    if (!item || !item.Oid) {
-      console.error("No valid item or Tid found.");
-      return;
-    }
-
-    // Add Tid to formData
-    const formDataWithTid = {
+    const formDataToSubmit = {
       ...formData,
-      Oid: item.Oid,
+      bookingcancelremarksbookingcancelID: item?.bookingcancelID || '',
     };
 
-    console.log(formDataWithTid, "follow up opportunut");
-
-    const url =
-      "https://proxy-forcorners.vercel.app/api/proxy/api-insert-opportunityfollowup.php";
+    const url = 'https://proxy-forcorners.vercel.app/api/proxy/api-insert-cancelbookingremarkupdate.php';
 
     try {
-      const response = await axios.post(url, formDataWithTid, {
-        headers: {
-          "Content-Type": "application/json",
-        },
+      const response = await axios.post(url, formDataToSubmit, {
+        headers: { 'Content-Type': 'application/json' },
       });
 
-      if (response.data.status === "Success") {
-        setFormData(intialName);
+      if (response.data.status === 'Success') {
         setOpen(false);
-        setSubmitSuccess(true);
-        setSubmitError(false);
-        // Show success message using SweetAlert
-
         Swal.fire({
-          icon: "success",
-          title: "Follow Up detail saved successfully",
+          icon: 'success',
+          title: 'Follow Up detail saved successfully',
           showConfirmButton: false,
           timer: 1000,
         }).then(() => {
           window.location.reload();
         });
       } else {
-        setSubmitSuccess(false);
-        setSubmitError(true);
-        // Show error message using SweetAlert
         Swal.fire({
-          icon: "error",
-          title: "Oops...",
-          text: "Something went wrong! Please try again later.",
+          icon: 'error',
+          title: 'Oops...',
+          text: response.data.message || 'Something went wrong! Please try again later.',
         });
       }
     } catch (error) {
-      console.error("There was an error!", error);
-      setSubmitSuccess(false);
-      setSubmitError(true);
-      // Show error message using SweetAlert
+      console.error('There was an error!', error);
       Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: "Something went wrong! Please try again later.",
+        icon: 'error',
+        title: 'Oops...',
+        text: 'Something went wrong! Please try again later.',
       });
     }
   };
 
   return (
     <>
-      <Grid
-        container
-        justifyContent="center"
-        spacing={2}
-        sx={{ marginBottom: 5 }}
-      >
-       
-       
+      <Grid container justifyContent="center" spacing={2} sx={{ marginBottom: 5 }}>
         <Grid item>
           <Button
             variant="contained"
             startIcon={<PersonAddIcon />}
-            onClick={handleDropdownClick}
+            onClick={handleAddFollowUpClick}
             sx={{
               mr: 30,
-
-              color: "#333333",
-              fontSize: "0.6rem",
-              backgroundColor: "#f0f0f0",
-              minWidth: "auto",
+              color: '#333333',
+              fontSize: '0.6rem',
+              backgroundColor: '#f0f0f0',
+              minWidth: 'auto',
               minHeight: 20,
-              "&:hover": {
-                backgroundColor: "#dcdcdc",
+              '&:hover': {
+                backgroundColor: '#dcdcdc',
               },
             }}
           >
-            Next FollowUp
+            Next Follow Up
           </Button>
-          <Menu
-            anchorEl={anchorEl}
-            open={Boolean(anchorEl)}
-            onClose={handleDropdownClose}
-          >
+          <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleDropdownClose}>
             <MenuItem onClick={handleAddFollowUpClick}>
               <AddIcon sx={{ mr: 1 }} />
               Add Follow Up
             </MenuItem>
-            <MenuItem onClick={handleHistoryClick}>
+            <MenuItem onClick={onHistoryClick}>
               <HistoryIcon sx={{ mr: 1 }} />
               History
             </MenuItem>
@@ -250,144 +193,115 @@ const ListCancel = ({ item, onDelete, onEdit, onHistoryClick }) => {
         </Grid>
       </Grid>
 
-      <Modal
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
+      <Modal open={open} onClose={handleClose} aria-labelledby="modal-modal-title">
         <Box
           sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            bgcolor: "background.paper",
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            bgcolor: 'background.paper',
             boxShadow: 24,
             p: 4,
             minWidth: 500,
-            maxWidth: 700, // Adjust the maxWidth to accommodate two text fields in a row
+            maxWidth: 700,
             mt: 5,
             mx: 2,
-            minHeight: 400, // Adjust the minHeight to increase the height of the modal
-            height: "auto",
+            minHeight: 400,
           }}
         >
-          <IconButton
-            aria-label="cancel"
-            onClick={handleClose}
-            sx={{ position: "absolute", top: 6, right: 10 }}
-          >
-            <CancelIcon sx={{ color: "red" }} />
+          <IconButton aria-label="cancel" onClick={handleClose} sx={{ position: 'absolute', top: 6, right: 10 }}>
+            <CancelIcon sx={{ color: 'red' }} />
           </IconButton>
-          <Typography
-            id="modal-modal-title"
-            variant="h7"
-            component="h3"
-            gutterBottom
-          >
-            Select Next Follow-Up Date and Time
+          <Typography id="modal-modal-title" variant="h7" component="h3" gutterBottom>
+            Select Next Follow-Ups
           </Typography>
 
           <Grid container spacing={2} mt={8}>
-            <Grid item xs={6}>
+            <Grid item xs={12}>
               <FormControl fullWidth>
                 <InputLabel>Current Update</InputLabel>
                 <Select
-                  value={formData.CurrentUpdateID}
+                  value={formData.cancelbookingupdateID}
                   onChange={handleCurrentUpdate}
                   label="Current Update"
-                  MenuProps={{
-                    PaperProps: {
-                      style: {
-                        maxHeight: 180, // Adjust as needed
-                      },
-                    },
-                  }}
                 >
-                  {currentUpdate.map((bhk) => (
-                    <MenuItem
-                      key={bhk.CurrentUpdateID}
-                      value={bhk.CurrentUpdateID}
-                    >
-                      {bhk.CurrentUpdateName}
-                    </MenuItem>
-                  ))}
+                  {currentUpdate.length > 0 ? (
+                    currentUpdate.map((update) => (
+                      <MenuItem key={update.cancelbookingupdateID} value={update.cancelbookingupdateID}>
+                        {update.cancelbookingupdateName}
+                      </MenuItem>
+                    ))
+                  ) : (
+                    <MenuItem disabled>No updates available</MenuItem>
+                  )}
                 </Select>
               </FormControl>
             </Grid>
-
+            <Grid item xs={12}>
+              <FormControl fullWidth>
+                <InputLabel>Remarks</InputLabel>
+                <Select
+                  value={formData.bookingcancelremarksID}
+                  onChange={handleCurrentRemark}
+                  label="Remarks"
+                >
+                  {currentRemark.length > 0 ? (
+                    currentRemark.map((remark) => (
+                      <MenuItem key={remark.bookingcancelremarksID} value={remark.bookingcancelremarksID}>
+                        {remark.bookingcancelremarksRemark}
+                      </MenuItem>
+                    ))
+                  ) : (
+                    <MenuItem disabled>No remarks available</MenuItem>
+                  )}
+                </Select>
+              </FormControl>
+            </Grid>
             <Grid item xs={6}>
               <TextField
                 fullWidth
-                // label="Next Follow-Up Date"
                 type="date"
-                name="NextFollowUpDate"
-                value={formData.NextFollowUpDate}
+                name="bookingcancelremarksDate"
+                value={formData.bookingcancelremarksDate}
                 onChange={handleChange}
                 label="Next Follow Up Date"
-                InputLabelProps={{
-                  shrink: true,
-                }}
+                InputLabelProps={{ shrink: true }}
               />
             </Grid>
-            <Grid item xs={6}>
-              <TextField
-                fullWidth
-                // label="Next Follow-Up Time"
-                type="time"
-                name="NextFollowUpTime"
-                value={formData.NextFollowUpTime}
-                onChange={handleChange}
-                label="Next Follow Up Time"
-                InputLabelProps={{
-                  shrink: true,
-                }}
-              />
-            </Grid>
+
             <Grid item xs={6}>
               <TextField
                 fullWidth
                 label="Interest In"
                 type="text"
-                name="Interest"
-                value={formData.Interest}
+                name="bookingcancelremarksRemark"
+                value={formData.bookingcancelremarksRemark}
                 onChange={handleChange}
                 InputLabelProps={{ sx: { mb: 1 } }}
               />
             </Grid>
+
             <Grid item xs={12}>
               <TextField
                 fullWidth
-                label="Remark"
-                type="text"
-                name="Note"
-                value={formData.Note}
+                label="Amount"
+                type="number"
+                name="bookingcancelremarksAmount"
+                value={formData.bookingcancelremarksAmount}
                 onChange={handleChange}
-                InputLabelProps={{ sx: { mb: 1 } }}
               />
             </Grid>
-          </Grid>
 
-          <Box sx={{ textAlign: "left" }}>
+            {/* Submit Button */}
             <Grid item xs={12}>
-              <Button
-                variant="contained"
-                sx={{
-                  marginRight: 3.5,
-                  marginTop: 15,
-                  backgroundColor: "#9155FD",
-                  color: "#FFFFFF",
-                }}
-                onClick={handleSubmit}
-              >
-                Submit
+              <Button variant="contained" onClick={handleSubmit}>  
+                Save Follow-Up
               </Button>
             </Grid>
-          </Box>
+          </Grid>
         </Box>
       </Modal>
-
       <Card sx={{}}>
         <Paper sx={{ padding: 5 }}>
           <Box
@@ -516,7 +430,7 @@ const ListCancel = ({ item, onDelete, onEdit, onHistoryClick }) => {
                       backgroundColor: "#bbdefb",
                     },
                   }}
-                  onClick={handleHistoryClick}
+                  // onClick={handleHistoryClick}
                 >
                   <HistoryIcon />
                 </IconButton>

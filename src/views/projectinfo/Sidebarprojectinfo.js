@@ -19,35 +19,30 @@ import {
   DialogContentText,
   DialogTitle,
   Button,
-  Popover,
+  Menu,
   ListItemIcon,
+  Popover,
 } from "@mui/material";
 import axios from "axios";
+import { Chip } from '@mui/material';
 import PersonIcon from "@mui/icons-material/Person";
+import FaceIcon from '@mui/icons-material/Face';
+
+import { Divider } from "@mui/material";
+import ApartmentIcon from '@mui/icons-material/Apartment';
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { useCookies } from "react-cookie";
 import AddIcon from "@mui/icons-material/Add";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import GetAppIcon from "@mui/icons-material/GetApp";
 import SortIcon from "@mui/icons-material/Sort";
-import Swal from 'sweetalert2';
 
-const Sidebarprojectinfo = ({ onEdit, onItemClick, onCreate }) => {
+
+const SidebarProjectinfo = ({ onEdit, onItemClick, onCreate }) => {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [cookies, setCookie] = useCookies(["amr"]); // Define cookies and setCookie function
-
-  // Accessing cookie values
-  const userName = cookies.amr?.FullName || 'User';
-  const roleName = cookies.amr?.RoleName || 'Admin';
-  const userid = cookies.amr?.UserID || 'Role';
-  console.log(userName, 'ye dekh username');
-  console.log(roleName, 'ye dekh rolname');
-  console.log(userid, 'ye dekh roleide');
-
   const [filteredRows, setFilteredRows] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(0);
@@ -61,15 +56,17 @@ const Sidebarprojectinfo = ({ onEdit, onItemClick, onCreate }) => {
   useEffect(() => {
     fetchData();
   }, []);
+
   const fetchData = async () => {
     try {
       const response = await axios.get(
-        `https://apiforcornershost.cubisysit.com/api/api-fetch-contacts.php?UserID=${userid}`
+        "https://apiforcornershost.cubisysit.com/api/api-fetch-projectmaster.php"
       );
       console.log("API Response:", response.data);
       setRows(response.data.data || []);
       setLoading(false);
     } catch (error) {
+      
       console.error("Error fetching data:", error);
       setError(error);
       setLoading(false);
@@ -77,31 +74,27 @@ const Sidebarprojectinfo = ({ onEdit, onItemClick, onCreate }) => {
   };
 
   useEffect(() => {
+    setFilteredRows(rows);
+  }, [rows]);
+
+  useEffect(() => {
     const lowerCaseQuery = searchQuery.toLowerCase().trim();
     if (lowerCaseQuery === "") {
-      setFilteredRows(rows); // Reset to show all rows if searchQuery is empty
+      setFilteredRows(rows);
     } else {
-      const filteredData = rows.filter((item) => {
-        // Check if item exists and has CName and Mobile properties
-        if (item && item.CName && typeof item.Mobile === "string") {
-          return (
-            item.CName.toLowerCase().includes(lowerCaseQuery) ||
-            item.Mobile.toLowerCase().includes(lowerCaseQuery)
-          );
-        }
-        return false; // Exclude items that don't have required properties or incorrect Mobile type
-      });
-      setFilteredRows(filteredData); // Filter rows based on searchQuery
+      const filteredData = rows.filter(
+        (item) =>
+          item?.CompanyName?.toLowerCase().includes(lowerCaseQuery) ||
+          item?.CompanyName?.toLowerCase().includes(lowerCaseQuery)
+      );
+      setFilteredRows(filteredData);
     }
-    setPage(0); // Reset pagination to the first page
+    setPage(0);
   }, [searchQuery, rows]);
-  
 
   const handleSearchChange = (event) => {
-    const { value } = event.target;
-    setSearchQuery(value);
+    setSearchQuery(event.target.value);
   };
-  
 
   const handleClearSearch = () => {
     setSearchQuery("");
@@ -120,40 +113,42 @@ const Sidebarprojectinfo = ({ onEdit, onItemClick, onCreate }) => {
   const handleDelete = async () => {
     try {
       const response = await axios.post(
-        "https://proxy-forcorners.vercel.app/api/proxy/api-delete-contacts.php",
+        "https://proxy-forcorners.vercel.app/api/proxy/api-delete-telecalling.php",
         {
-          Cid: deleteId,
+          Tid: deleteId,
           DeleteUID: 1,
         }
       );
       if (response.data.status === "Success") {
-        setRows(rows.filter((row) => row.Cid !== deleteId));
+        setRows(rows.filter((row) => row.Tid !== deleteId));
         console.log("Deleted successfully");
         setConfirmDelete(false);
-        Swal.fire({
-          title: 'Deleted!',
-          text: 'Your data has been deleted.',
-          icon: 'success',
-          confirmButtonText: 'OK',
-        });
       }
     } catch (error) {
       console.error("Error deleting data:", error);
       setError(error);
-      Swal.fire({
-        title: 'Error!',
-        text: 'There was an error deleting the data.',
-        icon: 'error',
-        confirmButtonText: 'OK',
-      });
     }
   };
-
   const handleOpenConfirmDelete = (id) => {
     setDeleteId(id);
     setConfirmDelete(true);
   };
-
+  const getDateStatus = (contactCreateDate) => {
+    const date = new Date(contactCreateDate);
+    const now = new Date();
+    
+    const isCurrentMonth = date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
+    const isPreviousMonth = date.getMonth() === now.getMonth() - 1 && date.getFullYear() === now.getFullYear();
+  
+    if (isCurrentMonth) {
+      return "New";
+    } else if (isPreviousMonth) {
+      return "In Progress";
+    } else {
+      return null;
+    }
+  };
+  
   const handleListItemClick = (item) => {
     onItemClick(item);
   };
@@ -190,29 +185,21 @@ const Sidebarprojectinfo = ({ onEdit, onItemClick, onCreate }) => {
     switch (option) {
       case "asc":
         sortedRows.sort(
-          (a, b) => new Date(a.CreateDate) - new Date(b.CreateDate)
+          (a, b) =>
+            new Date(a.NextFollowUpDate) - new Date(b.NextFollowUpDate)
         );
         break;
       case "desc":
         sortedRows.sort(
-          (a, b) => new Date(b.CreateDate) - new Date(a.CreateDate)
+          (a, b) =>
+            new Date(b.NextFollowUpDate) - new Date(a.NextFollowUpDate)
         );
         break;
       case "a-z":
-        sortedRows.sort((a, b) => {
-          if (a && a.CName && b && b.CName) {
-            return a.CName.localeCompare(b.CName);
-          }
-          return 0; // or handle differently, e.g., put items without Name at the end
-        });
+        sortedRows.sort((a, b) => a.PartyName.localeCompare(b.PartyName));
         break;
       case "z-a":
-        sortedRows.sort((a, b) => {
-          if (a && a.CName && b && b.CName) {
-            return b.CName.localeCompare(a.CName);
-          }
-          return 0; // or handle differently, e.g., put items without Name at the end
-        });
+        sortedRows.sort((a, b) => b.PartyName.localeCompare(a.PartyName));
         break;
       default:
         break;
@@ -222,8 +209,10 @@ const Sidebarprojectinfo = ({ onEdit, onItemClick, onCreate }) => {
 
   const jsonToCSV = (json) => {
     const header = Object.keys(json[0]).join(",");
-    const values = json.map((obj) => Object.values(obj).join(",")).join("\n");
-    return `${header}\n${values}`;
+    const values = json
+      .map((obj) => Object.values(obj).join(","))
+      .join("\n");
+      return `${header}\n${values}`;
   };
 
   const handleDownload = () => {
@@ -232,7 +221,7 @@ const Sidebarprojectinfo = ({ onEdit, onItemClick, onCreate }) => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "Contact.csv";
+    a.download = "Telecalling.csv";
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -241,7 +230,7 @@ const Sidebarprojectinfo = ({ onEdit, onItemClick, onCreate }) => {
   return (
     <Card
       sx={{
-        width: 390,
+   
         padding: 5,
         height: 700,
         overflowY: "auto",
@@ -250,10 +239,10 @@ const Sidebarprojectinfo = ({ onEdit, onItemClick, onCreate }) => {
       <Grid item xs={12} sx={{ marginBottom: 3 }}>
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Typography variant="body2" sx={{ fontWeight: "bold", fontSize: 20 }}>
-            All Contacts
+            All Projects
           </Typography>
           <Box display="flex" alignItems="center">
-            <IconButton
+          <IconButton
               aria-label="filter"
               sx={{ color: "grey" }}
               onClick={onCreate}
@@ -295,7 +284,7 @@ const Sidebarprojectinfo = ({ onEdit, onItemClick, onCreate }) => {
               </MenuItem>
             </Popover>
 
-            <IconButton
+            {/* <IconButton
               aria-label="more"
               aria-controls="menu"
               aria-haspopup="true"
@@ -322,9 +311,9 @@ const Sidebarprojectinfo = ({ onEdit, onItemClick, onCreate }) => {
                 <ListItemIcon>
                   <GetAppIcon fontSize="small" />
                 </ListItemIcon>
-                Download All Data
+            Download All Data
               </MenuItem>
-            </Popover>
+            </Popover> */}
           </Box>
         </Box>
       </Grid>
@@ -379,7 +368,7 @@ const Sidebarprojectinfo = ({ onEdit, onItemClick, onCreate }) => {
             onClick={onCreate}
             sx={{ mt: 2 }}
           >
-            Create Telecalling
+            Create Project
           </Button>
         </Box>
       ) : (
@@ -388,47 +377,56 @@ const Sidebarprojectinfo = ({ onEdit, onItemClick, onCreate }) => {
             {filteredRows
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((item) => (
-                <React.Fragment key={item.Cid}>
-                  <Card sx={{ marginBottom: 2 }}>
-                    <ListItem
-                      disablePadding
-                      onClick={() => handleListItemClick(item)}
-                    >
-                      <ListItemAvatar>
-                        <Avatar
-                          alt="John Doe"
-                          sx={{ width: 40, height: 40, margin: 2 }}
-                          src="/images/avatars/1.png"
-                        />
-                      </ListItemAvatar>
+                <React.Fragment key={item.ProjectID}>
+                  <Card sx={{marginBottom:2}}>
+                   <ListItem disablePadding onClick={() => handleListItemClick(item)}>
+                   <ListItemAvatar>
+ 
+        <ApartmentIcon style={{ width: 40, height: 40, margin: 2 ,color: '#b187fd' }} />
+
+    </ListItemAvatar>
                       <ListItemText
-                        primary={
+                       primary={
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
                           <Typography
                             variant="subtitle1"
-                            style={{ fontWeight: "bold" }}
+                            style={{ fontWeight: 600, fontSize: 13 }}         
                           >
-                           {item.TitleName} {item.CName}
+                         {item.ProjectName}
                           </Typography>
-                        }
+                          {item.leadstatusName && (
+                            <Chip
+                              label={item.leadstatusName}
+                              size="small"
+                              style={{
+                                fontSize: 8,
+                                marginLeft: 8,
+                                height: 12,
+                                p: 3,
+                                backgroundColor: getChipColor(item.leadstatusName),
+                                color: "#000000", // Adjust text color for better contrast if needed
+                              }}
+                            />
+                          )}
+                          
+                        </div>
+                      }
                         secondary={
                           <>
-                            <Typography
-                              variant="body2"
-                              style={{ fontSize: 10 }}
-                            >
-                              Phone: {item.Mobile}
+                      
+                            <Typography variant="body2" style={{ fontSize: 10 }}>
+                            Company Name :{item.CompanyName} 
+                            
                             </Typography>
-                            <Typography
-                              variant="body2"
-                              style={{ fontSize: 10 }}
-                            >
-                              City: {item.CityName}
+                            <Typography variant="body2" style={{ fontSize: 10 }}>
+                            Created By :{item?.Name}
+
+                            
                             </Typography>
-                            <Typography
-                              variant="body2"
-                              style={{ fontSize: 10 }}
-                            >
-                              Created At: {item.CreateDate}
+                            <Typography variant="body2" style={{ fontSize: 10 }}>
+                             Created Date : {item?.CreateDate}
+
+                            
                             </Typography>
                           </>
                         }
@@ -439,25 +437,24 @@ const Sidebarprojectinfo = ({ onEdit, onItemClick, onCreate }) => {
                         flexDirection="column"
                         alignItems="flex-end"
                       >
-                        {/* <IconButton
-                          aria-label="edit"
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            onEdit(item);
-                          }}
-                          sx={{ color: "blue" }}
-                        >
-                          <EditIcon />
-                        </IconButton> */}
                         <IconButton
-                          aria-label="delete"
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            handleOpenConfirmDelete(item.Cid);
-                          }}
-                          sx={{ color: "red" }}
-                        >
-                          {/* <DeleteIcon /> */}
+                          aria-label="edit"
+                         
+                          sx={{ color: "blue" }}
+                        >      
+                    {getDateStatus(item.ContactCreateDate) && (
+                            <Chip
+                              label={getDateStatus(item.ContactCreateDate)}
+                              size="small"
+                              color={getDateStatus(item.ContactCreateDate) === "New" ? "warning" : "default"}
+                              style={{
+                                fontSize: 8,
+                                marginLeft: 8,
+                                height: 20,
+                              }}
+                            />
+                          )}
+
                         </IconButton>
                       </Box>
                     </ListItem>
@@ -488,4 +485,5 @@ const Sidebarprojectinfo = ({ onEdit, onItemClick, onCreate }) => {
   );
 };
 
-export default Sidebarprojectinfo;
+
+export default SidebarProjectinfo;

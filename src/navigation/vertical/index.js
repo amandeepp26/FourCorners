@@ -123,7 +123,11 @@ const navigation = () => {
       icon: AssignmentIcon,
       path: "/typography",
     },
-
+    {
+      title: "Project Info",
+      icon: AssignmentIcon,
+      path: "/projectinfo",
+    },
     {
       title: "Project Details",
       icon: PhoneIcon,

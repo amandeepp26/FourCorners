@@ -57,8 +57,56 @@ const ListOpportunity = ({ item, onDelete, onEdit, onHistoryClick }) => {
   const [currentUpdate, setCurrentUpdate] = useState([]);
 
   const [setRowDataToUpdate] = useState(null);
-
   const [anchorEl, setAnchorEl] = useState(null);
+
+  const [shareAnchorEl, setShareAnchorEl] = useState(null);
+  const [projectAnchorEl, setProjectAnchorEl] = useState(null);
+  const [error, setError] = useState(null);
+  const [emailSuccess, setEmailSuccess] = useState(false);
+  const [projects, setProjects] = useState([]); // Assuming this is populated with project dat
+
+  const handleShareClick = async (event) => {
+    setShareAnchorEl(event.currentTarget);
+    try {
+      const response = await axios.get("https://apiforcornershost.cubisysit.com/api/api-share-project.php");
+      if (response.data.status === "Success") {
+        setProjects(response.data.data); // Directly set the projects from the API response
+      } else {
+        setError("Failed to fetch projects.");
+      }
+    } catch (err) {
+      setError("An error occurred while fetching projects.");
+    }
+  };
+
+  const handleProjectClick = (event) => {
+    setProjectAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setShareAnchorEl(null);
+    setProjectAnchorEl(null);
+  };
+
+  const handleProjectSelect = async (project) => {
+    try {
+      const emailResponse = await axios.post("YOUR_EMAIL_API_ENDPOINT", {
+        email: project.Email, // Ensure the project object has an Email field
+        subject: `Project Details for ${project.ProjectName}`,
+        body: JSON.stringify(project), // You can format this as needed
+      });
+
+      if (emailResponse.data.status === "Success") {
+        setEmailSuccess(true);
+        alert("Project details sent successfully!");
+      } else {
+        alert("Failed to send email.");
+      }
+    } catch (err) {
+      alert("An error occurred while sending email.");
+    }
+    handleClose();
+  };
   const handleDropdownClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -83,9 +131,6 @@ const ListOpportunity = ({ item, onDelete, onEdit, onHistoryClick }) => {
     setOpen(true);
   };
 
-  const handleClose = () => {
-    setOpen(false);
-  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -292,7 +337,7 @@ const ListOpportunity = ({ item, onDelete, onEdit, onHistoryClick }) => {
 
   const handleEdit = () => {
     if (onEdit) {
-      onEdit(item); // Pass item to parent component for editing
+      onEdit(item); 
     }
   };
 
@@ -677,24 +722,52 @@ const ListOpportunity = ({ item, onDelete, onEdit, onHistoryClick }) => {
                   <PhoneIcon />
                 </IconButton>
               </a>
-              <a style={{ marginRight: 10 }}>
-                <IconButton
-                  aria-label="share"
-                  size="small"
-                  sx={{
-                    color: "blue",
-                    backgroundColor: "#e3f2fd",
-                    borderRadius: "50%",
-                    padding: "10px",
-                    marginRight: 15,
-                    "&:hover": {
-                      backgroundColor: "#bbdefb",
-                    },
-                  }}
-                >
-                  <ShareIcon />
-                </IconButton>
-              </a>
+              <Box>
+     
+      {/* Share Menu */}
+      <Menu
+        anchorEl={shareAnchorEl}
+        open={Boolean(shareAnchorEl)}
+        onClose={handleClose}
+      >
+        {error && <Alert severity="error">{error}</Alert>}
+        {/* Your share options here */}
+      </Menu>
+
+      <IconButton
+        aria-label="share"
+        size="small"
+        onClick={handleProjectClick}
+        sx={{
+          color: "blue",
+          backgroundColor: "#e3f2fd",
+          borderRadius: "50%",
+          padding: "10px",
+          marginRight: 15,
+          "&:hover": {
+            backgroundColor: "#bbdefb",
+          },
+        }}
+      >
+        <ShareIcon />
+      </IconButton>
+
+
+      {/* Project Menu */}
+      <Menu
+        anchorEl={projectAnchorEl}
+        open={Boolean(projectAnchorEl)}
+        onClose={handleClose}
+      >
+        {projects.map((project) => (
+          <MenuItem key={project.ProjectID} onClick={() => handleProjectSelect(project)}>
+            <Typography>{project.ProjectName}</Typography>
+          </MenuItem>
+        ))}
+      </Menu>
+
+      {emailSuccess && <Alert severity="success">Email sent successfully!</Alert>}
+    </Box>
               <a style={{ marginRight: 30 }}>
                 <IconButton
                   aria-label="share"
