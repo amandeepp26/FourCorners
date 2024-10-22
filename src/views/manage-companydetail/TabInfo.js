@@ -77,24 +77,20 @@ const TabInfo = ({ setShowTabAccount , onEdit }) => {
     setOpen(false);
     setDeleteId(null);
   };
-
   const handleDelete = async () => {
-    const body = {
-      CompanyID: deleteId,
-      DeleteUID: 1,
-    };
-
     try {
+      console.log("Sending delete request with:", { CompanyID: deleteId, DeleteUID: 1 });
       const response = await axios.post(
         "https://proxy-forcorners.vercel.app/api/proxy/api-delete-companymaster.php",
-        body,
         {
-          headers: {
-            "Content-Type": "application/json",
-          },
+          CompanyID: deleteId,   // Ensure deleteId is set correctly
+          DeleteUID: 1,          // Replace with actual user ID if necessary
         }
       );
+      console.log("API Response:", response.data);
+      
       if (response.data.status === "Success") {
+        // Remove the deleted row from the local state
         setRows(rows.filter(row => row.CompanyID !== deleteId));
         setFilteredRows(filteredRows.filter(row => row.CompanyID !== deleteId));
       } else {
@@ -107,6 +103,7 @@ const TabInfo = ({ setShowTabAccount , onEdit }) => {
       setDeleteId(null);
     }
   };
+  
 
   const handleEdit = (rowData) => {
     setShowTabAccount(rowData);

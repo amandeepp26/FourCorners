@@ -723,8 +723,6 @@ const ListOpportunity = ({ item, onDelete, onEdit, onHistoryClick }) => {
                 </IconButton>
               </a>
               <Box>
-     
-      {/* Share Menu */}
       <Menu
         anchorEl={shareAnchorEl}
         open={Boolean(shareAnchorEl)}
@@ -752,8 +750,6 @@ const ListOpportunity = ({ item, onDelete, onEdit, onHistoryClick }) => {
         <ShareIcon />
       </IconButton>
 
-
-      {/* Project Menu */}
       <Menu
         anchorEl={projectAnchorEl}
         open={Boolean(projectAnchorEl)}

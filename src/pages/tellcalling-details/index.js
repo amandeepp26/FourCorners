@@ -41,7 +41,7 @@ const Tellecalling = () => {
     if (showAddDetailsFlag === 'true') {
       setShowAddDetails(true);
       setContactData(selectedContact ? JSON.parse(selectedContact) : null);
-      localStorage.removeItem('showAddDetails'); // Clear flag
+      localStorage.removeItem('showAddDetails');
     } else {
       setShowAddDetails(false);
     }
@@ -81,7 +81,6 @@ const Tellecalling = () => {
 
     fetchData();
   };
-
   const handleEdit = (row) => {
     setEditData(row);
     setRowDataToUpdate(null);
@@ -90,7 +89,6 @@ const Tellecalling = () => {
     setFirstVisit(false);
     setShowDashboard(false);
   };
-
   const handleShow = (item) => {
     setRowDataToUpdate(item);
     setShowAddDetails(false);
@@ -98,9 +96,6 @@ const Tellecalling = () => {
     setFirstVisit(false);
     setShowDashboard(false);
   };
-
-
-  
   const handleAddTelecaller = () => {
     setEditData(null);
     setRowDataToUpdate(null);
@@ -116,24 +111,16 @@ const Tellecalling = () => {
       console.warn('No contact data available');
     }
   };
-  
-  
-
   const handleShowHistory = () => {
     setShowHistory(true);
     setShowAddDetails(false);
     setShowDashboard(false);
-
     setFirstVisit(false);
   };
-
   const handleNavigation = () => {
     setShowDashboard(true);
     setShowAddDetails(false);
   };
-  
-  
-
   const renderStats = () => {
     console.log(counts, 'dekh>>>>>>>>>>>>>>>>>>');
     

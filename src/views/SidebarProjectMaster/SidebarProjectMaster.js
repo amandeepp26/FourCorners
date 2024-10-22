@@ -113,14 +113,13 @@ const SidebarProjectMaster = ({ onEdit, onItemClick, onCreate }) => {
   const handleDelete = async () => {
     try {
       const response = await axios.post(
-        "https://proxy-forcorners.vercel.app/api/proxy/api-delete-telecalling.php",
+        "https://proxy-forcorners.vercel.app/api/proxy/api-delete-project.php",
         {
-          Tid: deleteId,
-          DeleteUID: 1,
+          ProjectID: deleteId,
         }
       );
       if (response.data.status === "Success") {
-        setRows(rows.filter((row) => row.Tid !== deleteId));
+        setRows(rows.filter((row) => row.ProjectID !== deleteId));
         console.log("Deleted successfully");
         setConfirmDelete(false);
       }
@@ -455,6 +454,16 @@ const SidebarProjectMaster = ({ onEdit, onItemClick, onCreate }) => {
                             />
                           )}
 
+                        </IconButton>
+                        <IconButton
+                          aria-label="delete"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            handleOpenConfirmDelete(item.ProjectID);
+                          }}
+                          sx={{ color: "red" }}
+                        >
+                          <DeleteIcon />
                         </IconButton>
                       </Box>
                     </ListItem>

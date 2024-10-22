@@ -374,7 +374,7 @@ const Sidebar = ({ onEdit, onItemClick, onCreate , onDashboardClick}) => {
             variant="contained"
             color="primary"
             startIcon={<AddIcon />}
-            onClick={onCreate}
+            // onClick={onCreate}
             sx={{ mt: 2 }}
           >
             Create Opportunity

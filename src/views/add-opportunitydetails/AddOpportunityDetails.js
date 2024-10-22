@@ -239,23 +239,6 @@ const AddOpportunityDetails = ({
     fetchData();
   }, []);
 
-  // useEffect(() => {
-  //   fetchDataOppor.tunity();
-  // }, []);
-
-  // const fetchDataOpportunity = async () => {
-  //   setLoading(true);
-  //   try {
-  //     const response = await axios.get(
-  //       "https://apiforcornershost.cubisysit.com/api/api-fetch-opportunity.php"
-  //     );
-  //     setRows(response.data.data || []);
-  //   } catch (error) {
-  //     console.log("err");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
 
   useEffect(() => {
     if (rows.length > 0) {
@@ -424,12 +407,12 @@ const AddOpportunityDetails = ({
                 <InputLabel shrink>Project Name</InputLabel>
                 <TextField
                   label="Project Name"
-                  value={formData.ProjectName} // Display the ProjectName
+                  value={formData.ProjectName}
                   InputProps={{
-                    readOnly: true, // Make the field read-only
+                    readOnly: true,
                   }}
                 />
-                {/* Hidden input to send ProjectID when submitting the form */}
+          
                 <input
                   type="hidden"
                   name="ProjectID"
