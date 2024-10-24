@@ -37,7 +37,7 @@ import AddIcon from "@mui/icons-material/Add";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import GetAppIcon from "@mui/icons-material/GetApp";
 import SortIcon from "@mui/icons-material/Sort";
-
+import { useCookies } from "react-cookie";
 
 const SidebarProjectMaster = ({ onEdit, onItemClick, onCreate }) => {
   const [rows, setRows] = useState([]);
@@ -47,12 +47,13 @@ const SidebarProjectMaster = ({ onEdit, onItemClick, onCreate }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false); 
+  const [cookies, setCookie] = useCookies(["amr"]);
   const [deleteId, setDeleteId] = useState(null);
   const [anchorElFilter, setAnchorElFilter] = useState(null);
   const [anchorElDots, setAnchorElDots] = useState(null);
   const [sortOption, setSortOption] = useState("");
-
+  const userid = cookies.amr?.UserID || 'Role';
   useEffect(() => {
     fetchData();
   }, []);
@@ -116,6 +117,7 @@ const SidebarProjectMaster = ({ onEdit, onItemClick, onCreate }) => {
         "https://proxy-forcorners.vercel.app/api/proxy/api-delete-project.php",
         {
           ProjectID: deleteId,
+          DeleteUID:userid
         }
       );
       if (response.data.status === "Success") {

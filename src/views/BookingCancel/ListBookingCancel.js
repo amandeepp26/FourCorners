@@ -121,8 +121,8 @@ const ListBookingCancel = ({ onChequeReceiptClick, item }) => {
   useEffect(() => {
     if (searchQuery) {
       setFilteredRows(wingDetails.filter(row =>
-        row.FlatNo.toString().toLowerCase().includes(searchQuery.toLowerCase()) ||
-        row.Partyname?.toLowerCase().includes(searchQuery.toLowerCase())
+        row.bookingcancelFlatNo?.toString().toLowerCase().includes(searchQuery.toLowerCase()) ||
+        row.bookingcancelName?.toLowerCase().includes(searchQuery.toLowerCase())
       ));
     } else {
       setFilteredRows(wingDetails);

@@ -269,7 +269,7 @@ const ListCancel = ({ item, onDelete, onEdit, onHistoryClick }) => {
         {currentRemark.length > 0 ? (
           currentRemark.map((remark) => (
             <MenuItem key={remark.bookingcancelremarksID} value={remark.bookingcancelremarksID}>
-              {remark.bookingcancelremarksRemark}
+              {remark.bookingcancelremarksRemark}  ({remark.bookingcancelremarksDate})
             </MenuItem>
           ))
         ) : (
@@ -297,7 +297,7 @@ const ListCancel = ({ item, onDelete, onEdit, onHistoryClick }) => {
       <Grid item xs={6}>
         <TextField
           fullWidth
-          label="Interest In"
+          label="Remark"
           type="text"
           name="bookingcancelremarksRemark"
           value={formData.bookingcancelremarksRemark}
