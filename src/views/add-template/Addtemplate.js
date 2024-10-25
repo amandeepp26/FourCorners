@@ -83,13 +83,13 @@ const AddContact = ({ show, editData }) => {
     formDataToSend.append("TName", formData.TName);
     formDataToSend.append("templatetypeID", formData.templatetypeID);
     formDataToSend.append("para", formData.para);
-    formDataToSend.append("file", formData.file); // Append file object
+    formDataToSend.append("file", formData.file); 
     formDataToSend.append("url", formData.url);
 
     try {
       const response = await axios.post(url, formDataToSend, {
         headers: {
-          "Content-Type": "multipart/form-data", // Important for file uploads
+          "Content-Type": "multipart/form-data", 
         },
       });
 
@@ -129,7 +129,6 @@ const AddContact = ({ show, editData }) => {
     if (!formData.templatetypeID) {
       errors.templatetypeID = "Template Type is required";
     }
-    // Add validation rules for other fields if needed
 
     return errors;
   };

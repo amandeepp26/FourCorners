@@ -8,6 +8,7 @@ import {
   Select,
   FormControl,
   Card,
+  TextField,
   CardContent,
   Typography,
 } from "@mui/material";
@@ -34,6 +35,8 @@ const ListAvailabiltyList = ({ item }) => {
   const [editingCell, setEditingCell] = useState(null);
   const [skuOptions, setSkuOptions] = useState([]);
   const [parkingData, setParkingData] = useState([]);
+  const [holdDetails, setHoldDetails] = useState('');
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -94,13 +97,13 @@ const ListAvailabiltyList = ({ item }) => {
   const getStatusText = (skuID) => {
     switch (skuID) {
       case 1:
-        return 'Avl'; // Available
+        return 'Avl'; 
       case 2:
-        return 'HLD'; // Hold
+        return 'HLD'; 
       case 3:
-        return 'SLD'; // Sold
+        return 'SLD'; 
       default:
-        return 'RFG'; // Remaining/For Sale
+        return 'RFG'; 
     }
   };
 
@@ -135,6 +138,7 @@ const ListAvailabiltyList = ({ item }) => {
   
   const handleCellClick = (floorNo, flatNo) => {
     setEditingCell({ floorNo, flatNo });
+    setHoldDetails('');
     fetchSkuOptions();
   };
 
@@ -150,11 +154,10 @@ const ListAvailabiltyList = ({ item }) => {
       ProjectID: item.ProjectID,
       WingID: selectedWing.WingID,
       FloorNo: floorNo,
-      FlatNo: currentFlat.FlatNo,  // Pass only the FlatNo
+      FlatNo: currentFlat.FlatNo,
+      Partyname: holdDetails,  
     };
-
     console.log("Sending the following data:", requestData);
-
     const result = await Swal.fire({
       title: 'Are you sure?',
       text: `Do you want to update?`,
@@ -246,38 +249,57 @@ const ListAvailabiltyList = ({ item }) => {
                   const isEditing = editingCell && editingCell.floorNo === floorNo && editingCell.flatNo === i + 1;
                   return (
                     <td
-                      key={i}
-                      style={{
-                        border: '1px solid black',
-                        padding: '8px',
-                        backgroundColor: getCellBackgroundColor(flat.skuID),
-                        textAlign: 'center',
-                        cursor: flat.skuID === 1 || flat.skuID === 2 ? 'pointer' : 'default',
-                      }}
-                      onClick={() => (flat.skuID === 1 || flat.skuID === 2) && handleCellClick(floorNo, i + 1)}
-                    >
-                      {isEditing ? (
-                        <FormControl>
-                          <Select
-                            value={flat.skuID}
-                            onChange={handleSkuChange}
-                            autoWidth
-                          >
-                            {skuOptions.map((option) => (
-                              <MenuItem key={option.skuID} value={option.skuID}>
-                                {option.skuName}
-                              </MenuItem>
-                            ))}
-                          </Select>
-                        </FormControl>
-                      ) : (
-                        <>
-                          {flat.Area}<br />
-                          {flat.Flat}
-                          <span style={{ color: '#000000' }}>{getStatusText(flat.skuID)}</span>
-                        </>
-                      )}
-                    </td>
+                    key={i}
+                    style={{
+                      border: '1px solid black',
+                      padding: '8px',
+                      backgroundColor: getCellBackgroundColor(flat.skuID),
+                      textAlign: 'center',
+                      cursor: flat.skuID === 1 || flat.skuID === 2 ? 'pointer' : 'default',
+                    }}
+                    onClick={(e) => {
+                      if (flat.skuID === 1 || flat.skuID === 2) {
+                        // Prevent triggering click if input is focused
+                        if (e.target.tagName !== 'INPUT') {
+                          handleCellClick(floorNo, i + 1);
+                        }
+                      }
+                    }}
+                  >
+                    {isEditing ? (
+                      <FormControl>
+                        <Select
+                          value={flat.skuID}
+                          onChange={handleSkuChange}
+                          autoWidth
+                        >
+                          {skuOptions.map((option) => (
+                            <MenuItem key={option.skuID} value={option.skuID}>
+                              {option.skuName}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                        {flat.skuID === 1 && (
+                          <TextField
+                            fullWidth
+                            type="text"
+                            name="Partyname"
+                            label="Enter Party Name"
+                            value={holdDetails}
+                            onChange={(e) => setHoldDetails(e.target.value)}
+                            onFocus={(e) => e.stopPropagation()} // Prevent triggering the cell click
+                            style={{ marginTop: '8px', width: '100%' }}
+                          />
+                        )}
+                      </FormControl>
+                    ) : (
+                      <>
+                        {flat.Area}<br />
+                        {flat.Flat}
+                        <span style={{ color: '#000000' }}>{getStatusText(flat.skuID)}</span>
+                      </>
+                    )}
+                  </td>
                   );
                 })}
               </tr>

@@ -55,7 +55,7 @@
     "@mui/lab": "^5.0.0-alpha.70",
     "@mui/material": "^5.9.3",
     "@popperjs/core": "^2.11.2",
-    "apexcharts-clevision": "3.28.5",
+    "apexcharts-clevision": "^3.28.5",
     "axios": "^1.7.2",
     "babel-eslint": "^10.1.0",
     "chart.js": "^4.4.3",
@@ -83,7 +83,8 @@
     "react-select": "^5.8.0",
     "recharts": "^2.12.7",
     "styled-components": "^6.1.12",
-    "sweetalert2": "^11.12.0"
+    "sweetalert2": "^11.12.0",
+    "webpack": "^5.95.0"
   },
   "devDependencies": {
     "eslint": "^7.32.0",
