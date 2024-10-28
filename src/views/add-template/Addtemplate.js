@@ -9,33 +9,40 @@ import InputLabel from "@mui/material/InputLabel";
 import CardContent from "@mui/material/CardContent";
 import FormControl from "@mui/material/FormControl";
 import Button from "@mui/material/Button";
-import Swal from 'sweetalert2';
+import { useCookies } from "react-cookie";
+import Swal from "sweetalert2";
 import Card from "@mui/material/Card";
 import MuiAlert from "@mui/material/Alert";
 import axios from "axios";
-import { useCookies } from "react-cookie";
-import {
-  Snackbar,
-} from "@mui/material";
+import Snackbar from "@mui/material/Snackbar";
+import dynamic from "next/dynamic"; // For dynamic import if using Next.js
+import "react-quill/dist/quill.snow.css"; // Import Quill styles
+
+const ReactQuill = dynamic(() => import("react-quill"), { ssr: false }); // Dynamic import
 
 const AddContact = ({ show, editData }) => {
   const initialFormData = {
     TName: "",
     templatetypeID: "",
-    para: "",
-    file: null, // For storing the file object
-    url: ""
+    para: "", 
+    file: null,
+    url: "",
+    ProjectID: "",
+    content: "",
+    CreateUID: cookies?.amr?.UserID || 1,
   };
 
   const [cookies, setCookie] = useCookies(["amr"]);
   const [formData, setFormData] = useState(initialFormData);
   const [templateTypes, setTemplateTypes] = useState([]);
+  const [projectTypeData, setProjectTypeData] = useState([]);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitError, setSubmitError] = useState(false);
   const [errors, setErrors] = useState({});
-  
+
   useEffect(() => {
     fetchTemplateTypes();
+    fetchProject(); // Fetch project data when component mounts
   }, []);
 
   const fetchTemplateTypes = async () => {
@@ -49,6 +56,19 @@ const AddContact = ({ show, editData }) => {
     }
   };
 
+  const fetchProject = async () => {
+    try {
+      const response = await axios.get("https://apiforcornershost.cubisysit.com/api/api-fetch-projectmaster.php");
+      if (response.data.status === "Success") {
+        setProjectTypeData(response.data.data);
+      } else {
+        console.error("Failed to fetch projects:", response.data.message);
+      }
+    } catch (error) {
+      console.error("Error fetching project data:", error);
+    }
+  };
+
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormData({
@@ -57,7 +77,6 @@ const AddContact = ({ show, editData }) => {
     });
   };
 
-  // Handle file input change
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     setFormData({
@@ -66,59 +85,112 @@ const AddContact = ({ show, editData }) => {
     });
   };
 
+  const handleEditorChange = (value) => {
+    setFormData({
+      ...formData,
+      content: value,
+    });
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     const newErrors = validateForm(formData);
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
-      return;  
+      return;
     }
-
+  
     const url = editData
       ? "https://proxy-forcorners.vercel.app/api/proxy/api-update-contacts.php"
-      : "https://proxy-forcorners.vercel.app/api/proxy/api-insert-contacts.php";
-
-    // Prepare form data to send
-    const formDataToSend = new FormData();
-    formDataToSend.append("TName", formData.TName);
-    formDataToSend.append("templatetypeID", formData.templatetypeID);
-    formDataToSend.append("para", formData.para);
-    formDataToSend.append("file", formData.file); 
-    formDataToSend.append("url", formData.url);
-
-    try {
-      const response = await axios.post(url, formDataToSend, {
-        headers: {
-          "Content-Type": "multipart/form-data", 
-        },
-      });
-
-      if (response.data.status === "Success") {
-        setFormData(initialFormData);
-        setErrors({});
-        setSubmitSuccess(true);
-        setSubmitError(false);
-        show(false);
-
-        Swal.fire({
-          icon: "success",
-          title: editData ? "Data Updated Successfully" : "Data Added Successfully",
-          showConfirmButton: false,
-          timer: 1000,
-        }).then(() => {
-          window.location.reload();
+      : "https://proxy-forcorners.vercel.app/api/proxy/api-insert-template.php";
+  
+    // Prepare the data
+    const dataToSend = {
+      TName: formData.TName,
+      templatetypeID: formData.templatetypeID,
+      para: formData.para,
+      url: formData.url,
+      ProjectID: formData.ProjectID,
+      content: formData.content,
+      CreateUID: formData.CreateUID,
+    };
+  
+    // If there's a file, convert it to a base64 string
+    if (formData.file) {
+      const reader = new FileReader();
+      reader.readAsDataURL(formData.file);
+      reader.onloadend = async () => {
+        dataToSend.file = reader.result; // This is the base64 string of the file
+  
+        // Send data to API
+        try {
+          const response = await axios.post(url, dataToSend, {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+  
+          if (response.data.status === "Success") {
+            setFormData(initialFormData);
+            setErrors({});
+            setSubmitSuccess(true);
+            setSubmitError(false);
+            show(false);
+  
+            Swal.fire({
+              icon: "success",
+              title: editData ? "Data Updated Successfully" : "Data Added Successfully",
+              showConfirmButton: false,
+              timer: 1000,
+            }).then(() => {
+              window.location.reload();
+            });
+          } else {
+            setSubmitError(true);
+            setSubmitSuccess(false);
+          }
+        } catch (error) {
+          console.error("Error submitting form:", error);
+          setSubmitError(true);
+          setSubmitSuccess(false);
+        }
+      };
+    } else {
+      // Send data to API without file
+      try {
+        const response = await axios.post(url, dataToSend, {
+          headers: {
+            "Content-Type": "application/json",
+          },
         });
-
-      } else {
+  
+        if (response.data.status === "Success") {
+          setFormData(initialFormData);
+          setErrors({});
+          setSubmitSuccess(true);
+          setSubmitError(false);
+          show(false);
+  
+          Swal.fire({
+            icon: "success",
+            title: editData ? "Data Updated Successfully" : "Data Added Successfully",
+            showConfirmButton: false,
+            timer: 1000,
+          }).then(() => {
+            window.location.reload();
+          });
+        } else {
+          setSubmitError(true);
+          setSubmitSuccess(false);
+        }
+      } catch (error) {
+        console.error("Error submitting form:", error);
         setSubmitError(true);
         setSubmitSuccess(false);
       }
-    } catch (error) {
-      console.error("Error submitting form:", error);
-      setSubmitError(true);
-      setSubmitSuccess(false);
     }
   };
+  
 
   const validateForm = (formData) => {
     let errors = {};
@@ -128,6 +200,9 @@ const AddContact = ({ show, editData }) => {
     }
     if (!formData.templatetypeID) {
       errors.templatetypeID = "Template Type is required";
+    }
+    if (!formData.ProjectID) {
+      errors.ProjectID = "Project is required";
     }
 
     return errors;
@@ -139,13 +214,8 @@ const AddContact = ({ show, editData }) => {
         <CardContent>
           <Grid item xs={12} sx={{ marginTop: 4.8, marginBottom: 3 }}>
             <Box>
-              <Typography
-                variant="body2"
-                sx={{ marginTop: 5, fontWeight: "bold", fontSize: 20 }}
-              >
-                {editData
-                  ? "Edit Template Details"
-                  : "Add Template Details"}
+              <Typography variant="body2" sx={{ marginTop: 5, fontWeight: "bold", fontSize: 20 }}>
+                {editData ? "Edit Template Details" : "Add Template Details"}
               </Typography>
             </Box>
           </Grid>
@@ -161,6 +231,34 @@ const AddContact = ({ show, editData }) => {
                   error={!!errors.TName}
                   helperText={errors.TName}
                 />
+              </Grid>
+              <Grid item xs={8} sm={6}>
+                <FormControl fullWidth error={!!errors.ProjectID}>
+                  <InputLabel>
+                    Select Project
+                    <span style={{ color: "red", marginLeft: "5px" }}>*</span>
+                  </InputLabel>
+                  <Select
+                    value={formData.ProjectID}
+                    name="ProjectID"
+                    onChange={handleChange}
+                    label="Select Project"
+                  >
+                    <MenuItem value="">
+                      <em>None</em>
+                    </MenuItem>
+                    {projectTypeData.map((project) => (
+                      <MenuItem key={project.ProjectID} value={project.ProjectID}>
+                        {project.ProjectName}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                  {errors.ProjectID && (
+                    <Typography variant="caption" color="error">
+                      {errors.ProjectID}
+                    </Typography>
+                  )}
+                </FormControl>
               </Grid>
               <Grid item xs={12} sm={6}>
                 <FormControl fullWidth error={!!errors.templatetypeID}>
@@ -191,14 +289,34 @@ const AddContact = ({ show, editData }) => {
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
-                {/* Input for file upload */}
-                <input
-                  type="file"
-                  name="file"
-                  accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt"
-                  onChange={handleFileChange}
-                />
-              </Grid>
+  <Box
+    sx={{
+      border: "1px dashed #ccc",
+      borderRadius: "4px",
+      padding: "16px",
+      textAlign: "center",
+    }}
+  >
+    <input
+      type="file"
+      name="file"
+      accept="image/png, image/jpeg, image/jpg"
+      onChange={handleFileChange}
+      style={{ display: "none" }}
+      id="file-upload"
+    />
+    <label htmlFor="file-upload">
+      <Button variant="outlined" component="span">
+        Choose Image
+      </Button>
+    </label>
+    {formData.file && (
+      <Typography variant="body2" sx={{ marginTop: 1 }}>
+        {formData.file.name}
+      </Typography>
+    )}
+  </Box>
+</Grid>
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
@@ -206,6 +324,13 @@ const AddContact = ({ show, editData }) => {
                   label="URL"
                   value={formData.url}
                   onChange={handleChange}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <ReactQuill
+                  value={formData.content}
+                  onChange={handleEditorChange}
+                  placeholder="Write content here..."
                 />
               </Grid>
             </Grid>
@@ -233,7 +358,8 @@ const AddContact = ({ show, editData }) => {
       <Snackbar
         open={submitError}
         autoHideDuration={6000}
-        onClose={() => setSubmitError(false)} >
+        onClose={() => setSubmitError(false)}
+      >
         <MuiAlert elevation={6} variant="filled" onClose={() => setSubmitError(false)} severity="error">
           Failed to {editData ? "update template" : "add template"}. Please try again later.
         </MuiAlert>

@@ -3,7 +3,7 @@ import { Grid, CircularProgress, Alert, Typography, Box } from '@mui/material';
 import axios from 'axios';
 import { useRouter } from 'next/router';
 import Addtemplate from 'src/views/add-template/Addtemplate';
-import Sidebar from 'src/views/TellecallingSidebar/Sidebar';
+import Sidebar from 'src/views/add-template/Sidebartemplate';
 import Listtemplate from 'src/views/list-template/Listtemplate';
 import HistoryTelecalling from 'src/views/history-telecalling/HistoryTelecalling';
 import PieChartIcon from '@mui/icons-material/PieChart';

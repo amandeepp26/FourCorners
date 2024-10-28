@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
+import Card from "@mui/material/Card";
 import EditIcon from "@mui/icons-material/Edit";
 import GetAppIcon from "@mui/icons-material/GetApp";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-import { Menu, MenuItem } from "@mui/material";
+import { Menu, MenuItem , Paper ,Box, Typography} from "@mui/material";
+
 import Swal from "sweetalert2";
 import axios from "axios";
 import { useCookies } from "react-cookie";
@@ -13,6 +15,7 @@ import { useCookies } from "react-cookie";
 const ListTemplate = ({ item, onEdit, onHistoryClick }) => {
   const [cookies] = useCookies(["amr"]);
   const [templateData, setTemplateData] = useState(null);
+  
   const [anchorEl, setAnchorEl] = useState(null);
 
   useEffect(() => {
@@ -31,6 +34,19 @@ const ListTemplate = ({ item, onEdit, onHistoryClick }) => {
     } catch (error) {
       console.error("Error fetching single template data:", error);
     }
+  };
+
+  const fetchProject = () => {
+    axios
+      .get("https://apiforcornershost.cubisysit.com/api/api-fetch-projectmaster.php")
+      .then((response) => {
+        if (response.data.status === "Success") {
+          setProjectTypeData(response.data.data);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching project data:", error);
+      });
   };
 
   const handleEdit = () => {
@@ -205,7 +221,7 @@ const ListTemplate = ({ item, onEdit, onHistoryClick }) => {
               </Typography>
             </Card>
           </Grid>
-
+     
           <Grid item xs={4}>
             <Card
               variant="outlined"
@@ -215,10 +231,10 @@ const ListTemplate = ({ item, onEdit, onHistoryClick }) => {
               }}
             >
               <Typography variant="body2" sx={{ fontWeight: 600, fontSize: "0.8rem" }}>
-                Template Type ID
+                Template Type
               </Typography>
               <Typography variant="body2" sx={{ fontSize: "0.7rem" }}>
-                {item?.templatetypeID}
+                {item?.templatetypeName}
               </Typography>
             </Card>
           </Grid>
@@ -300,10 +316,10 @@ const ListTemplate = ({ item, onEdit, onHistoryClick }) => {
               }}
             >
               <Typography variant="body2" sx={{ fontWeight: 600, fontSize: "0.8rem" }}>
-                Create UID
+           Project Name
               </Typography>
               <Typography variant="body2" sx={{ fontSize: "0.7rem" }}>
-                {item?.CreateUID}
+                {item?.ProjectName}
               </Typography>
             </Card>
           </Grid>

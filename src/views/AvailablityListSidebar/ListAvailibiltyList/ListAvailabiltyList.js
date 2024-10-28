@@ -82,15 +82,15 @@ const ListAvailabiltyList = ({ item }) => {
   const getCellBackgroundColor = (skuID) => {
     switch (skuID) {
       case 1:
-        return '#d4edda'; // Light green
+        return '#d4edda'; 
       case 2:
-        return '#fff3cd'; // Light yellow
+        return '#fff3cd'; 
       case 3:
-        return '#f8d7da'; // Light red
+        return '#f8d7da';
       case 4:
-        return '#d6d6d6'; // Light grey
+        return '#d6d6d6'; 
       default:
-        return '#ffffff'; // Default color (white)
+        return '#ffffff'; 
     }
   };
 
@@ -120,7 +120,7 @@ const ListAvailabiltyList = ({ item }) => {
     }
   };
   useEffect(() => {
-    console.log("Item:", item); // Add this to check if item exists
+    console.log("Item:", item); 
     const fetchParkingData = async () => {
       if (!item) return;
       try {
@@ -206,7 +206,20 @@ const ListAvailabiltyList = ({ item }) => {
     }
   };
 
+  const getHeldPartyNames = () => {
+    const partyNames = [];
 
+    // Iterate over the wingDetails to find flats with HLD status
+    Object.values(wingDetails).forEach(flats => {
+      flats.forEach(flat => {
+        if (flat.skuID === 2) { // Assuming 2 corresponds to HLD
+          partyNames.push(flat.Partyname); // Collecting Partyname for HLD
+        }
+      });
+    });
+
+    return partyNames;
+  };
 
   const countStatuses = () => {
     const counts = { Avl: 0, HLD: 0, RFG: 0, SLD: 0 };
@@ -225,7 +238,7 @@ const ListAvailabiltyList = ({ item }) => {
   const totalParking = parkingData.length;
   const ProjectRoomTable = ({ data, maxFlats }) => {
     const headers = Array.from({ length: maxFlats }, (_, i) => `FlatNo ${i + 1}`);
-
+  
     return (
       <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid black' }}>
         <thead>
@@ -238,9 +251,7 @@ const ListAvailabiltyList = ({ item }) => {
         </thead>
         <tbody>
           {Object.keys(data).map((floorNo) => {
-            console.log(data, 'aagaya dataatatatatatatatatata');
             const flats = data[floorNo];
-            console.log(flats, 'floor number dekh');
             return (
               <tr key={floorNo}>
                 <td style={{ border: '1px solid black', padding: '8px' }}>{floorNo}</td>
@@ -249,57 +260,62 @@ const ListAvailabiltyList = ({ item }) => {
                   const isEditing = editingCell && editingCell.floorNo === floorNo && editingCell.flatNo === i + 1;
                   return (
                     <td
-                    key={i}
-                    style={{
-                      border: '1px solid black',
-                      padding: '8px',
-                      backgroundColor: getCellBackgroundColor(flat.skuID),
-                      textAlign: 'center',
-                      cursor: flat.skuID === 1 || flat.skuID === 2 ? 'pointer' : 'default',
-                    }}
-                    onClick={(e) => {
-                      if (flat.skuID === 1 || flat.skuID === 2) {
-                        // Prevent triggering click if input is focused
-                        if (e.target.tagName !== 'INPUT') {
-                          handleCellClick(floorNo, i + 1);
+                      key={i}
+                      style={{
+                        border: '1px solid black',
+                        padding: '8px',
+                        backgroundColor: getCellBackgroundColor(flat.skuID),
+                        textAlign: 'center',
+                        cursor: flat.skuID === 1 || flat.skuID === 2 ? 'pointer' : 'default',
+                      }}
+                      onClick={(e) => {
+                        if (flat.skuID === 1 || flat.skuID === 2) {
+                          if (e.target.tagName !== 'INPUT') {
+                            handleCellClick(floorNo, i + 1);
+                          }
                         }
-                      }
-                    }}
-                  >
-                    {isEditing ? (
-                      <FormControl>
-                        <Select
-                          value={flat.skuID}
-                          onChange={handleSkuChange}
-                          autoWidth
-                        >
-                          {skuOptions.map((option) => (
-                            <MenuItem key={option.skuID} value={option.skuID}>
-                              {option.skuName}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                        {flat.skuID === 1 && (
-                          <TextField
-                            fullWidth
-                            type="text"
-                            name="Partyname"
-                            label="Enter Party Name"
-                            value={holdDetails}
-                            onChange={(e) => setHoldDetails(e.target.value)}
-                            onFocus={(e) => e.stopPropagation()} // Prevent triggering the cell click
-                            style={{ marginTop: '8px', width: '100%' }}
-                          />
-                        )}
-                      </FormControl>
-                    ) : (
-                      <>
-                        {flat.Area}<br />
-                        {flat.Flat}
-                        <span style={{ color: '#000000' }}>{getStatusText(flat.skuID)}</span>
-                      </>
-                    )}
-                  </td>
+                      }}
+                    >
+                      {isEditing ? (
+                        <FormControl>
+                          <Select
+                            value={flat.skuID}
+                            onChange={handleSkuChange}
+                            autoWidth
+                          >
+                            {skuOptions.map((option) => (
+                              <MenuItem key={option.skuID} value={option.skuID}>
+                                {option.skuName}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                          {flat.skuID === 1 && (
+                            <TextField
+                              fullWidth
+                              type="text"
+                              name="Partyname"
+                              label="Enter Party Name"
+                              value={holdDetails}
+                              onChange={(e) => setHoldDetails(e.target.value)}
+                              onFocus={(e) => e.stopPropagation()}
+                              style={{ marginTop: '8px', width: '100%' }}
+                            />
+                          )}
+                        </FormControl>
+                      ) : (
+                        <>
+                          {flat.Area}<br />
+                          {flat.Flat}<br />
+                          <span style={{ color: '#000000' }}>{getStatusText(flat.skuID)}</span>
+                          {/* Show Partyname if skuID is 2 */}
+                          {flat.skuID === 2 && flat.Partyname && (
+                            <div style={{ fontWeight: 'bold', color: 'orange' }}>
+                              {flat.Partyname}
+                            </div>
+                          )}
+                        </>
+                      )}
+                    </td>
                   );
                 })}
               </tr>
@@ -309,6 +325,7 @@ const ListAvailabiltyList = ({ item }) => {
       </table>
     );
   };
+  
 
   const statusCounts = countStatuses();
 
@@ -345,6 +362,7 @@ const ListAvailabiltyList = ({ item }) => {
           {dataAvailable ? (
             <>
               <ProjectRoomTable data={wingDetails} maxFlats={maxFlats} />
+            
               <Grid container spacing={2} justifyContent="center" style={{ marginTop: '20px' }}>
 
 

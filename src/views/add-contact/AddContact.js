@@ -47,9 +47,7 @@ const AddContact = ({ show, editData  , onDashboardClick}) => {
     CityID:"",
     LocationID:"",
     PinCode:"",
-    KeyWordID:1,
     SourceID:"",
-    SourceTypeID: "",
     UserID: cookies.amr?.UserID || 1 ,
     Status:1,
     CreateUID:1,
@@ -58,13 +56,8 @@ const AddContact = ({ show, editData  , onDashboardClick}) => {
 
     
   };
-
-
-  
   const [rows, setRows] = useState([]);
   const [localities, setLocalities] = useState([]);
-
-
   const [contactTypes, setContactTypes] = useState([]);
   const [countryCodes, setCountryCodes] = useState([]);
   const [cities, setCities] = useState([]);
@@ -521,15 +514,13 @@ const handleSubmit = async (event) => {
         setSubmitSuccess(true);
         setSubmitError(false);
         show(false); // Hide the modal or close form
-  
+  console.log()
         Swal.fire({
           icon: "success",
           title: editData ? "Data Updated Successfully" : "Data Added Successfully",
           showConfirmButton: false,
           timer: 1000,
-        }).then(() => {
-          window.location.reload();
-        });
+        })
 
       } else {
         setSubmitSuccess(false);

@@ -126,7 +126,7 @@ const Addprojectinfo = ({ show, editData }) => {
 
   useEffect(() => {
     axios
-      .get("https://apiforcornershost.cubisysit.com/api/api-fetch-projectmasterdetails.php")
+      .get("https://apiforcornershost.cubisysit.com/api/api-fetch-projectmaster.php")
       .then((response) => {
         if (response.data.status === "Success") {
             setProjectTypes(response.data.data);

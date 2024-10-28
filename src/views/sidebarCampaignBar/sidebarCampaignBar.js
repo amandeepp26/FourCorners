@@ -82,8 +82,8 @@ const SidebarProjectMaster = ({ onEdit, onItemClick, onCreate }) => {
         } else {
             const filteredData = rows.filter(
                 (item) =>
-                item ? .ProjectName ? .toLowerCase().includes(lowerCaseQuery) ||
-                item ? .ProjectManager ? .toLowerCase().includes(lowerCaseQuery)
+                item?.ProjectName?.toLowerCase().includes(lowerCaseQuery) ||
+                item?.ProjectManager?.toLowerCase().includes(lowerCaseQuery)
             );
             setFilteredRows(filteredData);
         }
@@ -224,15 +224,14 @@ const SidebarProjectMaster = ({ onEdit, onItemClick, onCreate }) => {
         document.body.removeChild(a);
     };
 
-    return ( <
-        Card sx = {
+    return ( <Card sx = {
             {
                 width: 330,
                 padding: 5,
                 height: 700,
                 overflowY: "auto",
             }
-        } >
+             } >
         <
         Grid item xs = { 12 }
         sx = {

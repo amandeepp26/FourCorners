@@ -4,7 +4,7 @@ import axios from "axios";
 import { useRouter } from "next/router";
 import AddTellecallingDetails from "src/views/add-tellecallingDetails/AddTellecallingDetails";
 
-import ListTellecalling from "src/views/list-tellecalling/ListTellecalling";
+import Listcampaign from "src/views/campaignSidebar/Listcampaign";
 import HistoryTelecalling from "src/views/history-telecalling/HistoryTelecalling";
 import PieChartIcon from "@mui/icons-material/PieChart";
 import Card from "@mui/material/Card";
@@ -304,7 +304,7 @@ const Tellecalling = () => {
           rowDataToUpdate &&
           !showHistory &&
           !showAddDetails && (
-            <ListTellecalling
+            <Listcampaign
               item={rowDataToUpdate}
               onDelete={handleDelete}
               onHistoryClick={handleShowHistory}
@@ -312,29 +312,7 @@ const Tellecalling = () => {
             />
           )}
 
-        {!loading && !error && showHistory && (
-          <Box
-            display="flex"
-            flexDirection="column"
-            alignItems="center"
-            justifyContent="center"
-            minHeight="100vh"
-          >
-            <Typography
-              variant="body2"
-              sx={{
-                marginTop: 5,
-                fontWeight: "bold",
-                alignItems: "center",
-                textAlign: "center",
-                fontSize: 20,
-              }}
-            >
-              User History
-            </Typography>
-            <HistoryTelecalling item={rowDataToUpdate} onBack={handleBack} />
-          </Box>
-        )}
+      
       </Grid>
     </Grid>
   );
