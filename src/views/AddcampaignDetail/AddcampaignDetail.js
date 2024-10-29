@@ -22,24 +22,23 @@ const AddcampaignDetails = () => {
     campaignName: '',
     campaignTypeID: '',
     templateID: '',
-    submittedBy: '',
     date: '',
     time: '',
-    CreateUID: cookies?.amr?.UserID || 1,
-    contactCids: [], // Add for storing selected contact CIDs
+    CreateUID: 1, // Set default CreateUID or get from cookies if needed
+    contactCids: [], // For storing selected contact CIDs
+    ProjectID: 5, // Example ProjectID
   });
+  
   const [campaignTypes, setCampaignTypes] = useState([]);
   const [templates, setTemplates] = useState([]);
   const [contacts, setContacts] = useState([]); // State for contacts
   const [cookies] = useCookies(["amr"]);
-  const [submittedByUsers, setSubmittedByUsers] = useState([]);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitError, setSubmitError] = useState(null);
 
   useEffect(() => {
     fetchCampaignTypes();
     fetchTemplates();
-    fetchSubmittedBy();
     fetchContacts(); // Fetch contacts
   }, []);
 
@@ -62,17 +61,6 @@ const AddcampaignDetails = () => {
       }
     } catch (error) {
       console.error('Error fetching templates:', error);
-    }
-  };
-
-  const fetchSubmittedBy = async () => {
-    try {
-      const response = await axios.get('https://apiforcornershost.cubisysit.com/api/api-fetch-usermaster.php');
-      if (response.data.status === 'Success') {
-        setSubmittedByUsers(response.data.data);
-      }
-    } catch (error) {
-      console.error('Error fetching submitted by users:', error);
     }
   };
 
@@ -113,12 +101,12 @@ const AddcampaignDetails = () => {
       CampaignName: formData.campaignName,
       CampaignTypeID: parseInt(formData.campaignTypeID),
       TemplateID: parseInt(formData.templateID),
-      SubmittedBy: formData.submittedBy,
       Date: formData.date,
       Time: formData.time,
       CreateUID: formData.CreateUID,
-      ContactCids: formData.contactCids, // Send all selected CIDs
-    };
+      ContactCids: formData.contactCids,
+      ProjectID: formData.ProjectID,
+    }; 
 
     try {
       const response = await axios.post('https://proxy-forcorners.vercel.app/api/proxy/api-insert-compaigns.php', payload);
@@ -134,11 +122,11 @@ const AddcampaignDetails = () => {
           campaignName: '',
           campaignTypeID: '',
           templateID: '',
-          submittedBy: '',
           date: '',
           time: '',
-          CreateUID: cookies?.amr?.UserID || 1,
-          contactCids: [], // Reset selected contacts
+          CreateUID: 1,
+          contactCids: [],
+          ProjectID: 5,
         });
       }
     } catch (error) {
@@ -148,11 +136,6 @@ const AddcampaignDetails = () => {
         text: error.response?.data?.message || 'An error occurred',
       });
     }
-  };
-
-  const handleAlertClose = () => {
-    setSubmitSuccess(false);
-    setSubmitError(null);
   };
 
   return (
@@ -208,23 +191,6 @@ const AddcampaignDetails = () => {
               </FormControl>
             </Grid>
             <Grid item xs={12} sm={6}>
-              <FormControl fullWidth>
-                <InputLabel>Submitted By</InputLabel>
-                <Select
-                  name="submittedBy"
-                  value={formData.submittedBy}
-                  onChange={handleChange}
-                  required
-                >
-                  {submittedByUsers.map((user) => (
-                    <MenuItem key={user.UserID} value={user.UserID}>
-                      {user.Name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
                 label="Date"
@@ -252,24 +218,6 @@ const AddcampaignDetails = () => {
                 required
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
-              <FormControl fullWidth>
-                <InputLabel>Contacts</InputLabel>
-                <Select
-                  name="contactCids"
-                  multiple
-                  value={formData.contactCids}
-                  onChange={handleContactChange}
-                  required
-                >
-                  {contacts.map((contact) => (
-                    <MenuItem key={contact.Cid} value={contact.Cid}>
-                      {contact.CName}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
             <Grid item xs={12}>
               <Button
                 type="submit"
@@ -281,13 +229,13 @@ const AddcampaignDetails = () => {
             </Grid>
           </Grid>
         </form>
-        <Snackbar open={submitSuccess} autoHideDuration={6000} onClose={handleAlertClose}>
-          <MuiAlert onClose={handleAlertClose} severity="success" sx={{ width: '100%' }}>
+        <Snackbar open={submitSuccess} autoHideDuration={6000} onClose={() => setSubmitSuccess(false)}>
+          <MuiAlert onClose={() => setSubmitSuccess(false)} severity="success" sx={{ width: '100%' }}>
             Data Submitted Successfully
           </MuiAlert>
         </Snackbar>
-        <Snackbar open={!!submitError} autoHideDuration={6000} onClose={handleAlertClose}>
-          <MuiAlert onClose={handleAlertClose} severity="error" sx={{ width: '100%' }}>
+        <Snackbar open={!!submitError} autoHideDuration={6000} onClose={() => setSubmitError(null)}>
+          <MuiAlert onClose={() => setSubmitError(null)} severity="error" sx={{ width: '100%' }}>
             {submitError}
           </MuiAlert>
         </Snackbar>

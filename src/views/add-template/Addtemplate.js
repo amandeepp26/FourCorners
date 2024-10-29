@@ -24,7 +24,7 @@ const AddContact = ({ show, editData }) => {
   const initialFormData = {
     TName: "",
     templatetypeID: "",
-    para: "", 
+    para: "",
     file: null,
     url: "",
     ProjectID: "",
@@ -99,98 +99,144 @@ const AddContact = ({ show, editData }) => {
       setErrors(newErrors);
       return;
     }
-  
+
     const url = editData
       ? "https://proxy-forcorners.vercel.app/api/proxy/api-update-contacts.php"
       : "https://proxy-forcorners.vercel.app/api/proxy/api-insert-template.php";
-  
+
     // Prepare the data
-    const dataToSend = {
-      TName: formData.TName,
-      templatetypeID: formData.templatetypeID,
-      para: formData.para,
-      url: formData.url,
-      ProjectID: formData.ProjectID,
-      content: formData.content,
-      CreateUID: formData.CreateUID,
-    };
-  
-    // If there's a file, convert it to a base64 string
-    if (formData.file) {
-      const reader = new FileReader();
-      reader.readAsDataURL(formData.file);
-      reader.onloadend = async () => {
-        dataToSend.file = reader.result; // This is the base64 string of the file
-  
-        // Send data to API
-        try {
-          const response = await axios.post(url, dataToSend, {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          });
-  
-          if (response.data.status === "Success") {
-            setFormData(initialFormData);
-            setErrors({});
-            setSubmitSuccess(true);
-            setSubmitError(false);
-            show(false);
-  
-            Swal.fire({
-              icon: "success",
-              title: editData ? "Data Updated Successfully" : "Data Added Successfully",
-              showConfirmButton: false,
-              timer: 1000,
-            }).then(() => {
-              window.location.reload();
-            });
-          } else {
-            setSubmitError(true);
-            setSubmitSuccess(false);
-          }
-        } catch (error) {
-          console.error("Error submitting form:", error);
-          setSubmitError(true);
-          setSubmitSuccess(false);
-        }
-      };
-    } else {
-      // Send data to API without file
-      try {
-        const response = await axios.post(url, dataToSend, {
-          headers: {
-            "Content-Type": "application/json",
-          },
+    // const dataToSend = {
+    //   TName: formData.TName,
+    //   templatetypeID: formData.templatetypeID,
+    //   para: formData.para,
+    //   url: formData.url,
+    //   ProjectID: formData.ProjectID,
+    //   content: formData.content,
+    //   CreateUID: formData.CreateUID,
+    // };
+
+    const dataToSend = new FormData();
+    dataToSend.append("TName", formData.TName);
+    dataToSend.append("templatetypeID", formData.templatetypeID);
+    dataToSend.append("para", formData.para);
+    dataToSend.append("url", formData.url);
+    dataToSend.append("ProjectID", formData.ProjectID);
+    dataToSend.append("content", formData.content);
+    dataToSend.append("CreateUID", formData.CreateUID);
+
+    dataToSend.append("file", formData.file);
+
+    try {
+      const response = await axios.post(url, dataToSend, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+    
+      if (response.data.status === "Success") {
+        debugger;
+        setFormData(initialFormData);
+        setErrors({});
+        setSubmitSuccess(true);
+        setSubmitError(false);
+        show(false);
+    
+        Swal.fire({
+          icon: "success",
+          title: editData ? "Data Updated Successfully" : "Data Added Successfully",
+          showConfirmButton: false,
+          timer: 1000,
+        }).then(() => {
+          window.location.reload();
         });
-  
-        if (response.data.status === "Success") {
-          setFormData(initialFormData);
-          setErrors({});
-          setSubmitSuccess(true);
-          setSubmitError(false);
-          show(false);
-  
-          Swal.fire({
-            icon: "success",
-            title: editData ? "Data Updated Successfully" : "Data Added Successfully",
-            showConfirmButton: false,
-            timer: 1000,
-          }).then(() => {
-            window.location.reload();
-          });
-        } else {
-          setSubmitError(true);
-          setSubmitSuccess(false);
-        }
-      } catch (error) {
-        console.error("Error submitting form:", error);
+      } else {
+        debugger;
         setSubmitError(true);
         setSubmitSuccess(false);
       }
+    } catch (error) {
+      debugger;
+      console.error("Error submitting form:", error);
+      setSubmitError(true);
+      setSubmitSuccess(false);
     }
+
+    // If there's a file, convert it to a base64 string
+    // if (formData.file) {
+    //   const reader = new FileReader();
+    //   reader.readAsDataURL(formData.file);
+    //   reader.onloadend = async () => {
+    //     dataToSend.file = reader.result; // This is the base64 string of the file
+
+    //     // Send data to API
+    //     try {
+    //       const response = await axios.post(url, dataToSend, {
+    //         headers: {
+    //           "Content-Type": "multipart/form-data",
+    //         },
+    //       });
+
+    //       if (response.data.status === "Success") {
+    //         setFormData(initialFormData);
+    //         setErrors({});
+    //         setSubmitSuccess(true);
+    //         setSubmitError(false);
+    //         show(false);
+
+    //         Swal.fire({
+    //           icon: "success",
+    //           title: editData ? "Data Updated Successfully" : "Data Added Successfully",
+    //           showConfirmButton: false,
+    //           timer: 1000,
+    //         }).then(() => {
+    //           window.location.reload();
+    //         });
+    //       } else {
+    //         setSubmitError(true);
+    //         setSubmitSuccess(false);
+    //       }
+    //     } catch (error) {
+    //       console.error("Error submitting form:", error);
+    //       setSubmitError(true);
+    //       setSubmitSuccess(false);
+    //     }
+    //   };
+    // } else {
+    //   // Send data to API without file
+    //   try {
+    //     const response = await axios.post(url, dataToSend, {
+    //       headers: {
+    //         "Content-Type": "application/json",
+    //       },
+    //     });
+
+    //     if (response.data.status === "Success") {
+    //       setFormData(initialFormData);
+    //       setErrors({});
+    //       setSubmitSuccess(true);
+    //       setSubmitError(false);
+    //       show(false);
+
+    //       Swal.fire({
+    //         icon: "success",
+    //         title: editData ? "Data Updated Successfully" : "Data Added Successfully",
+    //         showConfirmButton: false,
+    //         timer: 1000,
+    //       }).then(() => {
+    //         window.location.reload();
+    //       });
+    //     } else {
+    //       setSubmitError(true);
+    //       setSubmitSuccess(false);
+    //     }
+    //   } catch (error) {
+    //     console.error("Error submitting form:", error);
+    //     setSubmitError(true);
+    //     setSubmitSuccess(false);
+    //   }
+    // }
   };
-  
+
 
   const validateForm = (formData) => {
     let errors = {};
@@ -289,34 +335,34 @@ const AddContact = ({ show, editData }) => {
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
-  <Box
-    sx={{
-      border: "1px dashed #ccc",
-      borderRadius: "4px",
-      padding: "16px",
-      textAlign: "center",
-    }}
-  >
-    <input
-      type="file"
-      name="file"
-      accept="image/png, image/jpeg, image/jpg"
-      onChange={handleFileChange}
-      style={{ display: "none" }}
-      id="file-upload"
-    />
-    <label htmlFor="file-upload">
-      <Button variant="outlined" component="span">
-        Choose Image
-      </Button>
-    </label>
-    {formData.file && (
-      <Typography variant="body2" sx={{ marginTop: 1 }}>
-        {formData.file.name}
-      </Typography>
-    )}
-  </Box>
-</Grid>
+                <Box
+                  sx={{
+                    border: "1px dashed #ccc",
+                    borderRadius: "4px",
+                    padding: "16px",
+                    textAlign: "center",
+                  }}
+                >
+                  <input
+                    type="file"
+                    name="file"
+                    accept="image/png, image/jpeg, image/jpg"
+                    onChange={handleFileChange}
+                    style={{ display: "none" }}
+                    id="file-upload"
+                  />
+                  <label htmlFor="file-upload">
+                    <Button variant="outlined" component="span">
+                      Choose Image
+                    </Button>
+                  </label>
+                  {formData.file && (
+                    <Typography variant="body2" sx={{ marginTop: 1 }}>
+                      {formData.file.name}
+                    </Typography>
+                  )}
+                </Box>
+              </Grid>
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth

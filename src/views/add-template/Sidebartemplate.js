@@ -243,6 +243,9 @@ Template
             >
               <Dashboard />
             </IconButton>
+            <IconButton aria-label="create" sx={{ color: "grey" }} onClick={onCreate}>
+              <AddIcon />
+            </IconButton>
             <IconButton
               aria-label="filter"
               sx={{ color: "grey" }}

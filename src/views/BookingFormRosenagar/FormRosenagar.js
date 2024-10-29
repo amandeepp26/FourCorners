@@ -759,13 +759,6 @@ const FormRosenagar = ({ onFormSubmitSuccess, show, editData }) => {
           </Grid>
           <form style={{ marginTop: "50px" }}>
             <Grid container spacing={7}>
-
-
-
-
-
-
-
             {/* <Grid item xs={8} sm={4}>
                 <FormControl fullWidth>
                   {editData ? (
@@ -1299,26 +1292,6 @@ const FormRosenagar = ({ onFormSubmitSuccess, show, editData }) => {
                 </FormControl>
               </Grid>
 
-              {/* <Grid item xs={12} sm={4}>
-                <input
-                  accept="image/*"
-                  id="contained-button-file"
-                  type="file"
-                  style={{ display: "none" }}
-                  onChange={handleImageChange}
-                />
-                <label htmlFor="contained-button-file">
-                  <Typography variant="body1" component="span">
-                    Choose Image File
-                  </Typography>
-                </label>
-                {formData.imageFile && (
-                  <Typography variant="body1">
-                    {formData.imageFile.name}
-                  </Typography>
-                )}
-              </Grid> */}
-
               {remarks.map((remark, index) => (
                 <Grid container item spacing={2} key={index}>
                   {/* Amount Field */}
@@ -1338,7 +1311,6 @@ const FormRosenagar = ({ onFormSubmitSuccess, show, editData }) => {
                     />
                   </Grid>
 
-                  {/* Amount Type Dropdown */}
                   <Grid item xs={2}>
                     <FormControl fullWidth>
                       <InputLabel>Amount Type</InputLabel>
@@ -1359,7 +1331,7 @@ const FormRosenagar = ({ onFormSubmitSuccess, show, editData }) => {
                     </FormControl>
                   </Grid>
 
-                  {/* Remark Field */}
+        
                   <Grid item xs={4}>
                     <TextField
                       fullWidth
@@ -1369,7 +1341,7 @@ const FormRosenagar = ({ onFormSubmitSuccess, show, editData }) => {
                     />
                   </Grid>
 
-                  {/* Date Field */}
+    
                   <Grid item xs={4}>
       <DatePicker
         selected={remark.RemarkDate}
@@ -1378,16 +1350,13 @@ const FormRosenagar = ({ onFormSubmitSuccess, show, editData }) => {
         customInput={
           <TextField fullWidth label="Expected Date" />
         }
-        // Shows both the date picker and allows month/year selection
+      
         showMonthDropdown
         showYearDropdown
-        yearDropdownItemNumber={15} // Number of years to show in dropdown
-        scrollableYearDropdown // Makes year dropdown scrollable
+        yearDropdownItemNumber={15}
+        scrollableYearDropdown 
       />
     </Grid>
-
-
-                  {/* Loan Process Checkbox */}
                   <Grid item xs={2}>
                     <FormControlLabel
                       control={
