@@ -12,6 +12,7 @@ import AddIcon from "@mui/icons-material/Add";
 import HistoryIcon from "@mui/icons-material/History";
 import EditIcon from "@mui/icons-material/Edit";
 import GetAppIcon from "@mui/icons-material/GetApp";
+import CloseIcon from "@mui/icons-material/Close";
 import GroupIcon from "@mui/icons-material/Group";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import { Modal, TextField, IconButton, Menu, MenuItem , FormControl , InputLabel , Select} from "@mui/material";
@@ -52,6 +53,12 @@ const ListContact = ({ item, onDelete, onEdit , onHistoryClick }) => {
   const [currentUpdate, setCurrentUpdate] = useState([]);
 
   const [setRowDataToUpdate] = useState(null);
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [projects, setProjects] = useState([]);
+  const [selectedProject, setSelectedProject] = useState(null);
+  const [templates, setTemplates] = useState([]);
+  const [selectedTemplate, setSelectedTemplate] = useState(null);
 
   const router = useRouter();
 
@@ -267,6 +274,88 @@ const handleNavigation = () => {
     return formattedDate;
   };
 
+    useEffect(() => {
+      fetchProjects();
+    }, []);
+     useEffect(() => {
+       fetchTemplate();
+     }, [selectedProject]);
+
+    const fetchProjects = async () => {
+      try {
+        const response = await axios.get(
+          "https://apiforcornershost.cubisysit.com/api/api-fetch-projectmaster.php"
+        );
+        console.log("API Response project:", response.data);
+        setProjects(response.data.data || []);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    const fetchTemplate = async () => {
+      try {
+        const response = await axios.get(
+          `https://apiforcornershost.cubisysit.com/api/api-fetch-templateselect.php?ProjectID=${selectedProject.ProjectID}`
+        );
+        console.log("API Response Templates:", response.data);
+        setTemplates(response.data.data || []);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+
+
+  if (modalVisible) {
+    return (
+      <div style={{paddingLeft:15}}>
+        <CloseIcon
+          style={{ cursor: "pointer" }}
+          onClick={() => setModalVisible(false)}
+        />
+
+        <Grid item xs={12} md={4} style={{ marginTop: 20 }}>
+          <FormControl fullWidth>
+            <InputLabel>Projects</InputLabel>
+            <Select
+              value={selectedProject || ""}
+              onChange={(event) => setSelectedProject(event.target.value)}
+              label="Projects"
+            >
+              {projects?.map((item) => (
+                <MenuItem key={item.ProjectID} value={item}>
+                  {item.ProjectName}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Grid>
+
+        <Grid item xs={12} md={4} style={{ marginTop: 20 }}>
+          <FormControl fullWidth>
+            <InputLabel>Templates</InputLabel>
+            <Select
+              value={selectedTemplate || ""}
+              onChange={(event) => setSelectedTemplate(event.target.value)}
+              label="Contacts"
+            >
+              {templates.map((temp) => (
+                <MenuItem key={temp.templateID} value={temp}>
+                  {temp.TName}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Grid>
+        <Grid style={{ marginTop: 50 }} item xs={12} md={4}>
+          <Button type="submit" variant="contained" color="primary" fullWidth>
+            Submit
+          </Button>
+        </Grid>
+      </div>
+    );
+  }
 
 
   return (
@@ -642,7 +731,7 @@ const handleNavigation = () => {
         </IconButton>
         </a>
 
-        <a href={`mailto:${item?.Email}`} style={{ marginRight: 35 }}>
+        <a onClick={()=>setModalVisible(true)} style={{ marginRight: 35 }}>
           <IconButton
             aria-label="email"
             size="small"
