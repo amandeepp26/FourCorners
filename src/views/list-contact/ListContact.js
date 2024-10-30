@@ -15,7 +15,7 @@ import GetAppIcon from "@mui/icons-material/GetApp";
 import CloseIcon from "@mui/icons-material/Close";
 import GroupIcon from "@mui/icons-material/Group";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
-import { Modal, TextField, IconButton, Menu, MenuItem , FormControl , InputLabel , Select} from "@mui/material";
+import { Modal, TextField, IconButton, Menu, MenuItem, FormControl, InputLabel, Select } from "@mui/material";
 import CancelIcon from "@mui/icons-material/Cancel";
 import Swal from 'sweetalert2';
 import EmailIcon from '@mui/icons-material/Email';
@@ -26,8 +26,8 @@ import PhoneIcon from "@mui/icons-material/Phone";
 import ShareIcon from "@mui/icons-material/Share";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 
-const ListContact = ({ item, onDelete, onEdit , onHistoryClick }) => {
-  console.log(item , 'dekh bhaiiiiii<<<<<>>>>>>>>>');
+const ListContact = ({ item, onDelete, onEdit, onHistoryClick }) => {
+  console.log(item, 'dekh bhaiiiiii<<<<<>>>>>>>>>');
 
   const [cookies, setCookie, removeCookie] = useCookies(["amr"]);
   const intialName = {
@@ -115,19 +115,19 @@ const ListContact = ({ item, onDelete, onEdit , onHistoryClick }) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
-// const handlenavigate =() => {
-//   window.location.href = "/tellcalling-details/";
+  // const handlenavigate =() => {
+  //   window.location.href = "/tellcalling-details/";
 
-// }
+  // }
 
-const handleNavigation = () => {
-  // Store the contact data in local storage
-  localStorage.setItem('selectedContact', JSON.stringify(item));
-  localStorage.setItem('showAddDetails', 'true'); // Set flag
-  
-  // Redirect to the telecalling-details page
-  router.push('/tellcalling-details');
-};
+  const handleNavigation = () => {
+    // Store the contact data in local storage
+    localStorage.setItem('selectedContact', JSON.stringify(item));
+    localStorage.setItem('showAddDetails', 'true'); // Set flag
+
+    // Redirect to the telecalling-details page
+    router.push('/tellcalling-details');
+  };
 
   const handleSave = () => {
     console.log(formData);
@@ -163,24 +163,28 @@ const handleNavigation = () => {
     fetchData();
   }, [item]);
 
+
+
+
   const handleSubmit = async (event) => {
+    debugger;
     event.preventDefault();
-  
+
     // Ensure selectedProject and selectedTemplate are available
     if (!selectedProject || !selectedTemplate) {
       console.error('Project or Template not selected.');
       return;
     }
-  
+
     try {
-    console.log('IIIIIIIIIIIIIIDDDDDDDDDDDDDDDDDDDDD',selectedProject.ProjectID)
+      console.log('IIIIIIIIIIIIIIDDDDDDDDDDDDDDDDDDDDD', selectedProject.ProjectID)
       const projectResponse = await axios.get(
         `https://apiforcornershost.cubisysit.com/api/api-fetch-projectdetails.php?ProjectID=${selectedProject.ProjectID}`
       );
       console.log('Project Response:', projectResponse.data);
       // Fetch template details
       const templateResponse = await axios.get(
-        `https://apiforcornershost.cubisysit.com/api/api-fetch-templateselect.php?ProjectID=${selectedTemplate.ProjectID}`
+        `https://apiforcornershost.cubisysit.com/api/api-fetch-templatedetails.php?templateID=${selectedTemplate.templateID}`
       );
       console.log('Template Response:', templateResponse.data);
       const emailData = {
@@ -196,14 +200,18 @@ const handleNavigation = () => {
         possessionDate: projectResponse.data.data[0].PossessionDate,
         remark: projectResponse.data.data[0].Remark,
         amenities: projectResponse.data.data[0].AmenitiesNames,
-        
+
         // Access the first item in the template response's data array
         templateID: templateResponse.data.data[0].templateID,
         templateName: templateResponse.data.data[0].TName,
         templateTypeID: templateResponse.data.data[0].templatetypeID,
         content: templateResponse.data.data[0].content,
+        name: item.CName,
+        email: item.Email,
+
         // Add any additional data needed for the email
       };
+      console.log("email data ", emailData)
       const emailResponse = await axios.post(
         "https://proxy-forcorners.vercel.app/api/proxy/api-email.php",
         emailData,
@@ -213,7 +221,7 @@ const handleNavigation = () => {
           },
         }
       );
-  
+      console.log("email data ", emailResponse)
       // Check the response from the email API
       if (emailResponse.data.status === "Success") {
         Swal.fire({
@@ -228,10 +236,10 @@ const handleNavigation = () => {
           text: 'Failed to send the email. Please try again.',
         });
       }
-  
+
       // Reset the form or handle other UI changes
       setModalVisible(false);
-  
+
     } catch (error) {
       console.error("There was an error!", error);
       Swal.fire({
@@ -241,8 +249,8 @@ const handleNavigation = () => {
       });
     }
   };
-  
-  
+
+
 
   const jsonToCSV = (json) => {
     const header = Object.keys(json[0]).join(",");
@@ -296,119 +304,123 @@ const handleNavigation = () => {
     return formattedDate;
   };
 
-    useEffect(() => {
-      fetchProjects();
-    }, []);
-     useEffect(() => {
-       fetchTemplate();
-     }, [selectedProject]);
+  useEffect(() => {
+    fetchProjects();
+  }, []);
 
-    const fetchProjects = async () => {
-      try {
-        const response = await axios.get(
-          "https://apiforcornershost.cubisysit.com/api/api-fetch-projectmaster.php"
-        );
-        console.log("API Response project:", response.data);
-        setProjects(response.data.data || []);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
+  useEffect(() => {
+    fetchTemplate();
+  }, [selectedProject]);
 
-    const fetchTemplate = async () => {
-      try {
-        const response = await axios.get(
-          `https://apiforcornershost.cubisysit.com/api/api-fetch-templateselect.php?ProjectID=${selectedProject.ProjectID}`
-        );
-        console.log("API Response Templates:", response.data);
-        setTemplates(response.data.data || []);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
+  const fetchProjects = async () => {
+    try {
+      const response = await axios.get(
+        "https://apiforcornershost.cubisysit.com/api/api-fetch-projectmaster.php"
+      );
+      console.log("API Response project:", response.data);
+      setProjects(response.data.data || []);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  const fetchTemplate = async () => {
+    try {
+      const response = await axios.get(
+        `https://apiforcornershost.cubisysit.com/api/api-fetch-templateselect.php?ProjectID=${selectedProject.ProjectID}`
+      );
+      console.log("API Response Templates:", response.data);
+      setTemplates(response.data.data || []);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
 
 
 
   return (
     <>
-    <Modal open={modalVisible} onClose={() => setModalVisible(false)}>
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          width: { xs: '90%', sm: '500px' },
-          bgcolor: 'background.paper',
-          borderRadius: 2,
-          boxShadow: 24,
-          p: 4,
-          mx: 'auto',
-          mt: '10%',
-        }}
-      >
-        <IconButton
-          onClick={() => setModalVisible(false)}
-          
-          sx={{ alignSelf: 'flex-end' }}
+      <Modal open={modalVisible} onClose={() => setModalVisible(false)}>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            width: { xs: '90%', sm: '500px' },
+            bgcolor: 'background.paper',
+            borderRadius: 2,
+            boxShadow: 24,
+            p: 4,
+            mx: 'auto',
+            mt: '10%',
+          }}
         >
-          <CloseIcon />
-        </IconButton>
+          <IconButton
+            onClick={() => setModalVisible(false)}
 
-        <Typography variant="h6" component="h2" sx={{ mb: 2 }}>
-          Share Details
-        </Typography>
+            sx={{ alignSelf: 'flex-end' }}
+          >
+            <CloseIcon />
+          </IconButton>
 
-        <Grid container spacing={2}>
-          {/* Project Selection */}
-          <Grid item xs={12}>
-            <FormControl fullWidth variant="outlined">
-              <InputLabel>Projects</InputLabel>
-              <Select
-                value={selectedProject || ""}
-                onChange={(event) => setSelectedProject(event.target.value)}
-                label="Projects"
+          <Typography variant="h6" component="h2" sx={{ mb: 2 }}>
+            Share Details
+          </Typography>
+
+          <Grid container spacing={2}>
+            {/* Project Selection */}
+            <Grid item xs={12}>
+              <FormControl fullWidth variant="outlined">
+                <InputLabel>Projects</InputLabel>
+                <Select
+                  value={selectedProject || ""}
+                  onChange={(event) => setSelectedProject(event.target.value)}
+                  label="Projects"
+                >
+                  {projects?.map((item) => (
+                    <MenuItem key={item.ProjectID} value={item}>
+                      {item.ProjectName}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+
+            {/* Template Selection */}
+            <Grid item xs={12}>
+              <FormControl fullWidth variant="outlined">
+                <InputLabel>Templates</InputLabel>
+                <Select
+                  value={selectedTemplate || ""}
+                  onChange={(event) => {
+                    debugger;
+                    setSelectedTemplate(event.target.value)
+                  }}
+                  label="Templates"
+                >
+                  {templates?.map((template) => (
+                    <MenuItem key={template.templateID} value={template}>
+                      {template.TName}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+
+            {/* Submit Button */}
+            <Grid item xs={12}>
+              <Button
+                variant="contained"
+                color="primary"
+                fullWidth
+                onClick={handleSubmit}
+                sx={{ mt: 2 }}
               >
-                {projects?.map((item) => (
-                  <MenuItem key={item.ProjectID} value={item}>
-                    {item.ProjectName}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+                Submit
+              </Button>
+            </Grid>
           </Grid>
-
-          {/* Template Selection */}
-          <Grid item xs={12}>
-            <FormControl fullWidth variant="outlined">
-              <InputLabel>Templates</InputLabel>
-              <Select
-                value={selectedTemplate || ""}
-                onChange={(event) => setSelectedTemplate(event.target.value)}
-                label="Templates"
-              >
-                {templates.map((temp) => (
-                  <MenuItem key={temp.templateID} value={temp}>
-                    {temp.TName}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-
-          {/* Submit Button */}
-          <Grid item xs={12}>
-            <Button
-              variant="contained"
-              color="primary"
-              fullWidth
-              onClick={handleSubmit}
-              sx={{ mt: 2 }}
-            >
-              Submit
-            </Button>
-          </Grid>
-        </Grid>
-      </Box>
-    </Modal>
+        </Box>
+      </Modal>
       <Grid
         container
         justifyContent="center"
@@ -459,7 +471,7 @@ const handleNavigation = () => {
         <Grid item>
           <Button
             variant="contained"
-             onClick={handleNavigation}
+            onClick={handleNavigation}
             startIcon={<TransformIcon />}
             sx={{
               backgroundColor: "#f0f0f0",
@@ -472,7 +484,7 @@ const handleNavigation = () => {
               },
             }}
           >
-           Convert To Lead
+            Convert To Lead
           </Button>
         </Grid>
         {/* <Grid item>
@@ -652,11 +664,11 @@ const handleNavigation = () => {
               padding: 5,
             }}
           >
-                 <Avatar
-                          alt="John Doe"
-                          sx={{ width: 60, height: 60, mr: 6 }}
-                          src="/images/avatars/1.png"
-                        />
+            <Avatar
+              alt="John Doe"
+              sx={{ width: 60, height: 60, mr: 6 }}
+              src="/images/avatars/1.png"
+            />
             <Box sx={{ flex: "1 1" }}>
               <Typography
                 variant="h6"
@@ -698,7 +710,7 @@ const handleNavigation = () => {
                 Source: {item?.SourceName}
               </Typography>
             </div>
-             <div style={{ marginRight: 5 }}>
+            <div style={{ marginRight: 5 }}>
               <Typography
                 variant="body2"
                 sx={{
@@ -718,7 +730,7 @@ const handleNavigation = () => {
               >
                 City: {item?.CityName}/{item.Location}
               </Typography>
-            </div> 
+            </div>
             <div style={{ marginRight: 5 }}>
               <Typography
                 variant="body2"
@@ -742,197 +754,197 @@ const handleNavigation = () => {
             </div>
           </Box>
 
-          <Box sx={{ display: "flex",  mt: 10 , ml:50}}>
-        <a href={`tel:${item?.Mobile}`} style={{ marginRight: 40 }}>
-          <IconButton
-            aria-label="phone"
-            size="small"
-            sx={{
-              color: "green",
-              backgroundColor: "#e0f7fa",
-              borderRadius: "50%",
-              padding: "10px",
-              "&:hover": {
-                backgroundColor: "#b2ebf2",
-              },
-            }}
-          >
-            <PhoneIcon />
-          </IconButton>
-        </a>
-        <a  style={{ marginRight: 10 }}>
+          <Box sx={{ display: "flex", mt: 10, ml: 50 }}>
+            <a href={`tel:${item?.Mobile}`} style={{ marginRight: 40 }}>
+              <IconButton
+                aria-label="phone"
+                size="small"
+                sx={{
+                  color: "green",
+                  backgroundColor: "#e0f7fa",
+                  borderRadius: "50%",
+                  padding: "10px",
+                  "&:hover": {
+                    backgroundColor: "#b2ebf2",
+                  },
+                }}
+              >
+                <PhoneIcon />
+              </IconButton>
+            </a>
+            <a style={{ marginRight: 10 }}>
 
-        <IconButton
-          aria-label="share"
-          size="small"
-          sx={{
-            color: "blue",
-            backgroundColor: "#e3f2fd",
-            borderRadius: "50%",
-            padding: "10px",
-            marginRight: 15,
-            "&:hover": {
-              backgroundColor: "#bbdefb",
-            },
-          }}
-        >
-          <ShareIcon />
-        </IconButton>
-        </a>
+              <IconButton
+                aria-label="share"
+                size="small"
+                sx={{
+                  color: "blue",
+                  backgroundColor: "#e3f2fd",
+                  borderRadius: "50%",
+                  padding: "10px",
+                  marginRight: 15,
+                  "&:hover": {
+                    backgroundColor: "#bbdefb",
+                  },
+                }}
+              >
+                <ShareIcon />
+              </IconButton>
+            </a>
 
-        <a onClick={()=>setModalVisible(true)} style={{ marginRight: 35 }}>
-          <IconButton
-            aria-label="email"
-            size="small"
-            sx={{
-              color: "red",
-              backgroundColor: "#ffebee",
-              borderRadius: "50%",
-              padding: "10px",
-              "&:hover": {
-                backgroundColor: "#ffcdd2",
-              },
-            }}
-          >
-            <EmailIcon />
-          </IconButton>
-        </a>
-        <a
-          href={`https://wa.me/${item?.Mobile}?text=${whatsappText}`}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <IconButton
-            aria-label="whatsapp"
-            size="small"
-            sx={{
-              color: "green",
-              backgroundColor: "#e8f5e9",
-              borderRadius: "50%",
-              padding: "10px",
-              "&:hover": {
-                backgroundColor: "#c8e6c9",
-              },
-            }}
-          >
-            <WhatsAppIcon />
-          </IconButton>
-        </a>
-      </Box>
+            <a onClick={() => setModalVisible(true)} style={{ marginRight: 35 }}>
+              <IconButton
+                aria-label="email"
+                size="small"
+                sx={{
+                  color: "red",
+                  backgroundColor: "#ffebee",
+                  borderRadius: "50%",
+                  padding: "10px",
+                  "&:hover": {
+                    backgroundColor: "#ffcdd2",
+                  },
+                }}
+              >
+                <EmailIcon />
+              </IconButton>
+            </a>
+            <a
+              href={`https://wa.me/${item?.Mobile}?text=${whatsappText}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <IconButton
+                aria-label="whatsapp"
+                size="small"
+                sx={{
+                  color: "green",
+                  backgroundColor: "#e8f5e9",
+                  borderRadius: "50%",
+                  padding: "10px",
+                  "&:hover": {
+                    backgroundColor: "#c8e6c9",
+                  },
+                }}
+              >
+                <WhatsAppIcon />
+              </IconButton>
+            </a>
+          </Box>
 
           <Box
-  sx={{
-    width: "100%",
-    display: "flex",
-    alignItems: "center",
-    mt: 15,
-  }}
->
-  <Grid container spacing={3}>
-    <Grid item xs={4}>
-      <Card variant="outlined" sx={{ borderRadius: 1, padding: "10px" }}>
-        <Typography variant="body2" sx={{ fontWeight: 500, fontSize: "0.9rem",alignContent:"center"}}>
-Email
-        </Typography>
-        <Typography variant="body2" sx={{ fontSize: "0.8rem" }}>{item?.Email}</Typography>
-      </Card>
-    </Grid>
-    <Grid item xs={4}>
-      <Card variant="outlined" sx={{ borderRadius: 1, padding: "10px" }}>
-        <Typography variant="body2" sx={{ fontSize: "0.9rem", fontWeight: 500 }}>
-          Customer Type
-        </Typography>
-        <Typography variant="body2" sx={{ fontSize: "0.8rem" }}>{item?.CustomerTypeName}</Typography>
-      </Card>
-    </Grid>
-    <Grid item xs={4}>
-      <Card variant="outlined" sx={{ borderRadius: 1, padding: "10px" }}>
-        <Typography variant="body2" sx={{ fontSize: "0.9rem", fontWeight: 500 }}>
-          Contact Type
-        </Typography>
-        <Typography variant="body2" sx={{ fontSize: "0.8rem" }}>{item?.ContactName}</Typography>
-      </Card>
-    </Grid>
-  </Grid>
-</Box>
+            sx={{
+              width: "100%",
+              display: "flex",
+              alignItems: "center",
+              mt: 15,
+            }}
+          >
+            <Grid container spacing={3}>
+              <Grid item xs={4}>
+                <Card variant="outlined" sx={{ borderRadius: 1, padding: "10px" }}>
+                  <Typography variant="body2" sx={{ fontWeight: 500, fontSize: "0.9rem", alignContent: "center" }}>
+                    Email
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontSize: "0.8rem" }}>{item?.Email}</Typography>
+                </Card>
+              </Grid>
+              <Grid item xs={4}>
+                <Card variant="outlined" sx={{ borderRadius: 1, padding: "10px" }}>
+                  <Typography variant="body2" sx={{ fontSize: "0.9rem", fontWeight: 500 }}>
+                    Customer Type
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontSize: "0.8rem" }}>{item?.CustomerTypeName}</Typography>
+                </Card>
+              </Grid>
+              <Grid item xs={4}>
+                <Card variant="outlined" sx={{ borderRadius: 1, padding: "10px" }}>
+                  <Typography variant="body2" sx={{ fontSize: "0.9rem", fontWeight: 500 }}>
+                    Contact Type
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontSize: "0.8rem" }}>{item?.ContactName}</Typography>
+                </Card>
+              </Grid>
+            </Grid>
+          </Box>
 
-<Box
-  sx={{
-    width: "100%",
-    display: "flex",
-    alignItems: "center",
-  
-    mt: 12,
-  }}
->
-  <Grid container spacing={3}>
-    <Grid item xs={4}>
-      <Card variant="outlined" sx={{ borderRadius: 1, padding: "10px" }}>
-        <Typography variant="body2" sx={{ fontWeight: 500, fontSize: "0.9rem" }}>
-          Create Date
-        </Typography>
-        <Typography variant="body2" sx={{ fontSize: "0.8rem" }}>
-        {formatCreateDate(item?.CreateDate)}
-        </Typography>
-      </Card>
-    </Grid>
-    <Grid item xs={4}>
-      <Card variant="outlined" sx={{ borderRadius: 1, padding: "10px" }}>
-        <Typography variant="body2" sx={{ fontSize: "0.9rem", fontWeight: 500 }}>
-          Country Code
-        </Typography>
-        <Typography variant="body2" sx={{ fontSize: "0.8rem" }}>
-          {item?.CountryName}
-        </Typography>
-      </Card>
-    </Grid>
-    <Grid item xs={4}>
-      <Card variant="outlined" sx={{ borderRadius: 1, padding: "10px" }}>
-        <Typography variant="body2" sx={{ fontSize: "0.9rem", fontWeight: 500 }}>
-          City Name
-        </Typography>
-        <Typography variant="body2" sx={{ fontSize: "0.8rem" }}>
-          {item?.CityName}
-        </Typography>
-      </Card>
-    </Grid>
-   
-  </Grid>
-</Box>
+          <Box
+            sx={{
+              width: "100%",
+              display: "flex",
+              alignItems: "center",
 
-<Box
-  sx={{
-    width: "100%",
-    display: "flex",
-    alignItems: "center",
-   
-    mt: 12,
-  }}
->
+              mt: 12,
+            }}
+          >
+            <Grid container spacing={3}>
+              <Grid item xs={4}>
+                <Card variant="outlined" sx={{ borderRadius: 1, padding: "10px" }}>
+                  <Typography variant="body2" sx={{ fontWeight: 500, fontSize: "0.9rem" }}>
+                    Create Date
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontSize: "0.8rem" }}>
+                    {formatCreateDate(item?.CreateDate)}
+                  </Typography>
+                </Card>
+              </Grid>
+              <Grid item xs={4}>
+                <Card variant="outlined" sx={{ borderRadius: 1, padding: "10px" }}>
+                  <Typography variant="body2" sx={{ fontSize: "0.9rem", fontWeight: 500 }}>
+                    Country Code
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontSize: "0.8rem" }}>
+                    {item?.CountryName}
+                  </Typography>
+                </Card>
+              </Grid>
+              <Grid item xs={4}>
+                <Card variant="outlined" sx={{ borderRadius: 1, padding: "10px" }}>
+                  <Typography variant="body2" sx={{ fontSize: "0.9rem", fontWeight: 500 }}>
+                    City Name
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontSize: "0.8rem" }}>
+                    {item?.CityName}
+                  </Typography>
+                </Card>
+              </Grid>
 
-  <Grid container spacing={3}>
+            </Grid>
+          </Box>
 
-    <Grid item xs={4}>
-      <Card variant="outlined" sx={{ borderRadius: 1, padding: "10px" }}>
-        <Typography variant="body2" sx={{ fontSize: "0.9rem", fontWeight: 500 }}>
-          Locality
-        </Typography>
-        <Typography variant="body2" sx={{ fontSize: "0.8rem" }}>
-          {item?.Location}
-        </Typography>
-      </Card>
-    </Grid>
-    <Grid item xs={4}>
-      <Card variant="outlined" sx={{ borderRadius: 1, padding: "10px" }}>
-        <Typography variant="body2" sx={{ fontWeight: 500, fontSize: "0.9rem" }}>
-          Attended By
-        </Typography>
-        <Typography variant="body2" sx={{ fontSize: "0.8rem" }}>{item?.Name}</Typography>
-      </Card>
-    </Grid>
+          <Box
+            sx={{
+              width: "100%",
+              display: "flex",
+              alignItems: "center",
 
-  </Grid>
-</Box>
+              mt: 12,
+            }}
+          >
+
+            <Grid container spacing={3}>
+
+              <Grid item xs={4}>
+                <Card variant="outlined" sx={{ borderRadius: 1, padding: "10px" }}>
+                  <Typography variant="body2" sx={{ fontSize: "0.9rem", fontWeight: 500 }}>
+                    Locality
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontSize: "0.8rem" }}>
+                    {item?.Location}
+                  </Typography>
+                </Card>
+              </Grid>
+              <Grid item xs={4}>
+                <Card variant="outlined" sx={{ borderRadius: 1, padding: "10px" }}>
+                  <Typography variant="body2" sx={{ fontWeight: 500, fontSize: "0.9rem" }}>
+                    Attended By
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontSize: "0.8rem" }}>{item?.Name}</Typography>
+                </Card>
+              </Grid>
+
+            </Grid>
+          </Box>
 
         </Paper>
       </Card>
