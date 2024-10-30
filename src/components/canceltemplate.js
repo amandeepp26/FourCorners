@@ -10,116 +10,153 @@ import {
   TableContainer,
   TableRow,
   Paper,
-  Button,
   Avatar,
   ListItemAvatar,
+  Button,
 } from "@mui/material";
 import { createGlobalStyle } from "styled-components";
 import styled from "styled-components";
-import { useRouter } from "next/router";
 import CancelIcon from "@mui/icons-material/Cancel";
+import PrintIcon from "@mui/icons-material/Print";
+
 const GlobalStyle = createGlobalStyle`
   @media print {
-    body * {
+    body {
+      margin: 0;
+      padding: 0;
+      color: #000;
+      font-size: 12px; /* Adjust font size for print */
+    }
+
+    @page {
+      size: auto; /* auto is the initial value */
+      margin: 10mm; /* Add margin for print */
+    }
+
+    /* Hide unwanted elements */
+    * {
       visibility: hidden;
     }
+
     .printableArea, .printableArea * {
       visibility: visible;
     }
+
     .printableArea {
       position: absolute;
       left: 0;
       top: 0;
       width: 100%;
+      page-break-inside: avoid; /* Prevent page breaks inside this area */
+    }
+
+    /* Prevent breaking inside tables */
+    table {
+      page-break-inside: avoid;
+      border-collapse: collapse; /* For better control over breaks */
     }
   }
 `;
+const formatAmount = (amount) => {
+  if (!amount) return "0";
+
+  const numAmount = parseFloat(amount);
+  
+  // Format for Crores
+  if (numAmount >= 10000000) return `${(numAmount / 10000000).toFixed(2)} CR`; 
+  // Format for Lakhs
+  if (numAmount >= 100000) return `${(numAmount / 100000).toFixed(2)} L`; 
+  // Format for Thousands
+  if (numAmount >= 1000) return `${(numAmount / 1000).toFixed(2)} K`; 
+  
+  // If less than 1000, return the amount in hundreds
+  return `${numAmount.toFixed(2)} H`;
+};
+
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  const options = { day: 'numeric', month: 'short', year: 'numeric' };
+  return date.toLocaleDateString('en-GB', options).replace(/ /g, ' ');
+};
+
 
 const StyledTableCell = styled(TableCell)({
   textAlign: "center",
   borderBottom: "none",
-  border: "1px solid #ccc",
-  borderRadius: "8px 0 0 8px",
+  border: "1px solid #ddd",
+  borderRadius: "8px",
+  padding: "8px",
 });
 
 const InvoiceBox = styled(Box)({
   maxWidth: "890px",
   margin: "auto",
-  padding: "10px",
+  padding: "16px",
   border: "1px solid #eee",
-  fontSize: "11px",
-  lineHeight: "18px",
-  fontFamily: "Helvetica Neue, Helvetica, Arial, sans-serif",
+  backgroundColor: "#f9f9f9",
+  borderRadius: "8px",
+  fontSize: "14px",
+  lineHeight: "1.5",
+  fontFamily: "Arial, sans-serif",
+  boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
 });
 
-const TemplatePayment = ({ bookingID, handleCancel }) => {
-  const router = useRouter();
-  console.log(bookingID, "row data aaayaa<<<<>>>>>>>>>>> ");
+const HeaderTitle = styled(Typography)({
+  textAlign: "center",
+  fontSize: "24px",
+  fontWeight: "bold",
+  marginBottom: "16px",
+});
+
+const TemplatePayment = ({ bookingcancelID, handleCancel }) => {
   const printRef = useRef();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [filterOption, setFilterOption] = useState("remarksWithCreateDate");
-  const [payments, setPayments] = useState([]);
 
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          `https://apiforcornershost.cubisysit.com/api/api-fetch-cancelprojectbooking.php?bookingcancelID=${bookingcancelID}`
+        );
+        setData(response.data.data);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setError(error);
+        setLoading(false);
+      }
+    };
     fetchData();
-  }, []);
+  }, [bookingcancelID]);
 
-  const fetchData = async (selectedFilter) => {
-    try {
-      const response = await axios.get(
-        `https://apiforcornershost.cubisysit.com/api/api-fetch-cancelprojectbooking.php?bookingcancelID=${bookingID}`
-      );
-      console.log("data aaya dekh<<<<<>>>>>>>>>>>>>", response.data);
-      setData(response.data.data);
-      setPayments(response.data.data.payments); // Assuming you need to set payments here
-      setLoading(false);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      setError(error);
-      setLoading(false);
-    }
+  const handlePrint = () => {
+    window.print();
   };
-  if (loading) {
-    return <Typography>Loading...</Typography>;
-  }
 
-  if (error) {
-    return <Typography>Error loading data</Typography>;
-  }
+  if (loading) return <Typography>Loading...</Typography>;
+  if (error) return <Typography>Error loading data</Typography>;
+
   return (
     <>
       <GlobalStyle />
-      <Box
-        display="flex"
-        alignItems="center"
-        justifyContent="space-between"
-        marginBottom={2}
-      >
+      <Box display="flex" alignItems="center" justifyContent="space-between" marginBottom={2}>
         <IconButton onClick={handleCancel}>
           <CancelIcon style={{ color: "red" }} />
         </IconButton>
+        <Button variant="contained" color="primary" onClick={handlePrint} startIcon={<PrintIcon />}>
+          Print
+        </Button>
       </Box>
       <InvoiceBox className="printableArea" ref={printRef}>
-        <TableContainer component={Paper}>
+        <HeaderTitle>CANCELLATION DETAILS</HeaderTitle>
+     
+        <TableContainer component={Paper} sx={{ marginBottom: 3 }}>
           <Table>
             <TableBody>
-              <TableRow sx={{ height: "10px", padding: 0 }}>
-                <StyledTableCell colSpan={3} sx={{ height: "10px", padding: 0 }}>
-                  <Typography
-                    style={{
-                      textAlign: "center",
-                      fontSize: 20,
-                      fontWeight: 900,
-                    }}
-                  >
-                    CANCELLATION DETAILS
-                  </Typography>
-                </StyledTableCell>
-              </TableRow>
-              <TableRow sx={{ padding: 0 }}>
-                <StyledTableCell colSpan={3} sx={{ padding: 0 }}>
+              <TableRow>
+              <StyledTableCell colSpan={3} sx={{ padding: 0 }}>
                   <Typography
                     style={{
                       textAlign: "center",
@@ -132,307 +169,135 @@ const TemplatePayment = ({ bookingID, handleCancel }) => {
                   <Typography
                     style={{ float: "left", fontSize: 15, fontWeight: 200 }}
                   >
-                    Date: {data.bookingDetails.bookingcancelBookingDate}
+                   Date: {data.bookingDetails.bookingcancelBookingDate}
                   </Typography>
                   <Typography
                     style={{ float: "right", fontSize: 15, fontWeight: 200 }}
                   >
-                    Booked By: {data.bookingDetails.bookingcancelName}
+                    Booked By: {data.bookingDetails.UserName}
                   </Typography>
                 </StyledTableCell>
               </TableRow>
-              <TableRow
-                sx={{ padding: 0, display: "flex", alignItems: "center" }}
-              >
-                <StyledTableCell style={{ textAlign: "center", padding: 1 }}>
+              <TableRow>
+                <StyledTableCell colSpan={2}>
                   <ListItemAvatar>
                     <Avatar
                       alt="User Avatar"
-                      sx={{
-                        width: 'auto',
-                        height: 160,
-                        margin: 2,
-                        borderRadius: 1,
-                      }}
-                      src="/images/avatars/user-avatar.png"
+                      sx={{ width: 80, height: 80, margin: "auto" }}
+                      src="/images/avatars/user-avatar1.png" // Placeholder for first avatar
                     />
                   </ListItemAvatar>
+                  <Typography align="center">User Photo 1</Typography>
                 </StyledTableCell>
-                <Box
-                  sx={{
-                    marginLeft: 2,
-                    flexGrow: 1,
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <Typography variant="h6" align="center">
-                    Photo
-                  </Typography>
-                </Box>
+              </TableRow>
+         
+              {[
+                { label: "Name", value: data.bookingDetails.bookingcancelName },
+                { label: "Address", value: data.bookingDetails.bookingcancelAddress },
+                { label: "MOBILE No.", value: data.bookingDetails.bookingcancelMobile },
+                { label: "PAN Card No.", value: data.bookingDetails.bookingcancelPancard },
+                { label: "Aadhar No.", value: data.bookingDetails.bookingcancelAadhar },
+                { label: "EMAIL ID.", value: data.bookingDetails.bookingcancelEmail },
+              ].map(({ label, value }) => (
+                <TableRow key={label}>
+                  <StyledTableCell style={{ textAlign: "left" }}>{label}</StyledTableCell>
+                  <StyledTableCell style={{ textAlign: "center" }}>{value}</StyledTableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+
+        <TableContainer component={Paper} sx={{ marginBottom: 3 }}>
+          <Table>
+            <TableBody>
+              <TableRow>
+                <StyledTableCell>Project</StyledTableCell>
+                <StyledTableCell>Wing</StyledTableCell>
+                <StyledTableCell>Floor</StyledTableCell>
+                <StyledTableCell>Flat No.</StyledTableCell>
+                <StyledTableCell>Type</StyledTableCell>
+              </TableRow>
+              <TableRow>
+                <StyledTableCell>{data.bookingDetails.ProjectName}</StyledTableCell>
+                <StyledTableCell>{data.bookingDetails.WingName}</StyledTableCell>
+                <StyledTableCell>{data.bookingDetails.bookingcancelFloorNo}</StyledTableCell>
+                <StyledTableCell>{data.bookingDetails.bookingcancelFlatNo}</StyledTableCell>
+                <StyledTableCell>{data.bookingDetails.UnittypeName}</StyledTableCell>
               </TableRow>
             </TableBody>
           </Table>
         </TableContainer>
-  
+
         <TableContainer component={Paper} sx={{ marginBottom: 3 }}>
           <Table>
             <TableBody>
-              <TableRow sx={{ padding: 0 }}>
-                <StyledTableCell
-                  style={{ textAlign: "left", width: "20%", padding: 0 }}
-                  colSpan={2}
-                >
-                  <Typography>Name</Typography>
-                </StyledTableCell>
-                <StyledTableCell
-                  style={{ width: "80%", padding: 0 }}
-                  colSpan={10}
-                >
-                  {data.bookingDetails.bookingcancelName}
-                </StyledTableCell>
+              <TableRow>
+                <StyledTableCell>Area in Building (in Sq.Ft)</StyledTableCell>
+                <StyledTableCell>{data.bookingDetails.bookingcancelArea}</StyledTableCell>
+                <StyledTableCell>Total Amount</StyledTableCell>
+                <StyledTableCell>{data.bookingDetails.bookingcancelTotalCost}</StyledTableCell>
               </TableRow>
-              <TableRow sx={{ padding: 0 }}>
-                <StyledTableCell
-                  style={{ textAlign: "left", padding: 0 }}
-                  colSpan={2}
-                >
-                  <Typography>Address</Typography>
-                </StyledTableCell>
-                <StyledTableCell
-                  colSpan={10}
-                  style={{ textAlign: "center", padding: 0 }}
-                >
-                  {data.bookingDetails.bookingcancelAddress}
-                </StyledTableCell>
-              </TableRow>
-              <TableRow sx={{ padding: 0 }}>
-                <StyledTableCell
-                  style={{ textAlign: "left", padding: 0 }}
-                  colSpan={2}
-                >
-                  <Typography>MOBILE No.</Typography>
-                </StyledTableCell>
-                <StyledTableCell
-                  colSpan={10}
-                  style={{ textAlign: "center", padding: 0 }}
-                >
-                  {data.bookingDetails.bookingcancelMobile}
-                </StyledTableCell>
-              </TableRow>
-              <TableRow sx={{ padding: 0 }}>
-                <StyledTableCell
-                  style={{ textAlign: "left", padding: 0 }}
-                  colSpan={2}
-                >
-                  <Typography>PAN Card No.</Typography>
-                </StyledTableCell>
-                <StyledTableCell
-                  colSpan={10}
-                  style={{ textAlign: "center", padding: 0 }}
-                >
-                  {data.bookingDetails.bookingcancelPancard}
-                </StyledTableCell>
-              </TableRow>
-              <TableRow sx={{ padding: 0 }}>
-                <StyledTableCell
-                  colSpan={2}
-                  style={{ textAlign: "left", padding: 0 }}
-                >
-                  <Typography>Aadhar No.</Typography>
-                </StyledTableCell>
-                <StyledTableCell
-                  colSpan={10}
-                  style={{ textAlign: "center", padding: 0 }}
-                >
-                  {data.bookingDetails.bookingcancelAadhar}
-                </StyledTableCell>
-              </TableRow>
-              <TableRow sx={{ padding: 0 }}>
-                <StyledTableCell
-                  style={{ textAlign: "left", padding: 0 }}
-                  colSpan={2}
-                >
-                  <Typography>EMAIL ID.</Typography>
-                </StyledTableCell>
-                <StyledTableCell
-                  colSpan={10}
-                  style={{ textAlign: "center", padding: 0 }}
-                >
-                  {data.bookingDetails.bookingcancelEmail}
-                </StyledTableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </TableContainer>
-  
-        <TableContainer component={Paper} sx={{ marginBottom: 3 }}>
-          <Table>
-            <TableBody>
-              <TableRow sx={{ padding: 0 }}>
-                <StyledTableCell
-                  style={{ width: "40%", padding: 0 }}
-                  colSpan={10}
-                >
-                  <Typography>Project</Typography>
-                </StyledTableCell>
-                <StyledTableCell
-                  style={{ width: "15%", padding: 0 }}
-                  colSpan={10}
-                >
-                  <Typography>Wing</Typography>
-                </StyledTableCell>
-                <StyledTableCell
-                  style={{ width: "15%", padding: 0 }}
-                  colSpan={10}
-                >
-                  <Typography>Floor</Typography>
-                </StyledTableCell>
-                <StyledTableCell
-                  style={{ width: "15%", padding: 0 }}
-                  colSpan={10}
-                >
-                  <Typography>Flat No.</Typography>
-                </StyledTableCell>
-                <StyledTableCell
-                  style={{ width: "15%", padding: 0 }}
-                  colSpan={10}
-                >
-                  <Typography>Type</Typography>
-                </StyledTableCell>
-              </TableRow>
-              <TableRow sx={{ padding: 0 }}>
-                <StyledTableCell
-                  style={{ width: "40%", padding: 0 }}
-                  colSpan={10}
-                >
-                  {data.bookingDetails.ProjectName}
-                </StyledTableCell>
-                <StyledTableCell
-                  style={{ width: "15%", padding: 0 }}
-                  colSpan={10}
-                >
-                  {data.bookingDetails.WingName}
-                </StyledTableCell>
-                <StyledTableCell
-                  style={{ width: "15%", padding: 0 }}
-                  colSpan={10}
-                >
-                  {data.bookingDetails.bookingcancelFloorNo}
-                </StyledTableCell>
-                <StyledTableCell
-                  style={{ width: "15%", padding: 0 }}
-                  colSpan={10}
-                >
-                  {data.bookingDetails.bookingcancelFlatNo}
-                </StyledTableCell>
-                <StyledTableCell
-                  style={{ width: "15%", padding: 0 }}
-                  colSpan={10}
-                >
-                  {data.bookingDetails.UnittypeName}
-                </StyledTableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </TableContainer>
-  
-        <TableContainer component={Paper} sx={{ marginBottom: 3 }}>
-          <Table>
-            <TableBody>
-              <TableRow sx={{ padding: 0 }}>
-                <StyledTableCell
-                  style={{ width: "30%", padding: 0, textAlign: "left" }}
-                  colSpan={4}
-                >
-                  Area in Building (in Sq.Ft)
-                </StyledTableCell>
-                <StyledTableCell
-                  style={{ width: "20%", padding: 0 }}
-                  colSpan={1}
-                >
-                  {data.bookingDetails.bookingcancelArea}
-                </StyledTableCell>
-                <StyledTableCell
-                  style={{ width: "30%", padding: 0, textAlign: "left" }}
-                  colSpan={4}
-                >
-                  Total Amount
-                </StyledTableCell>
-                <StyledTableCell
-                  style={{ width: "20%", padding: 0 }}
-                  colSpan={1}
-                >
-                  {data.bookingDetails.bookingcancelTotalCost}
-                </StyledTableCell>
-              </TableRow>
-              <TableRow sx={{ padding: 0 }}>
-                <StyledTableCell
-                  style={{ width: "30%", padding: 0, textAlign: "left" }}
-                  colSpan={4}
-                >
-                  Booking Reference Code
-                </StyledTableCell>
-                <StyledTableCell
-                  style={{ width: "20%", padding: 0 }}
-                  colSpan={1}
-                >
-                  {data.bookingDetails.bookingcancelBookingRef}
-                </StyledTableCell>
-                <StyledTableCell
-                  style={{ width: "30%", padding: 0, textAlign: "left" }}
-                  colSpan={4}
-                >
-                  Cancellation Status
-                </StyledTableCell>
-                <StyledTableCell
-                  style={{ width: "20%", padding: 0 }}
-                  colSpan={1}
-                >
+              <TableRow>
+                <StyledTableCell>Booking Reference Code</StyledTableCell>
+                <StyledTableCell>{data.bookingDetails.bookingcancelBookingRef}</StyledTableCell>
+                <StyledTableCell>Cancellation Status</StyledTableCell>
+                <StyledTableCell>
                   {data.bookingDetails.bookingcancelStatus === 1 ? "Cancelled" : "Active"}
                 </StyledTableCell>
               </TableRow>
             </TableBody>
           </Table>
         </TableContainer>
-  
-        <TableContainer component={Paper} sx={{ marginBottom: 3 }}>
-          <Table>
-            <TableBody>
-              <TableRow sx={{ padding: 0 }}>
-                <StyledTableCell
-                  style={{ padding: 0, textAlign: "left" }}
-                  colSpan={3}
-                >
-                  <Typography>Remarks</Typography>
-                </StyledTableCell>
-              </TableRow>
-              {data.remarks.length === 0 ? (
-                <TableRow>
-                  <StyledTableCell colSpan={3} style={{ textAlign: "center" }}>
-                    No remarks available
-                  </StyledTableCell>
-                </TableRow>
-              ) : (
-                data.remarks.map((remark, index) => (
-                  <TableRow key={index} sx={{ padding: 0 }}>
-                    <StyledTableCell
-                      style={{ textAlign: "left", padding: 0 }}
-                      colSpan={3}
-                    >
-                      {remark.bookingcancelremarksRemark || "No details provided"}
-                    </StyledTableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
+        <TableContainer component={Paper}>
+  <Table>
+    <TableBody>
+      <TableRow>
+        <TableCell colSpan={4}>
+          <Typography style={{ fontWeight: 'bold' }}>Remarks</Typography>
+        </TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell style={{ textAlign: "left", fontWeight: 'bold' }}>#</TableCell>
+        <TableCell style={{ textAlign: "left", fontWeight: 'bold' }}>Amount</TableCell>
+        <TableCell style={{ textAlign: "left", fontWeight: 'bold' }}>Date</TableCell>
+        <TableCell style={{ textAlign: "left", fontWeight: 'bold' }}>Remark</TableCell>
+      </TableRow>
+      {data.remarks.length === 0 ? (
+        <TableRow>
+          <TableCell colSpan={4} style={{ textAlign: "center" }}>
+            No remarks available
+          </TableCell>
+        </TableRow>
+      ) : (
+        data.remarks.map((remark, index) => (
+          <TableRow key={index}>
+            <TableCell style={{ textAlign: "left", padding: "8px 0" }}>
+              {index + 1}  {/* Display index + 1 */}
+            </TableCell>
+            <TableCell style={{ textAlign: "left", padding: "8px 0" }}>
+              {formatAmount(remark.bookingcancelremarksAmount)}
+            </TableCell>
+            <TableCell style={{ textAlign: "left", padding: "8px 0" }}>
+              {formatDate(remark.bookingcancelremarksDate)}
+            </TableCell>
+            <TableCell style={{ textAlign: "left", padding: "8px 0" }}>
+              {remark.bookingcancelremarksRemark || "No details provided"}
+            </TableCell>
+          </TableRow>
+        ))
+      )}
+    </TableBody>
+  </Table>
+</TableContainer>
+
+
+
+
+
       </InvoiceBox>
     </>
   );
-  
 };
 
 export default TemplatePayment;

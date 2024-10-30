@@ -32,9 +32,10 @@ import {
 import PaymentIcon from "@mui/icons-material/Payment";
 import axios from "axios";
 import { useRouter } from "next/router";
+import CancelTemplate from "../../components/canceltemplate"
 import { useCookies } from "react-cookie";
+import FileCopyIcon from '@mui/icons-material/FileCopy';
 import DownloadIcon from '@mui/icons-material/Download';
-
 
 const NoDataIcon = () => (
   <Avatar alt="No Data" sx={{ width: 500, height: "auto" }} src="/images/avatars/nodata.svg" />
@@ -50,12 +51,13 @@ const ListBookingCancel = ({ onChequeReceiptClick, item }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredRows, setFilteredRows] = useState([]);
   const [dataAvailable, setDataAvailable] = useState(true);
-  const [openPaymentModal, setOpenPaymentModal] = useState(false);
+  const [openTemplate, setOpenTemplate] = useState(false);
   const [followupData, setFollowupData] = useState({ note: '', followupDate: new Date() });
   const [remarks, setRemarks] = useState([]);
   const [selectedRemark, setSelectedRemark] = useState("");
+  const [bookingcancelID, setBookingID] = useState(null);
   const [amount, setAmount] = useState("");
-  // Fetch wings based on the selected project
+ 
   useEffect(() => {
     if (!item) return;
     const fetchWings = async () => {
@@ -136,17 +138,44 @@ const ListBookingCancel = ({ onChequeReceiptClick, item }) => {
   const handleFollowupSubmit = () => {
     // Here you would handle the submit logic (e.g., sending data to an API)
     console.log("Follow-up Data:", followupData);
-    setOpenPaymentModal(false); // Close modal after submission
+    setOpenTemplate(false); // Close modal after submission
   };
 
-  const handleAddPayment = (bookingID) => {
-    // Logic to handle adding payment for a specific booking
-    console.log("Adding payment for Booking ID:", bookingID);
-    setOpenPaymentModal(true);
+
+  const handleTemplateClick = (bookingcancelID) => {
+    console.log("Adding payment for Booking ID:", bookingcancelID);
+    setBookingID(bookingcancelID); 
+    setOpenTemplate(true); 
   };
+
+
+  const handleCloseTemplate = () => {
+    setOpenTemplate(false); // Close the modal
+    setBookingID(null); // Reset the booking ID (optional)
+  };
+
+
 
   return (
     <>
+        <Modal open={openTemplate} onClose={handleCloseTemplate}>
+        <Card
+          style={{
+            maxWidth: "800px",
+            margin: "auto",
+            marginTop: "50px",
+            height: "90vh", // Set height relative to the viewport
+            padding: "20px",
+            overflowY: "auto", // Enable vertical scrolling if content overflows
+          }}
+        >
+          <CancelTemplate
+            bookingcancelID={bookingcancelID}
+            handleCancel={handleCloseTemplate}
+          />
+        </Card>
+      </Modal>
+
       <Grid container justifyContent="center" spacing={2} sx={{ marginBottom: 5 }}>
         {wings.map((wing) => (
           <Grid item key={wing.WingID}>
@@ -207,8 +236,8 @@ const ListBookingCancel = ({ onChequeReceiptClick, item }) => {
                           <TableCell>{row.WingName}</TableCell>
                           <TableCell>{row.bookingcancelFlatNo}</TableCell>
                           <TableCell>
-                            <IconButton onClick={() => handleAddPayment(row.bookingcancelID)} color="primary">
-                              <DownloadIcon />
+                            <IconButton onClick={() => handleTemplateClick(row.bookingcancelID)} color="primary">
+                              <FileCopyIcon />   
                             </IconButton>
                           </TableCell>
                         </TableRow>

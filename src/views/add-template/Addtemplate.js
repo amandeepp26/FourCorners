@@ -15,24 +15,23 @@ import Card from "@mui/material/Card";
 import MuiAlert from "@mui/material/Alert";
 import axios from "axios";
 import Snackbar from "@mui/material/Snackbar";
-import dynamic from "next/dynamic"; // For dynamic import if using Next.js
-import "react-quill/dist/quill.snow.css"; // Import Quill styles
+import dynamic from "next/dynamic"; 
+import "react-quill/dist/quill.snow.css"; 
 
-const ReactQuill = dynamic(() => import("react-quill"), { ssr: false }); // Dynamic import
+const ReactQuill = dynamic(() => import("react-quill"), { ssr: false }); 
 
 const AddContact = ({ show, editData }) => {
+  const [cookies] = useCookies(["amr"]);
+  
   const initialFormData = {
-    TName: "",
-    templatetypeID: "",
-    para: "",
+    TName: editData ? editData.TName : "",
+    templatetypeID: editData ? editData.templatetypeID : "",
     file: null,
-    url: "",
-    ProjectID: "",
-    content: "",
-    CreateUID: cookies?.amr?.UserID || 1,
+    ProjectID: editData ? editData.ProjectID : "",
+    content: editData ? editData.content : "",
+    CreateUID: cookies.amr?.UserID || 1,
   };
 
-  const [cookies, setCookie] = useCookies(["amr"]);
   const [formData, setFormData] = useState(initialFormData);
   const [templateTypes, setTemplateTypes] = useState([]);
   const [projectTypeData, setProjectTypeData] = useState([]);
@@ -42,7 +41,7 @@ const AddContact = ({ show, editData }) => {
 
   useEffect(() => {
     fetchTemplateTypes();
-    fetchProject(); // Fetch project data when component mounts
+    fetchProject();
   }, []);
 
   const fetchTemplateTypes = async () => {
@@ -99,48 +98,54 @@ const AddContact = ({ show, editData }) => {
       setErrors(newErrors);
       return;
     }
-
+  
     const url = editData
       ? "https://proxy-forcorners.vercel.app/api/proxy/api-update-contacts.php"
       : "https://proxy-forcorners.vercel.app/api/proxy/api-insert-template.php";
-
-    // Prepare the data
-    // const dataToSend = {
-    //   TName: formData.TName,
-    //   templatetypeID: formData.templatetypeID,
-    //   para: formData.para,
-    //   url: formData.url,
-    //   ProjectID: formData.ProjectID,
-    //   content: formData.content,
-    //   CreateUID: formData.CreateUID,
-    // };
-
-    const dataToSend = new FormData();
-    dataToSend.append("TName", formData.TName);
-    dataToSend.append("templatetypeID", formData.templatetypeID);
-    dataToSend.append("para", formData.para);
-    dataToSend.append("url", formData.url);
-    dataToSend.append("ProjectID", formData.ProjectID);
-    dataToSend.append("content", formData.content);
-    dataToSend.append("CreateUID", formData.CreateUID);
-
-    dataToSend.append("file", formData.file);
-
+  
+    const dataToSend = {
+      TName: formData.TName,
+      templatetypeID: formData.templatetypeID,
+      ProjectID: formData.ProjectID,
+      content: formData.content,
+      CreateUID: formData.CreateUID,
+    };
+  
     try {
+      // First, upload the file and get the file path
+      if (formData.filePath) {
+        const formDataUpload = new FormData();
+        formDataUpload.append("file", formData.file);
+        
+        const uploadResponse = await axios.post("https://apiforcornershost.cubisysit.com/api/template", formDataUpload, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+  
+        if (uploadResponse.data.status === "Success") {
+          dataToSend.filePath = uploadResponse.data.filePath; // Add the file path to the data
+        } else {
+          setSubmitError(true);
+          console.error("Image upload failed:", uploadResponse.data.message);
+          return;
+        }
+      }
+  
+      // Now send the main data as JSON
       const response = await axios.post(url, dataToSend, {
         headers: {
-          "Content-Type": "multipart/form-data",
+          "Content-Type": "application/json", // Send data as JSON
         },
       });
-    
+  
       if (response.data.status === "Success") {
-        debugger;
         setFormData(initialFormData);
         setErrors({});
         setSubmitSuccess(true);
         setSubmitError(false);
         show(false);
-    
+  
         Swal.fire({
           icon: "success",
           title: editData ? "Data Updated Successfully" : "Data Added Successfully",
@@ -150,93 +155,15 @@ const AddContact = ({ show, editData }) => {
           window.location.reload();
         });
       } else {
-        debugger;
         setSubmitError(true);
-        setSubmitSuccess(false);
+        console.error("Submission failed:", response.data.message);
       }
     } catch (error) {
-      debugger;
       console.error("Error submitting form:", error);
       setSubmitError(true);
-      setSubmitSuccess(false);
     }
-
-    // If there's a file, convert it to a base64 string
-    // if (formData.file) {
-    //   const reader = new FileReader();
-    //   reader.readAsDataURL(formData.file);
-    //   reader.onloadend = async () => {
-    //     dataToSend.file = reader.result; // This is the base64 string of the file
-
-    //     // Send data to API
-    //     try {
-    //       const response = await axios.post(url, dataToSend, {
-    //         headers: {
-    //           "Content-Type": "multipart/form-data",
-    //         },
-    //       });
-
-    //       if (response.data.status === "Success") {
-    //         setFormData(initialFormData);
-    //         setErrors({});
-    //         setSubmitSuccess(true);
-    //         setSubmitError(false);
-    //         show(false);
-
-    //         Swal.fire({
-    //           icon: "success",
-    //           title: editData ? "Data Updated Successfully" : "Data Added Successfully",
-    //           showConfirmButton: false,
-    //           timer: 1000,
-    //         }).then(() => {
-    //           window.location.reload();
-    //         });
-    //       } else {
-    //         setSubmitError(true);
-    //         setSubmitSuccess(false);
-    //       }
-    //     } catch (error) {
-    //       console.error("Error submitting form:", error);
-    //       setSubmitError(true);
-    //       setSubmitSuccess(false);
-    //     }
-    //   };
-    // } else {
-    //   // Send data to API without file
-    //   try {
-    //     const response = await axios.post(url, dataToSend, {
-    //       headers: {
-    //         "Content-Type": "application/json",
-    //       },
-    //     });
-
-    //     if (response.data.status === "Success") {
-    //       setFormData(initialFormData);
-    //       setErrors({});
-    //       setSubmitSuccess(true);
-    //       setSubmitError(false);
-    //       show(false);
-
-    //       Swal.fire({
-    //         icon: "success",
-    //         title: editData ? "Data Updated Successfully" : "Data Added Successfully",
-    //         showConfirmButton: false,
-    //         timer: 1000,
-    //       }).then(() => {
-    //         window.location.reload();
-    //       });
-    //     } else {
-    //       setSubmitError(true);
-    //       setSubmitSuccess(false);
-    //     }
-    //   } catch (error) {
-    //     console.error("Error submitting form:", error);
-    //     setSubmitError(true);
-    //     setSubmitSuccess(false);
-    //   }
-    // }
   };
-
+  
 
   const validateForm = (formData) => {
     let errors = {};
@@ -314,6 +241,9 @@ const AddContact = ({ show, editData }) => {
                     value={formData.templatetypeID}
                     onChange={handleChange}
                   >
+                    <MenuItem value="">
+                      <em>None</em>
+                    </MenuItem>
                     {templateTypes.map((type) => (
                       <MenuItem key={type.templatetypeID} value={type.templatetypeID}>
                         {type.templatetypeName}
@@ -324,15 +254,6 @@ const AddContact = ({ show, editData }) => {
                     <MuiAlert severity="error">{errors.templatetypeID}</MuiAlert>
                   )}
                 </FormControl>
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  name="para"
-                  label="Paragraph"
-                  value={formData.para}
-                  onChange={handleChange}
-                />
               </Grid>
               <Grid item xs={12} sm={6}>
                 <Box
@@ -362,15 +283,6 @@ const AddContact = ({ show, editData }) => {
                     </Typography>
                   )}
                 </Box>
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  name="url"
-                  label="URL"
-                  value={formData.url}
-                  onChange={handleChange}
-                />
               </Grid>
               <Grid item xs={12}>
                 <ReactQuill

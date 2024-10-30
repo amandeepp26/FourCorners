@@ -306,12 +306,10 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
   };
 
   const handleTemplateClick = (row) => {
-    setBookingID(row.BookingID); // Set the selected BookingID
-    setOpenTemplate(true); // Open the modal
-    handleMenuClose(); // Close the menu if it's open
+    setBookingID(row.BookingID); 
+    setOpenTemplate(true); 
+    handleMenuClose();
 
-    // Optionally, you can set other states with the selected row data
-    // setOtherState(row.someField);
   };
 
   const onCheque = (row) => {
@@ -327,11 +325,11 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
   };
 
   const onEdit = (row) => {
-    console.log(row, "Selected row data EDit"); // Log the selected row data
+    console.log(row, "Selected row data EDit"); 
 
-    setBookingID(row.BookingID); // Set the selected BookingID
-    setOpenEdit(true); // Open the modal
-    handleMenuClose(); // Close the menu if it's open
+    setBookingID(row.BookingID); 
+    setOpenEdit(true);
+    handleMenuClose(); 
   };
 
   const SortableTableCell = ({ label, onClick }) => (
@@ -821,7 +819,7 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
             width: 1300,
             mt: 5,
             mx: 2,
-            maxHeight: "80vh", // Set maximum height relative to the viewport height
+            maxHeight: "80vh", 
             overflow: "auto",
           }}
         >
