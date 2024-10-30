@@ -174,37 +174,6 @@ const Listprojectmaster = ({ item, onDelete, onEdit, onHistoryClick }) => {
     return `${header}\n${values}`;
   };
 
-  const downloadCSV = () => {
-    const csvData = [
-      {
-        "C Name ": item.CName,
-        Mobile: item.Mobile,
-        Email: item.Email,
-        "Project Name": item.ProjectName,
-        "Unit Type": item.UnittypeName,
-        "Estimated Budget": item.EstimatedbudgetName,
-        "Lead Status": item.leadstatusName,
-        "Next Follow Up-Date": item.NextFollowUpDate,
-        "Source Description": item.SourceDescription,
-        "Telecall Attended By": item.TelecallAttendedByName,
-        "Alternate Mobile Number": item.AlternateMobileNo,
-        Comments: item.Comments,
-        "Source Name": item.SourceName,
-        Location: item.Location,
-        "Attended By": item.TelecallAttendedByName,
-      },
-    ];
-
-    const csv = jsonToCSV(csvData);
-    const blob = new Blob([csv], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "Telecalling.csv";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-  };
 
   const handleEdit = () => {
     if (onEdit) {
@@ -217,7 +186,7 @@ const Listprojectmaster = ({ item, onDelete, onEdit, onHistoryClick }) => {
   };
 
   const userid = cookies.amr?.UserID || "Role";
-
+console.log('UserID',userid)
   useEffect(() => {
     fetchContacts();
     fetchTemplate();
@@ -246,16 +215,38 @@ const Listprojectmaster = ({ item, onDelete, onEdit, onHistoryClick }) => {
     }
   };
 
-  if (modalVisible) {
-    return (
-      <>
-        <CloseIcon
-          style={{ cursor: "pointer" }}
-          onClick={() => setModalVisible(false)}
-        />
+  
 
-        <Grid item xs={12} md={4} style={{ marginTop: 20 }}>
-          <FormControl fullWidth>
+  return (
+    <>
+      <Modal open={modalVisible} onClose={() => setModalVisible(false)}>
+  <Box
+    sx={{
+      display: 'flex',
+      flexDirection: 'column',
+      width: { xs: '90%', sm: '500px' }, // Responsive width
+      bgcolor: 'background.paper',
+      borderRadius: 2,
+      boxShadow: 24,
+      p: 4,
+      mx: 'auto', // Center modal horizontally
+      mt: '10%', // Center modal vertically
+    }}
+  >
+    <IconButton
+      onClick={() => setModalVisible(false)}
+      sx={{ alignSelf: 'flex-end' }}
+    >
+      <CloseIcon />
+    </IconButton>
+
+    <Typography variant="h6" component="h2" sx={{ mb: 2 }}>
+      Share Details
+    </Typography>
+
+    <Grid container spacing={2}>
+      <Grid item xs={12}>
+      <FormControl fullWidth>
             <InputLabel>Contacts</InputLabel>
             <Select
               value={selectedContact || ""}
@@ -269,49 +260,52 @@ const Listprojectmaster = ({ item, onDelete, onEdit, onHistoryClick }) => {
               ))}
             </Select>
           </FormControl>
-        </Grid>
+      </Grid>
 
-        {!selectedContact?.Email && selectedContact && (
-          <Grid item xs={12} md={4}>
-            <TextField
-              fullWidth
-              label="Email"
-              value={email}
-              onChange={(e) => {
-                setEmail(e);
-              }}
-              name="Email"
-            />
-          </Grid>
-        )}
-
-        <Grid item xs={12} md={4} style={{ marginTop: 20 }}>
-          <FormControl fullWidth>
-            <InputLabel>Templates</InputLabel>
-            <Select
-              value={selectedTemplate || ""}
-              onChange={(event) => setSelectedTemplate(event.target.value)}
-              label="Contacts"
-            >
-              {templates.map((temp) => (
-                <MenuItem key={temp.templateID} value={temp}>
-                  {temp.TName}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+      {selectedContact?.Email === undefined && selectedContact && (
+        <Grid item xs={12}>
+          <TextField
+            fullWidth
+            label="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            name="Email"
+            variant="outlined"
+          />
         </Grid>
-        <Grid style={{marginTop:50}} item xs={12} md={4}>
-          <Button type="submit" variant="contained" color="primary" fullWidth>
-            Submit
-          </Button>
-        </Grid>
-      </>
-    );
-  }
+      )}
 
-  return (
-    <>
+      <Grid item xs={12}>
+        <FormControl fullWidth variant="outlined">
+          <InputLabel>Templates</InputLabel>
+          <Select
+            value={selectedTemplate || ""}
+            onChange={(event) => setSelectedTemplate(event.target.value)}
+            label="Templates"
+          >
+            {templates.map((temp) => (
+              <MenuItem key={temp.templateID} value={temp}>
+                {temp.TName}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Grid>
+
+      <Grid item xs={12}>
+        <Button
+          variant="contained"
+          color="primary"
+          fullWidth
+          onClick={handleSubmit}
+          sx={{ mt: 2 }}
+        >
+          Submit
+        </Button>
+      </Grid>
+    </Grid>
+  </Box>
+</Modal>
       <Grid
         container
         justifyContent="center"

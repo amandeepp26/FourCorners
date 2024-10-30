@@ -9,10 +9,6 @@ import HistoryTelecalling from 'src/views/history-telecalling/HistoryTelecalling
 import PieChartIcon from '@mui/icons-material/PieChart';
 import Card from '@mui/material/Card';
 import TrendingUp from 'mdi-material-ui/TrendingUp';
-import CurrencyUsd from 'mdi-material-ui/CurrencyUsd';
-import DotsVertical from 'mdi-material-ui/DotsVertical';
-import CellphoneLink from 'mdi-material-ui/CellphoneLink';
-import AccountOutline from 'mdi-material-ui/AccountOutline';
 import CardContent from '@mui/material/CardContent';
 import CardHeader from '@mui/material/CardHeader';
 import IconButton from '@mui/material/IconButton';

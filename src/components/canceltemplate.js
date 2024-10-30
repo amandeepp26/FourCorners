@@ -68,8 +68,6 @@ const formatAmount = (amount) => {
   if (numAmount >= 100000) return `${(numAmount / 100000).toFixed(2)} L`; 
   // Format for Thousands
   if (numAmount >= 1000) return `${(numAmount / 1000).toFixed(2)} K`; 
-  
-  // If less than 1000, return the amount in hundreds
   return `${numAmount.toFixed(2)} H`;
 };
 

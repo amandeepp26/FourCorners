@@ -164,7 +164,6 @@ const handleNavigation = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
   
-    // Ensure item and Tid are available
     if (!item || !item.Tid) {
       console.error('No valid item or Tid found.');
       return;
@@ -307,59 +306,136 @@ const handleNavigation = () => {
 
 
 
-  if (modalVisible) {
-    return (
-      <div style={{paddingLeft:15}}>
-        <CloseIcon
-          style={{ cursor: "pointer" }}
-          onClick={() => setModalVisible(false)}
-        />
+  // if (modalVisible) {
+  //   return (
+  //     <div style={{paddingLeft:15}}>
+  //       <CloseIcon
+  //         style={{ cursor: "pointer" }}
+  //         onClick={() => setModalVisible(false)}
+  //       />
 
-        <Grid item xs={12} md={4} style={{ marginTop: 20 }}>
-          <FormControl fullWidth>
-            <InputLabel>Projects</InputLabel>
-            <Select
-              value={selectedProject || ""}
-              onChange={(event) => setSelectedProject(event.target.value)}
-              label="Projects"
-            >
-              {projects?.map((item) => (
-                <MenuItem key={item.ProjectID} value={item}>
-                  {item.ProjectName}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Grid>
+  //       <Grid item xs={12} md={4} style={{ marginTop: 20 }}>
+  //         <FormControl fullWidth>
+  //           <InputLabel>Projects</InputLabel>
+  //           <Select
+  //             value={selectedProject || ""}
+  //             onChange={(event) => setSelectedProject(event.target.value)}
+  //             label="Projects"
+  //           >
+  //             {projects?.map((item) => (
+  //               <MenuItem key={item.ProjectID} value={item}>
+  //                 {item.ProjectName}
+  //               </MenuItem>
+  //             ))}
+  //           </Select>
+  //         </FormControl>
+  //       </Grid>
 
-        <Grid item xs={12} md={4} style={{ marginTop: 20 }}>
-          <FormControl fullWidth>
-            <InputLabel>Templates</InputLabel>
-            <Select
-              value={selectedTemplate || ""}
-              onChange={(event) => setSelectedTemplate(event.target.value)}
-              label="Contacts"
-            >
-              {templates.map((temp) => (
-                <MenuItem key={temp.templateID} value={temp}>
-                  {temp.TName}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Grid>
-        <Grid style={{ marginTop: 50 }} item xs={12} md={4}>
-          <Button type="submit" variant="contained" color="primary" fullWidth>
-            Submit
-          </Button>
-        </Grid>
-      </div>
-    );
-  }
+  //       <Grid item xs={12} md={4} style={{ marginTop: 20 }}>
+  //         <FormControl fullWidth>
+  //           <InputLabel>Templates</InputLabel>
+  //           <Select
+  //             value={selectedTemplate || ""}
+  //             onChange={(event) => setSelectedTemplate(event.target.value)}
+  //             label="Contacts"
+  //           >
+  //             {templates.map((temp) => (
+  //               <MenuItem key={temp.templateID} value={temp}>
+  //                 {temp.TName}
+  //               </MenuItem>
+  //             ))}
+  //           </Select>
+  //         </FormControl>
+  //       </Grid>
+  //       <Grid style={{ marginTop: 50 }} item xs={12} md={4}>
+  //         <Button type="submit" variant="contained" color="primary" fullWidth>
+  //           Submit
+  //         </Button>
+  //       </Grid>
+  //     </div>
+  //   );
+  // }
 
 
   return (
     <>
+    <Modal open={modalVisible} onClose={() => setModalVisible(false)}>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          width: { xs: '90%', sm: '500px' },
+          bgcolor: 'background.paper',
+          borderRadius: 2,
+          boxShadow: 24,
+          p: 4,
+          mx: 'auto',
+          mt: '10%',
+        }}
+      >
+        <IconButton
+          onClick={() => setModalVisible(false)}
+          sx={{ alignSelf: 'flex-end' }}
+        >
+          <CloseIcon />
+        </IconButton>
+
+        <Typography variant="h6" component="h2" sx={{ mb: 2 }}>
+          Share Details
+        </Typography>
+
+        <Grid container spacing={2}>
+          {/* Project Selection */}
+          <Grid item xs={12}>
+            <FormControl fullWidth variant="outlined">
+              <InputLabel>Projects</InputLabel>
+              <Select
+                value={selectedProject || ""}
+                onChange={(event) => setSelectedProject(event.target.value)}
+                label="Projects"
+              >
+                {projects?.map((item) => (
+                  <MenuItem key={item.ProjectID} value={item}>
+                    {item.ProjectName}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+
+          {/* Template Selection */}
+          <Grid item xs={12}>
+            <FormControl fullWidth variant="outlined">
+              <InputLabel>Templates</InputLabel>
+              <Select
+                value={selectedTemplate || ""}
+                onChange={(event) => setSelectedTemplate(event.target.value)}
+                label="Templates"
+              >
+                {templates.map((temp) => (
+                  <MenuItem key={temp.templateID} value={temp}>
+                    {temp.TName}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+
+          {/* Submit Button */}
+          <Grid item xs={12}>
+            <Button
+              variant="contained"
+              color="primary"
+              fullWidth
+              onClick={handleSubmit}
+              sx={{ mt: 2 }}
+            >
+              Submit
+            </Button>
+          </Grid>
+        </Grid>
+      </Box>
+    </Modal>
       <Grid
         container
         justifyContent="center"
