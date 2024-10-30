@@ -151,10 +151,12 @@ const handleNavigation = () => {
 
         if (response.data.status === "Success") {
           console.log(response.data.data[0], "Single telecalling data fetched");
+
           // Update item state with fetched data
           setRowDataToUpdate(response.data.data[0]);
         }
       } catch (error) {
+
         console.error("Error fetching single telecalling data:", error);
       }
     };
@@ -164,61 +166,82 @@ const handleNavigation = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
   
-    if (!item || !item.Tid) {
-      console.error('No valid item or Tid found.');
+    // Ensure selectedProject and selectedTemplate are available
+    if (!selectedProject || !selectedTemplate) {
+      console.error('Project or Template not selected.');
       return;
     }
   
-    // Add Tid to formData
-    const formDataWithTid = {
-      ...formData,
-      Tid: item.Tid
-    };
-  
-    const url = "https://proxy-forcorners.vercel.app/api/proxy/api-insert-nextfollowup.php";
-  
     try {
-      const response = await axios.post(url, formDataWithTid, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+    console.log('IIIIIIIIIIIIIIDDDDDDDDDDDDDDDDDDDDD',selectedProject.ProjectID)
+      const projectResponse = await axios.get(
+        `https://apiforcornershost.cubisysit.com/api/api-fetch-projectdetails.php?ProjectID=${selectedProject.ProjectID}`
+      );
+      console.log('Project Response:', projectResponse.data);
+      // Fetch template details
+      const templateResponse = await axios.get(
+        `https://apiforcornershost.cubisysit.com/api/api-fetch-templateselect.php?ProjectID=${selectedTemplate.ProjectID}`
+      );
+      console.log('Template Response:', templateResponse.data);
+      const emailData = {
+        projectID: projectResponse.data.data[0].ProjectID,
+        projectName: projectResponse.data.data[0].ProjectName,
+        projectCode: projectResponse.data.data[0].ProjectCode,
+        projectManager: projectResponse.data.data[0].ProjectManager,
+        areaSqft: projectResponse.data.data[0].Areasqft,
+        videoLink: projectResponse.data.data[0].VideoLink,
+        virtualLink: projectResponse.data.data[0].VirtualLink,
+        launchDate: projectResponse.data.data[0].LaunchDate,
+        completionDate: projectResponse.data.data[0].CompletionDate,
+        possessionDate: projectResponse.data.data[0].PossessionDate,
+        remark: projectResponse.data.data[0].Remark,
+        amenities: projectResponse.data.data[0].AmenitiesNames,
+        
+        // Access the first item in the template response's data array
+        templateID: templateResponse.data.data[0].templateID,
+        templateName: templateResponse.data.data[0].TName,
+        templateTypeID: templateResponse.data.data[0].templatetypeID,
+        content: templateResponse.data.data[0].content,
+        // Add any additional data needed for the email
+      };
+      const emailResponse = await axios.post(
+        "https://proxy-forcorners.vercel.app/api/proxy/api-email.php",
+        emailData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
   
-      if (response.data.status === "Success") {
-        setFormData(intialName);
-        setOpen(false);
-        setSubmitSuccess(true);
-        setSubmitError(false);
-        // Show success message using SweetAlert
+      // Check the response from the email API
+      if (emailResponse.data.status === "Success") {
         Swal.fire({
           icon: 'success',
-          title: 'Success!',
-          text: 'Follow-up details saved successfully.',
+          title: 'Email Sent!',
+          text: 'The email has been sent successfully.',
         });
       } else {
-        setSubmitSuccess(false);
-        setSubmitError(true);
-        // Show error message using SweetAlert
         Swal.fire({
           icon: 'error',
           title: 'Oops...',
-          text: 'Something went wrong! Please try again later.',
+          text: 'Failed to send the email. Please try again.',
         });
       }
+  
+      // Reset the form or handle other UI changes
+      setModalVisible(false);
+  
     } catch (error) {
       console.error("There was an error!", error);
-      setSubmitSuccess(false);
-      setSubmitError(true);
-      // Show error message using SweetAlert
       Swal.fire({
         icon: 'error',
-        title: 'Oops...',
-        text: 'Something went wrong! Please try again later.',
+        title: 'Error',
+        text: 'An error occurred while processing your request. Please try again later.',
       });
     }
   };
-
-
+  
   
 
   const jsonToCSV = (json) => {
@@ -306,57 +329,6 @@ const handleNavigation = () => {
 
 
 
-  // if (modalVisible) {
-  //   return (
-  //     <div style={{paddingLeft:15}}>
-  //       <CloseIcon
-  //         style={{ cursor: "pointer" }}
-  //         onClick={() => setModalVisible(false)}
-  //       />
-
-  //       <Grid item xs={12} md={4} style={{ marginTop: 20 }}>
-  //         <FormControl fullWidth>
-  //           <InputLabel>Projects</InputLabel>
-  //           <Select
-  //             value={selectedProject || ""}
-  //             onChange={(event) => setSelectedProject(event.target.value)}
-  //             label="Projects"
-  //           >
-  //             {projects?.map((item) => (
-  //               <MenuItem key={item.ProjectID} value={item}>
-  //                 {item.ProjectName}
-  //               </MenuItem>
-  //             ))}
-  //           </Select>
-  //         </FormControl>
-  //       </Grid>
-
-  //       <Grid item xs={12} md={4} style={{ marginTop: 20 }}>
-  //         <FormControl fullWidth>
-  //           <InputLabel>Templates</InputLabel>
-  //           <Select
-  //             value={selectedTemplate || ""}
-  //             onChange={(event) => setSelectedTemplate(event.target.value)}
-  //             label="Contacts"
-  //           >
-  //             {templates.map((temp) => (
-  //               <MenuItem key={temp.templateID} value={temp}>
-  //                 {temp.TName}
-  //               </MenuItem>
-  //             ))}
-  //           </Select>
-  //         </FormControl>
-  //       </Grid>
-  //       <Grid style={{ marginTop: 50 }} item xs={12} md={4}>
-  //         <Button type="submit" variant="contained" color="primary" fullWidth>
-  //           Submit
-  //         </Button>
-  //       </Grid>
-  //     </div>
-  //   );
-  // }
-
-
   return (
     <>
     <Modal open={modalVisible} onClose={() => setModalVisible(false)}>
@@ -375,6 +347,7 @@ const handleNavigation = () => {
       >
         <IconButton
           onClick={() => setModalVisible(false)}
+          
           sx={{ alignSelf: 'flex-end' }}
         >
           <CloseIcon />
@@ -938,17 +911,7 @@ Email
 >
 
   <Grid container spacing={3}>
-  {/* <Grid item xs={4}>
-      <Card variant="outlined" sx={{ borderRadius: 1, padding: "10px" }}>
-        <Typography variant="body2" sx={{ fontSize: "0.9rem", fontWeight: 500 }}>
-          Location
-        </Typography>
-        <Typography variant="body2" sx={{ fontSize: "0.8rem" }}>
-          {item?.LocationID}
-        </Typography>
-      </Card>
-    </Grid> */}
-    
+
     <Grid item xs={4}>
       <Card variant="outlined" sx={{ borderRadius: 1, padding: "10px" }}>
         <Typography variant="body2" sx={{ fontSize: "0.9rem", fontWeight: 500 }}>
