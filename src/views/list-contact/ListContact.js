@@ -166,63 +166,48 @@ const ListContact = ({ item, onDelete, onEdit, onHistoryClick }) => {
 
 
 
-  const handleSubmit = async (event) => {
-    debugger;
-    event.preventDefault();
-
-    // Ensure selectedProject and selectedTemplate are available
-    if (!selectedProject || !selectedTemplate) {
-      console.error('Project or Template not selected.');
+  const handleSubmit = async () => {
+    if (!selectedProject) {
+      console.error('Project not selected.');
       return;
     }
 
     try {
-      console.log('IIIIIIIIIIIIIIDDDDDDDDDDDDDDDDDDDDD', selectedProject.ProjectID)
-      const projectResponse = await axios.get(
-        `https://apiforcornershost.cubisysit.com/api/api-fetch-projectdetails.php?ProjectID=${selectedProject.ProjectID}`
-      );
-      console.log('Project Response:', projectResponse.data);
-      // Fetch template details
-      const templateResponse = await axios.get(
-        `https://apiforcornershost.cubisysit.com/api/api-fetch-templatedetails.php?templateID=${selectedTemplate.templateID}`
-      );
-      console.log('Template Response:', templateResponse.data);
-      const emailData = {
-        projectID: projectResponse.data.data[0].ProjectID,
-        projectName: projectResponse.data.data[0].ProjectName,
-        projectCode: projectResponse.data.data[0].ProjectCode,
-        projectManager: projectResponse.data.data[0].ProjectManager,
-        areaSqft: projectResponse.data.data[0].Areasqft,
-        videoLink: projectResponse.data.data[0].VideoLink,
-        virtualLink: projectResponse.data.data[0].VirtualLink,
-        launchDate: projectResponse.data.data[0].LaunchDate,
-        completionDate: projectResponse.data.data[0].CompletionDate,
-        possessionDate: projectResponse.data.data[0].PossessionDate,
-        remark: projectResponse.data.data[0].Remark,
-        amenities: projectResponse.data.data[0].AmenitiesNames,
+      const projectResponse = await axios.get(`https://apiforcornershost.cubisysit.com/api/api-fetch-projectdetails.php?ProjectID=${selectedProject.ProjectID}`);
+      const projectData = projectResponse.data.data[0];
 
-        // Access the first item in the template response's data array
-        templateID: templateResponse.data.data[0].templateID,
-        templateName: templateResponse.data.data[0].TName,
-        templateTypeID: templateResponse.data.data[0].templatetypeID,
-        content: templateResponse.data.data[0].content,
+      // Prepare email data with project details and amenities
+      const emailData = {
+        projectID: projectData.ProjectID,
+        projectCode: projectData.ProjectCode,
+        projectManager: projectData.ProjectManager,
+        areaSqft: projectData.Areasqft,
+        videoLink: projectData.VideoLink,
+        virtualLink: projectData.VirtualLink,
+        launchDate: projectData.LaunchDate,
+        completionDate: projectData.CompletionDate,
+        possessionDate: projectData.PossessionDate,
+        remark: projectData.Remark,
+        cc: projectData.Cc,
+        oc: projectData.Oc,
+        facebookLink: projectData.FacebookLink,
+        instagramLink: projectData.InstagramLink,
+        latitude: projectData.Latitude,
+        para: projectData.para,
+        projectName: projectData.ProjectName,
+        amenities: projectData.AmenitiesNames.join(', '), // Convert amenities array to string
         name: item.CName,
         email: item.Email,
+    };
 
-        // Add any additional data needed for the email
-      };
-      console.log("email data ", emailData)
-      const emailResponse = await axios.post(
-        "https://proxy-forcorners.vercel.app/api/proxy/api-email.php",
-        emailData,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      console.log("email data ", emailResponse)
-      // Check the response from the email API
+      // Send email (use your email API endpoint)
+      const emailResponse = await axios.post("https://proxy-forcorners.vercel.app/api/proxy/api-email.php", emailData, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      // Check email response
       if (emailResponse.data.status === "Success") {
         Swal.fire({
           icon: 'success',
@@ -237,11 +222,9 @@ const ListContact = ({ item, onDelete, onEdit, onHistoryClick }) => {
         });
       }
 
-      // Reset the form or handle other UI changes
       setModalVisible(false);
-
     } catch (error) {
-      console.error("There was an error!", error);
+      console.error("Error submitting data:", error);
       Swal.fire({
         icon: 'error',
         title: 'Error',
@@ -249,7 +232,6 @@ const ListContact = ({ item, onDelete, onEdit, onHistoryClick }) => {
       });
     }
   };
-
 
 
   const jsonToCSV = (json) => {
@@ -340,7 +322,7 @@ const ListContact = ({ item, onDelete, onEdit, onHistoryClick }) => {
 
   return (
     <>
-      <Modal open={modalVisible} onClose={() => setModalVisible(false)}>
+   <Modal open={modalVisible} onClose={() => setModalVisible(false)}>
         <Box
           sx={{
             display: 'flex',
@@ -354,11 +336,7 @@ const ListContact = ({ item, onDelete, onEdit, onHistoryClick }) => {
             mt: '10%',
           }}
         >
-          <IconButton
-            onClick={() => setModalVisible(false)}
-
-            sx={{ alignSelf: 'flex-end' }}
-          >
+          <IconButton onClick={() => setModalVisible(false)} sx={{ alignSelf: 'flex-end' }}>
             <CloseIcon />
           </IconButton>
 
@@ -376,30 +354,9 @@ const ListContact = ({ item, onDelete, onEdit, onHistoryClick }) => {
                   onChange={(event) => setSelectedProject(event.target.value)}
                   label="Projects"
                 >
-                  {projects?.map((item) => (
-                    <MenuItem key={item.ProjectID} value={item}>
-                      {item.ProjectName}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-
-            {/* Template Selection */}
-            <Grid item xs={12}>
-              <FormControl fullWidth variant="outlined">
-                <InputLabel>Templates</InputLabel>
-                <Select
-                  value={selectedTemplate || ""}
-                  onChange={(event) => {
-                    debugger;
-                    setSelectedTemplate(event.target.value)
-                  }}
-                  label="Templates"
-                >
-                  {templates?.map((template) => (
-                    <MenuItem key={template.templateID} value={template}>
-                      {template.TName}
+                  {projects.map((project) => (
+                    <MenuItem key={project.ProjectID} value={project}>
+                      {project.ProjectName}
                     </MenuItem>
                   ))}
                 </Select>
@@ -487,173 +444,7 @@ const ListContact = ({ item, onDelete, onEdit, onHistoryClick }) => {
             Convert To Lead
           </Button>
         </Grid>
-        {/* <Grid item>
-          <Button
-            variant="contained"
-            onClick={handleDropdownClick}
-            startIcon={<PersonAddIcon />}
-            sx={{
-              mr: 30,
-              backgroundColor: "#f0f0f0",
-              color: "#333333",
-              fontSize: "0.6rem",
-              minWidth: "auto",
-              minHeight: 20,
-              "&:hover": {
-                backgroundColor: "#dcdcdc",
-              },
-            }}
-          >
-            Next FollowUp
-          </Button>
-          <Menu
-            anchorEl={anchorEl}
-            open={Boolean(anchorEl)}
-            onClose={handleDropdownClose}
-          >
-            <MenuItem onClick={handleAddFollowUpClick}>
-              <AddIcon sx={{ mr: 1 }} />
-              Add Follow Up
-            </MenuItem>
-            <MenuItem onClick={handleHistoryClick}>
-              <HistoryIcon sx={{ mr: 1 }} />
-              History
-            </MenuItem>
-          </Menu>
-        </Grid> */}
       </Grid>
-      {/* <Modal
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            bgcolor: "background.paper",
-            boxShadow: 24,
-            p: 4,
-            minWidth: 500,
-            maxWidth: 700, // Adjust the maxWidth to accommodate two text fields in a row
-            mt: 5,
-            mx: 2,
-            minHeight: 400, // Adjust the minHeight to increase the height of the modal
-            height: 'auto', 
-          }}
-        >
-          <IconButton
-            aria-label="cancel"
-            onClick={handleClose}
-            sx={{ position: "absolute", top: 6, right: 10 }}
-          >
-            <CancelIcon sx={{ color: "red" }} />
-          </IconButton>
-          <Typography
-            id="modal-modal-title"
-            variant="h7"
-            component="h3"
-            gutterBottom
-          >
-            Select Next Follow-Up Date and Time
-          </Typography>
-
-          <Grid container spacing={2} mt={8}>
-     
-
-            <Grid item xs={6}>
-              <FormControl fullWidth>
-                <InputLabel>Current Update</InputLabel>
-                <Select
-                  value={formData.CurrentUpdateID}
-                  onChange={handleCurrentUpdate}
-                  label="Current Update"
-                  MenuProps={{
-                    PaperProps: {
-                      style: {
-                        maxHeight: 180, // Adjust as needed
-                      },
-                    },
-                  }}
-                  
-                >
-                  {currentUpdate.map((bhk) => (
-                    <MenuItem  key={bhk.CurrentUpdateID} value={bhk.CurrentUpdateID}>
-                      {bhk.CurrentUpdateName}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-
-
-            <Grid item xs={6}>
-              <TextField
-                fullWidth
-                // label="Next Follow-Up Date"
-                type="date"
-                name="NextFollowUpDate"
-                value={formData.NextFollowUpDate}
-                onChange={handleChange}
-                InputLabelProps={{ sx: { mb: 1 } }}
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                fullWidth
-                // label="Next Follow-Up Time"
-                type="time"
-                name="NextFollowUpTime"
-                value={formData.NextFollowUpTime}
-                onChange={handleChange}
-                InputLabelProps={{ sx: { mb: 1 } }}
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                fullWidth
-                label="Interest In"
-                type="text"
-                name="Interest"
-                value={formData.Interest}
-                onChange={handleChange}
-                InputLabelProps={{ sx: { mb: 1 } }}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Note"
-                type="text"
-                name="Note"
-                value={formData.Note}
-                onChange={handleChange}
-                InputLabelProps={{ sx: { mb: 1 } }}
-              />
-            </Grid>
-          </Grid>
-
-          <Box sx={{ textAlign: "left" }}>
-            <Grid item xs={12}>
-              <Button
-                variant="contained"
-                sx={{
-                  marginRight: 3.5,
-                  marginTop: 15,
-                  backgroundColor: "#9155FD",
-                  color: "#FFFFFF",
-                }}
-                onClick={handleSubmit}
-              >
-                Submit
-              </Button>
-            </Grid>
-          </Box>
-        </Box>
-      </Modal> */}
       <Card sx={{}}>
         <Paper sx={{ padding: 5 }}>
           <Box

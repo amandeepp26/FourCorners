@@ -36,11 +36,18 @@ const Addprojectinfo = ({ show, editData }) => {
     specification: "",
     WelcomeMessage: "",
     ProjectTypeID: "",
-    amenitiesIDs: [], 
+    amenitiesIDs: [],
     video: "",
     virtualvideo: "",
     keyword: "",
     ProjectManager: "",
+    Para: "", // New field
+    Latitude: "", // New field
+    Longitude: "", // New field
+    Cc: "", // New field
+    Oc: "", // New field
+    FacebookLink: "", // New field
+    InstagramLink: "", // New field
   });
 
   const [errors, setErrors] = useState({});
@@ -53,6 +60,7 @@ const Addprojectinfo = ({ show, editData }) => {
 
   useEffect(() => {
     if (editData) {
+      // Destructure and set formData...
       const {
         ProjectID,
         projectstartdate,
@@ -70,7 +78,12 @@ const Addprojectinfo = ({ show, editData }) => {
         keyword,
         ProjectAddress,
         ProjectManager,
-        ModifyUID,
+        Para,
+        Latitude,
+        Cc,
+        Oc,
+        FacebookLink,
+        InstagramLink,
       } = editData;
 
       setFormData({
@@ -90,6 +103,12 @@ const Addprojectinfo = ({ show, editData }) => {
         keyword: keyword || "",
         ProjectAddress: ProjectAddress || "",
         ProjectManager: ProjectManager || "",
+        Para: Para || "", // Set new fields
+        Latitude: Latitude || "",
+        Cc: Cc || "",
+        Oc: Oc || "",
+        FacebookLink: FacebookLink || "",
+        InstagramLink: InstagramLink || "",
         ModifyUID: 1 || "",
       });
     }
@@ -175,9 +194,7 @@ const Addprojectinfo = ({ show, editData }) => {
 
   const handleSubmitData = (event) => {
     event.preventDefault();
-  
-    // Your validation logic...
-    
+    console.log("Form submitted");
     const body = {
       LaunchDate: formData.projectstartdate ? formData.projectstartdate.toISOString() : "",
       CompletionDate: formData.completiondate ? formData.completiondate.toISOString() : "",
@@ -191,58 +208,36 @@ const Addprojectinfo = ({ show, editData }) => {
       Remark: formData.WelcomeMessage,
       CreateUID: cookies.amr?.UserID || 1,
       AmenitiesIDs: formData.amenitiesIDs,
+      Para: formData.Para, // Include new fields
+      Latitude: formData.Latitude,
+      Cc: formData.Cc,
+      Oc: formData.Oc,
+      FacebookLink: formData.FacebookLink,
+      InstagramLink: formData.InstagramLink,
     };
-  
+
     const url = editData
-      ? "https://proxy-forcorners.vercel.app/api/proxy/api-update-projectmaster.php"
-      : "https://proxy-forcorners.vercel.app/api/proxy/api-insert-projectdetails.php";
-  
+    ? "https://proxy-forcorners.vercel.app/api/proxy/api-update-projectmaster.php"
+    : "https://proxy-forcorners.vercel.app/api/proxy/api-insert-projectdetails.php";
+
     axios
-      .post(url, body)
-      .then((response) => {
-        if (response.data.status === "Success") {
-          // Reset only the relevant fields, including amenitiesIDs as an empty array
-          setFormData({
-            projectstartdate: null,
-            completiondate: null,
-            possessiondate: null,
-            ProjectName: "",
-            Possession: "",
-            ProjectID: "",
-            ProjectCode: "",
-            PlotAreaInSqft: "",
-            specification: "",
-            WelcomeMessage: "",
-            ProjectTypeID: "",
-            amenitiesIDs: [],
-            video: "",
-            virtualvideo: "",
-            keyword: "",
-            ProjectManager: "",
-          }); 
-          setErrors({});
-          setSubmitSuccess(true);
-          setSubmitError(false);
-          show(false);
-  
-          Swal.fire({
-            icon: "success",
-            title: editData ? "Data Updated Successfully" : "Data Added Successfully",
-            showConfirmButton: false,
-            timer: 1000,
-          });
-        } else {
-          setSubmitSuccess(false);
-          setSubmitError(true);
-          Swal.fire({
-            icon: "error",
-            title: "Oops...",
-            text: "Something went wrong!",
-          });
-        }
-      })
-      .catch((error) => {
-        console.error("Error submitting data:", error);
+    .post(url, body)
+    .then((response) => {
+      if (response.data.status === "Success") {
+        // Reset only the relevant fields, including amenitiesIDs as an empty array
+   
+        setErrors({});
+        setSubmitSuccess(true);
+        setSubmitError(false);
+        show(false);
+
+        Swal.fire({
+          icon: "success",
+          title: editData ? "Data Updated Successfully" : "Data Added Successfully",
+          showConfirmButton: false,
+          timer: 1000,
+        });
+      } else {
         setSubmitSuccess(false);
         setSubmitError(true);
         Swal.fire({
@@ -250,9 +245,19 @@ const Addprojectinfo = ({ show, editData }) => {
           title: "Oops...",
           text: "Something went wrong!",
         });
+      }
+    })
+    .catch((error) => {
+      console.error("Error submitting data:", error);
+      setSubmitSuccess(false);
+      setSubmitError(true);
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Something went wrong!",
       });
-  };
-  
+    });
+};
 
   if (loading) return <p>Loading...</p>;
 
@@ -476,7 +481,62 @@ const Addprojectinfo = ({ show, editData }) => {
                     onChange={handleInputChange}
                   />
                 </Grid>
-              <Grid item xs={12} textAlign="center">
+                <Grid item xs={12} md={4}>
+                <TextField
+                  fullWidth
+                  label="Para"
+                  name="Para"
+                  value={formData.Para}
+                  onChange={handleInputChange}
+                />
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <TextField
+                  fullWidth
+                  label="Latitude"
+                  name="Latitude"
+                  value={formData.Latitude}
+                  onChange={handleInputChange}
+                />
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <TextField
+                  fullWidth
+                  label="Cc"
+                  name="Cc"
+                  value={formData.Cc}
+                  onChange={handleInputChange}
+                />
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <TextField
+                  fullWidth
+                  label="Oc"
+                  name="Oc"
+                  value={formData.Oc}
+                  onChange={handleInputChange}
+                />
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <TextField
+                  fullWidth
+                  label="Facebook Link"
+                  name="FacebookLink"
+                  value={formData.FacebookLink}
+                  onChange={handleInputChange}
+                />
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <TextField
+                  fullWidth
+                  label="Instagram Link"
+                  name="InstagramLink"
+                  value={formData.InstagramLink}
+                  onChange={handleInputChange}
+                />
+              </Grid>
+
+            <Grid item xs={12} textAlign="center">
                 <Button type="submit" variant="contained" color="primary" disabled={loading}>
                   {editData ? "Update Project" : "Add Project"}
                 </Button>
