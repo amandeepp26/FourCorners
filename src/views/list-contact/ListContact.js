@@ -199,22 +199,16 @@ const ListContact = ({ item, onDelete, onEdit, onHistoryClick }) => {
         name: item.CName,
         email: item.Email,
     };
-        // Add any additional data needed for the email
-      };
-      console.log("email data ", emailData)
-      const emailResponse = await axios.post(
-        "https://proxy-forcorners.vercel.app/api/proxy/api-email.php",
-        emailData,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      debugger;
-      console.log("email data ", emailResponse)
-      // Check the response from the email API
-      if (emailResponse.status == 200) {
+
+      // Send email (use your email API endpoint)
+      const emailResponse = await axios.post("https://proxy-forcorners.vercel.app/api/proxy/api-email.php", emailData, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      // Check email response
+      if (emailResponse.data.status === "Success") {
         Swal.fire({
           icon: 'success',
           title: 'Email Sent!',
