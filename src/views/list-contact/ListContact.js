@@ -175,7 +175,7 @@ const ListContact = ({ item, onDelete, onEdit, onHistoryClick }) => {
     try {
       const projectResponse = await axios.get(`https://apiforcornershost.cubisysit.com/api/api-fetch-projectdetails.php?ProjectID=${selectedProject.ProjectID}`);
       const projectData = projectResponse.data.data[0];
-
+      debugger;
       // Prepare email data with project details and amenities
       const emailData = {
         projectID: projectData.ProjectID,
@@ -196,11 +196,13 @@ const ListContact = ({ item, onDelete, onEdit, onHistoryClick }) => {
         para: projectData.Para,
         projectName: projectData.ProjectName,
         amenities: projectData.AmenitiesNames.join(', '), // Convert amenities array to string
+        amenitieIcons: projectData.AmenitiesIcon.join(', '), // Convert amenities array to string
         name: item.CName,
         email: item.Email,
-    };
+      };
 
       // Send email (use your email API endpoint)
+      debugger;
       const emailResponse = await axios.post("https://proxy-forcorners.vercel.app/api/proxy/api-email.php", emailData, {
         headers: {
           "Content-Type": "application/json",
@@ -322,7 +324,7 @@ const ListContact = ({ item, onDelete, onEdit, onHistoryClick }) => {
 
   return (
     <>
-   <Modal open={modalVisible} onClose={() => setModalVisible(false)}>
+      <Modal open={modalVisible} onClose={() => setModalVisible(false)}>
         <Box
           sx={{
             display: 'flex',
