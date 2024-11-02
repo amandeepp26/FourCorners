@@ -4,154 +4,33 @@ import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
-import Avatar from "@mui/material/Avatar";
-import axios from "axios";
 import Button from "@mui/material/Button";
-import AddIcon from "@mui/icons-material/Add";
-import HistoryIcon from "@mui/icons-material/History";
 import EditIcon from "@mui/icons-material/Edit";
-import GetAppIcon from "@mui/icons-material/GetApp";
-import GroupIcon from "@mui/icons-material/Group";
-import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import ApartmentIcon from '@mui/icons-material/Apartment';
-
-import { Modal, TextField, IconButton, Menu, MenuItem , FormControl , InputLabel , Select} from "@mui/material";
-import CancelIcon from "@mui/icons-material/Cancel";
+import axios from "axios";
 import Swal from 'sweetalert2';
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { useCookies } from "react-cookie";
-const Listprojectinfo = ({ item, onDelete, onEdit , onHistoryClick }) => {
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemText from "@mui/material/ListItemText";
+const Listprojectinfo = ({ item, onDelete, onEdit, onHistoryClick }) => {
+  const [cookies] = useCookies(["amr"]);
+  const [projectDetails, setProjectDetails] = useState(null);
 
-  const [cookies, setCookie, removeCookie] = useCookies(["amr"]);
-  
-  const intialName = {
-    Tid: "",
-    CurrentUpdateID: "",
-    NextFollowUpDate: "",
-    NextFollowUpTime: "",
-    Interest: "",
-    Note: "",
-    CreateUID: cookies.amr?.UserID || 1,
-  }
-
-
-
-
-  const [open, setOpen] = useState(false);
-  const [formData, setFormData] = useState(intialName);
-
-  const [submitSuccess, setSubmitSuccess] = useState(false);
-  const [submitError, setSubmitError] = useState(false);
-
-  const [bhkOptions, setBhkOptions] = useState([]);
-  const [currentUpdate, setCurrentUpdate] = useState([]);
-
-  const [setRowDataToUpdate] = useState(null);
-
-  const [anchorEl, setAnchorEl] = useState(null);
-  const handleDropdownClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-
-  const handleCurrentUpdate = (event) => {
-    setFormData({
-      ...formData,
-      CurrentUpdateID: event.target.value,
-    });
-  };
-
-
-
-
-
-
-  const handleDropdownClose = () => {
-    setAnchorEl(null);
-  };
-
-  const handleAddFollowUpClick = () => {
-    handleDropdownClose();
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
-  const handleSave = () => {
-    console.log(formData);
-    setOpen(false);
-  };
-
-  const handleHistoryClick = () => {
-    if (onHistoryClick) {
-      // toggleSidebar(false);
-      onHistoryClick(item); // Pass item to parent component for showing history
-    }
-  };
-
-
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-  
-    // Ensure item and Tid are available
-    if (!item || !item.Tid) {
-      console.error('No valid item or Tid found.');
-      return;
-    }
-  
-    // Add Tid to formData
-    const formDataWithTid = {
-      ...formData,
-      Tid: item.Tid
-    };
-
-    console.log(formDataWithTid , 'sdf');
-  
-    const url = "https://proxy-forcorners.vercel.app/api/proxy/api-insert-nextfollowup.php";
-  
+  const fetchProjectDetails = async (projectID) => {
     try {
-      const response = await axios.post(url, formDataWithTid, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      console.log(formDataWithTid ,  'sdf');
-      
-  
+      const response = await axios.get(`https://apiforcornershost.cubisysit.com/api/api-fetch-projectdetails.php?ProjectID=${projectID}`);
       if (response.data.status === "Success") {
-        setFormData(intialName);
-        setOpen(false);
-        setSubmitSuccess(true);
-        setSubmitError(false);
-        // Show success message using SweetAlert
-        Swal.fire({
-          icon: 'success',
-          title: 'Success!',
-          text: 'Follow-up details saved successfully.',
-        });
+        setProjectDetails(response.data.data[0]);
       } else {
-        setSubmitSuccess(false);
-        setSubmitError(true);
-        // Show error message using SweetAlert
         Swal.fire({
           icon: 'error',
           title: 'Oops...',
-          text: 'Something went wrong! Please try again later.',
+          text: 'Failed to fetch project details!',
         });
       }
     } catch (error) {
-      console.error("There was an error!", error);
-      setSubmitSuccess(false);
-      setSubmitError(true);
-      // Show error message using SweetAlert
+      console.error("Error fetching project details:", error);
       Swal.fire({
         icon: 'error',
         title: 'Oops...',
@@ -159,191 +38,273 @@ const Listprojectinfo = ({ item, onDelete, onEdit , onHistoryClick }) => {
       });
     }
   };
-  
-  const handlenavigate =() => {
-    window.location.href = "/opportunity/";
-  
-  }
-  const jsonToCSV = (json) => {
-    const header = Object.keys(json[0]).join(",");
-    const values = json.map((obj) => Object.values(obj).join(",")).join("\n");
-    return `${header}\n${values}`;
-  };
 
-  const downloadCSV = () => {
-    const csvData = [
-      {
-        "C Name ": item.CName,
-        Mobile: item.Mobile,
-        Email: item.Email,
-        "Project Name": item.ProjectName,
-        "Unit Type": item.UnittypeName,
-        "Estimated Budget": item.EstimatedbudgetName,
-        "Lead Status": item.leadstatusName,
-        "Next Follow Up-Date": item.NextFollowUpDate,
-        "Source Description": item.SourceDescription,
-        "Telecall Attended By": item.TelecallAttendedByName,
-        "Alternate Mobile Number": item.AlternateMobileNo,
-        Comments: item.Comments,
-        "Source Name": item.SourceName,
-        Location: item.Location,
-        "Attended By": item.TelecallAttendedByName,
-      },
-    ];
-
-    const csv = jsonToCSV(csvData);
-    const blob = new Blob([csv], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "Telecalling.csv";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-  };
+  useEffect(() => {
+    if (item && item.ProjectID) {
+      fetchProjectDetails(item.ProjectID);
+    }
+  }, [item]);
 
   const handleEdit = () => {
     if (onEdit) {
-      onEdit(item); // Pass item to parent component for editing
+      onEdit(item);
     }
   };
+  const isDetailsEmpty = projectDetails === null || Object.values(projectDetails).every(value => !value);
 
-
+  if (isDetailsEmpty) {
+    return <Typography>No project details available.</Typography>;
+  }
+  if (!projectDetails) {
+    return <Typography>Loading project details...</Typography>;
+  }
 
   return (
     <>
-      <Grid
-        container
-        justifyContent="center"
-        spacing={2}
-        sx={{ marginBottom: 5 }}
-      >
+      <Grid container justifyContent="center" spacing={2} sx={{ marginBottom: 5 }}>
         <Grid item>
           <Button
             variant="contained"
             onClick={handleEdit}
             startIcon={<EditIcon />}
             sx={{
-            // Light gray background color
-              color: "#333333", // Dark gray text color
+              color: "#333333",
               fontSize: "0.6rem",
               backgroundColor: "#f0f0f0",
               minWidth: "auto",
-              minHeight: 20, // Decrease button height
+              minHeight: 20,
               "&:hover": {
-                backgroundColor: "#dcdcdc", // Darken background on hover
+                backgroundColor: "#dcdcdc",
               },
             }}
           >
             Edit Details
           </Button>
         </Grid>
-     
       </Grid>
-     
-      <Card sx={{}}>
-        <Paper sx={{ padding: 5 }}>
-          <Box
-            sx={{
-              width: "100%",
-              display: "flex",
-              alignItems: "center",
-              padding: 5,
-            }}
-          >
-                    <ApartmentIcon style={{ fontSize: 30, textAlign:"center" ,width: 60, height: 60, mr: 6 ,color: '#b187fd'}} />
 
-                
+      <Card>
+        <Paper sx={{ padding: 5 }}>
+          <Box sx={{ width: "100%", display: "flex", alignItems: "center", padding: 5 }}>
+            <ApartmentIcon style={{ fontSize: 30, textAlign: "center", width: 60, height: 60, mr: 6, color: '#b187fd' }} />
             <Box sx={{ flex: "1 1" }}>
-              <Typography
-                variant="h6"
-                sx={{ fontWeight: 500, fontSize: "1.0rem" }}
-              >
-                {item?.ProjectName}
+              <Typography variant="h6" sx={{ fontWeight: 500, fontSize: "1.0rem" }}>
+                {projectDetails.ProjectName}
               </Typography>
               <Typography sx={{ fontSize: "0.8rem" }}>
-                Created By  : {item?.Name}
+                Created By: {projectDetails.Name}
               </Typography>
             </Box>
           </Box>
 
-          <Box
-            sx={{
-              width: "100%",
-              display: "flex",
-              alignItems: "center",
-              ml: 20,
-            }}
-          >
+          <Box sx={{ width: "auto", display: "flex", alignItems: "center", justifyContent: "center", ml: 12, mt: 15 }}>
+            <Grid container spacing={3}>
+              {/* Project Code */}
+              <Grid item xs={4}>
+                <Card variant="outlined" sx={{ borderRadius: 1, padding: "10px" }}>
+                  <Typography variant="body2" sx={{ fontWeight: 600, fontSize: "0.8rem" }}>
+                    Project Code
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontSize: "0.7rem" }}>
+                    {projectDetails.ProjectCode}
+                  </Typography>
+                </Card>
+              </Grid>
+
+              {/* Project Manager */}
+              <Grid item xs={4}>
+                <Card variant="outlined" sx={{ borderRadius: 1, padding: "10px" }}>
+                  <Typography variant="body2" sx={{ fontWeight: 600, fontSize: "0.8rem" }}>
+                    Project Manager
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontSize: "0.7rem" }}>
+                    {projectDetails.Name} {/* Assuming Name refers to the project manager */}
+                  </Typography>
+                </Card>
+              </Grid>
+
+              {/* Area sqft */}
+              <Grid item xs={4}>
+                <Card variant="outlined" sx={{ borderRadius: 1, padding: "10px" }}>
+                  <Typography variant="body2" sx={{ fontWeight: 600, fontSize: "0.8rem" }}>
+                    Area (sqft)
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontSize: "0.7rem" }}>
+                    {projectDetails.Areasqft}
+                  </Typography>
+                </Card>
+              </Grid>
+
+              {/* Video Link */}
+              <Grid item xs={4}>
+                <Card variant="outlined" sx={{ borderRadius: 1, padding: "10px" }}>
+                  <Typography variant="body2" sx={{ fontWeight: 600, fontSize: "0.8rem" }}>
+                    Video Link
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontSize: "0.7rem" }}>
+                    <a href={projectDetails.VideoLink} target="_blank" rel="noopener noreferrer">
+                      {projectDetails.VideoLink}
+                    </a>
+                  </Typography>
+                </Card>
+              </Grid>
+
+              {/* Virtual Link */}
+              <Grid item xs={4}>
+                <Card variant="outlined" sx={{ borderRadius: 1, padding: "10px" }}>
+                  <Typography variant="body2" sx={{ fontWeight: 600, fontSize: "0.8rem" }}>
+                    Virtual Link
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontSize: "0.7rem" }}>
+                    <a href={projectDetails.VirtualLink} target="_blank" rel="noopener noreferrer">
+                      {projectDetails.VirtualLink}
+                    </a>
+                  </Typography>
+                </Card>
+              </Grid>
+
+              {/* Launch Date */}
+              <Grid item xs={4}>
+                <Card variant="outlined" sx={{ borderRadius: 1, padding: "10px" }}>
+                  <Typography variant="body2" sx={{ fontWeight: 600, fontSize: "0.8rem" }}>
+                    Launch Date
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontSize: "0.7rem" }}>
+                    {new Date(projectDetails.LaunchDate).toLocaleDateString()}
+                  </Typography>
+                </Card>
+              </Grid>
+
+              {/* Completion Date */}
+              <Grid item xs={4}>
+                <Card variant="outlined" sx={{ borderRadius: 1, padding: "10px" }}>
+                  <Typography variant="body2" sx={{ fontWeight: 600, fontSize: "0.8rem" }}>
+                    Completion Date
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontSize: "0.7rem" }}>
+                    {new Date(projectDetails.CompletionDate).toLocaleDateString()}
+                  </Typography>
+                </Card>
+              </Grid>
+
+              {/* Possession Date */}
+              <Grid item xs={4}>
+                <Card variant="outlined" sx={{ borderRadius: 1, padding: "10px" }}>
+                  <Typography variant="body2" sx={{ fontWeight: 600, fontSize: "0.8rem" }}>
+                    Possession Date
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontSize: "0.7rem" }}>
+                    {new Date(projectDetails.PossessionDate).toLocaleDateString()}
+                  </Typography>
+                </Card>
+              </Grid>
+
+              {/* Remarks */}
+              <Grid item xs={4}>
+                <Card variant="outlined" sx={{ borderRadius: 1, padding: "10px" }}>
+                  <Typography variant="body2" sx={{ fontWeight: 600, fontSize: "0.8rem" }}>
+                    Remarks
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontSize: "0.7rem" }}>
+                    {projectDetails.Remark}
+                  </Typography>
+                </Card>
+              </Grid>
+
+              {/* CC */}
+              <Grid item xs={4}>
+                <Card variant="outlined" sx={{ borderRadius: 1, padding: "10px" }}>
+                  <Typography variant="body2" sx={{ fontWeight: 600, fontSize: "0.8rem" }}>
+                    CC
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontSize: "0.7rem" }}>
+                    {projectDetails.Cc}
+                  </Typography>
+                </Card>
+              </Grid>
+
+              {/* OC */}
+              <Grid item xs={4}>
+                <Card variant="outlined" sx={{ borderRadius: 1, padding: "10px" }}>
+                  <Typography variant="body2" sx={{ fontWeight: 600, fontSize: "0.8rem" }}>
+                    OC
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontSize: "0.7rem" }}>
+                    {projectDetails.Oc}
+                  </Typography>
+                </Card>
+              </Grid>
+
+              {/* Facebook Link */}
+              <Grid item xs={4}>
+                <Card variant="outlined" sx={{ borderRadius: 1, padding: "10px" }}>
+                  <Typography variant="body2" sx={{ fontWeight: 600, fontSize: "0.8rem" }}>
+                    Facebook Link
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontSize: "0.7rem" }}>
+                    <a href={projectDetails.FacebookLink} target="_blank" rel="noopener noreferrer">
+                      {projectDetails.FacebookLink}
+                    </a>
+                  </Typography>
+                </Card>
+              </Grid>
+
+              {/* Instagram Link */}
+              <Grid item xs={4}>
+                <Card variant="outlined" sx={{ borderRadius: 1, padding: "10px" }}>
+                  <Typography variant="body2" sx={{ fontWeight: 600, fontSize: "0.8rem" }}>
+                    Instagram Link
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontSize: "0.7rem" }}>
+                    <a href={projectDetails.InstagramLink} target="_blank" rel="noopener noreferrer">
+                      {projectDetails.InstagramLink}
+                    </a>
+                  </Typography>
+                </Card>
+              </Grid>
+
+              {/* Latitude */}
+              <Grid item xs={4}>
+                <Card variant="outlined" sx={{ borderRadius: 1, padding: "10px" }}>
+                  <Typography variant="body2" sx={{ fontWeight: 600, fontSize: "0.8rem" }}>
+                    Latitude
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontSize: "0.7rem" }}>
+                    {projectDetails.Latitude}
+                  </Typography>
+                </Card>
+              </Grid>
+
+              {/* Description/Para */}
+              <Grid item xs={12}>
+                <Card variant="outlined" sx={{ borderRadius: 1, padding: "10px" }}>
+                  <Typography variant="body2" sx={{ fontWeight: 600, fontSize: "0.8rem" }}>
+                    Description
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontSize: "0.7rem" }}>
+                    {projectDetails.Para}
+                  </Typography>
+                </Card>
+              </Grid>
+
+              {/* Amenities */}
+              <Grid item xs={12}>
+                <Card variant="outlined" sx={{ borderRadius: 1, padding: "10px" }}>
+                  <Typography variant="body2" sx={{ fontWeight: 600, fontSize: "0.8rem" }}>
+                    Amenities
+                  </Typography>
+                  <List sx={{ paddingLeft: 2 }}>
+                    {projectDetails.AmenitiesNames.map((amenity, index) => (
+                      <ListItem key={index} sx={{ paddingLeft: 0 }}> {/* Remove left padding for better alignment */}
+                        <ListItemText primary={`${index + 1}. ${amenity}`} />
+                      </ListItem>
+                    ))}
+                  </List>
+                </Card>
+              </Grid>
+
+            </Grid>
           </Box>
-
-          <Box
-      sx={{
-        width: "auto",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        ml: 12,
-        mt: 15,
-      }}
-    >
-      <Grid container spacing={3}>
-        {/* Email */}
-       
-
-        {/* Project Name */}
-        <Grid item xs={4}>
-          <Card
-            variant="outlined" // Use outlined variant for a border without shadow
-            sx={{
-              borderRadius: 1,
-              padding: "10px",
-            }}
-          >
-            <Typography variant="body2" sx={{ fontWeight: 600, fontSize: "0.8rem" }}>
-              Company Name
-            </Typography>
-            <Typography variant="body2" sx={{ fontSize: "0.7rem" }}>
-              {item?.CompanyName}
-            </Typography>
-          </Card>
-        </Grid>
-
-        {/* Unit Type */}
-        <Grid item xs={4}>
-          <Card
-            variant="outlined" // Use outlined variant for a border without shadow
-            sx={{
-              borderRadius: 1,
-              padding: "10px",
-            }}
-          >
-            <Typography variant="body2" sx={{ fontWeight: 600, fontSize: "0.8rem" }}>
-             Created By 
-            </Typography>
-            <Typography variant="body2" sx={{ fontSize: "0.7rem" }}>
-              {item?.Name}
-            </Typography>
-          </Card>
-        </Grid>
-        <Grid item xs={4}>
-          <Card
-            variant="outlined" // Use outlined variant for a border without shadow
-            sx={{
-              borderRadius: 1,
-              padding: "10px",
-            }}
-          >
-            <Typography variant="body2" sx={{ fontWeight: 600, fontSize: "0.8rem" }}>
-             Created At 
-            </Typography>
-            <Typography variant="body2" sx={{ fontSize: "0.7rem" }}>
-              {item?.CreateDate}
-            </Typography>
-          </Card>
-        </Grid>
-      </Grid>
-    </Box>
         </Paper>
       </Card>
     </>

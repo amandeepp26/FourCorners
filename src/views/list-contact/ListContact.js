@@ -193,7 +193,7 @@ const ListContact = ({ item, onDelete, onEdit, onHistoryClick }) => {
         facebookLink: projectData.FacebookLink,
         instagramLink: projectData.InstagramLink,
         latitude: projectData.Latitude,
-        para: projectData.para,
+        para: projectData.Para,
         projectName: projectData.ProjectName,
         amenities: projectData.AmenitiesNames.join(', '), // Convert amenities array to string
         name: item.CName,

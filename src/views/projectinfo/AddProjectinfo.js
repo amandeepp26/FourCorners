@@ -25,136 +25,102 @@ import { useCookies } from "react-cookie";
 
 const Addprojectinfo = ({ show, editData }) => {
   const [formData, setFormData] = useState({
+    ProjectDetailsID: null,
     projectstartdate: null,
     completiondate: null,
     possessiondate: null,
     ProjectName: "",
-    Possession: "",
     ProjectID: "",
     ProjectCode: "",
     PlotAreaInSqft: "",
-    specification: "",
     WelcomeMessage: "",
-    ProjectTypeID: "",
     amenitiesIDs: [],
     video: "",
     virtualvideo: "",
-    keyword: "",
+    Para: "",
+    Latitude: "",
+    Cc: "",
+    Oc: "",
+    FacebookLink: "",
+    InstagramLink: "",
+    ModifyUID: 1,
     ProjectManager: "",
-    Para: "", // New field
-    Latitude: "", // New field
-    Longitude: "", // New field
-    Cc: "", // New field
-    Oc: "", // New field
-    FacebookLink: "", // New field
-    InstagramLink: "", // New field
   });
-
-  const [errors, setErrors] = useState({});
+  const [cookies] = useCookies(["amr"]);
   const [loading, setLoading] = useState(true);
   const [projectTypes, setProjectTypes] = useState([]);
   const [amenities, setAmenities] = useState([]);
   const [userMaster, setUserMaster] = useState([]);
-  const [submitSuccess, setSubmitSuccess] = useState(false);
-  const [submitError, setSubmitError] = useState(false);
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
-    if (editData) {
-      // Destructure and set formData...
-      const {
-        ProjectID,
-        projectstartdate,
-        completiondate,
-        possessiondate,
-        ProjectName,
-        ProjectCode,
-        PlotAreaInSqft,
-        specification,
-        WelcomeMessage,
-        ProjectTypeID,
-        amenitiesIDs,
-        video,
-        virtualvideo,
-        keyword,
-        ProjectAddress,
-        ProjectManager,
-        Para,
-        Latitude,
-        Cc,
-        Oc,
-        FacebookLink,
-        InstagramLink,
-      } = editData;
+    const fetchProjectDetails = async () => {
+      if (editData) {
+        try {
+          const response = await axios.get(`https://apiforcornershost.cubisysit.com/api/api-fetch-projectdetails.php?ProjectID=${editData.ProjectID}`);
+          if (response.data.status === "Success" && response.data.data.length > 0) {
+            const projectDetails = response.data.data[0];
+            setFormData({
+              ProjectDetailsID: projectDetails.ProjectDetailsID,
+              projectstartdate: new Date(projectDetails.LaunchDate),
+              completiondate: new Date(projectDetails.CompletionDate),
+              possessiondate: new Date(projectDetails.PossessionDate),
+              ProjectID: projectDetails.ProjectID,
+              ProjectCode: projectDetails.ProjectCode,
+              PlotAreaInSqft: projectDetails.Areasqft,
+              WelcomeMessage: projectDetails.Remark,
+              ProjectName: projectDetails.ProjectName,
+              Para: projectDetails.Para,
+              Latitude: projectDetails.Latitude,
+              Cc: projectDetails.Cc,
+              Oc: projectDetails.Oc,
+              FacebookLink: projectDetails.FacebookLink,
+              InstagramLink: projectDetails.InstagramLink,
+              amenitiesIDs: projectDetails.AmenitiesID.split(',').map(id => id.trim()),
+              video: projectDetails.VideoLink || "",
+              virtualvideo: projectDetails.VirtualLink || "",
+              ProjectManager: projectDetails.UserID 
+            });
+          }
+        } catch (error) {
+          console.error("Error fetching project details:", error);
+        } finally {
+          setLoading(false);
+        }
+      } else {
+        setLoading(false); // Set loading to false if no editData
+      }
+    };
 
-      setFormData({
-        ProjectID: ProjectID || "",
-        projectstartdate: projectstartdate ? new Date(projectstartdate) : null,
-        completiondate: completiondate ? new Date(completiondate) : null,
-        possessiondate: possessiondate ? new Date(possessiondate) : null,
-        ProjectName: ProjectName || "",
-        ProjectCode: ProjectCode || "",
-        PlotAreaInSqft: PlotAreaInSqft || "",
-        specification: specification || "",
-        WelcomeMessage: WelcomeMessage || "",
-        ProjectTypeID: ProjectTypeID || "",
-        amenitiesIDs: Array.isArray(amenitiesIDs) ? amenitiesIDs : [amenitiesIDs],
-        video: video || "",
-        virtualvideo: virtualvideo || "",
-        keyword: keyword || "",
-        ProjectAddress: ProjectAddress || "",
-        ProjectManager: ProjectManager || "",
-        Para: Para || "", // Set new fields
-        Latitude: Latitude || "",
-        Cc: Cc || "",
-        Oc: Oc || "",
-        FacebookLink: FacebookLink || "",
-        InstagramLink: InstagramLink || "",
-        ModifyUID: 1 || "",
-      });
-    }
+    fetchProjectDetails();
   }, [editData]);
 
+  // Fetch user master, amenities, and project types
   useEffect(() => {
-    axios
-      .get("https://apiforcornershost.cubisysit.com/api/api-fetch-usermaster.php")
-      .then((response) => {
-        if (response.data.status === "Success") {
-          setUserMaster(response.data.data);
-          setLoading(false);
+    const fetchData = async () => {
+      try {
+        const [userMasterResponse, amenitiesResponse, projectTypesResponse] = await Promise.all([
+          axios.get("https://apiforcornershost.cubisysit.com/api/api-fetch-usermaster.php"),
+          axios.get("https://apiforcornershost.cubisysit.com/api/api-fetch-amenities.php"),
+          axios.get("https://apiforcornershost.cubisysit.com/api/api-fetch-projectmaster.php"),
+        ]);
+
+        if (userMasterResponse.data.status === "Success") {
+          setUserMaster(userMasterResponse.data.data);
         }
-      })
-      .catch((error) => {
-        console.error("Error fetching user master data:", error);
-        setLoading(false);
-      });
-  }, []);
-
-  useEffect(() => {
-    axios
-      .get("https://apiforcornershost.cubisysit.com/api/api-fetch-amenities.php")
-      .then((response) => {
-        if (response.data.status === "Success") {
-          setAmenities(response.data.data);
-          setLoading(false);
+        if (amenitiesResponse.data.status === "Success") {
+          setAmenities(amenitiesResponse.data.data);
         }
-      })
-      .catch((error) => console.error("Error fetching data:", error));
-  }, []);
-
-
-
-  useEffect(() => {
-    axios
-      .get("https://apiforcornershost.cubisysit.com/api/api-fetch-projectmaster.php")
-      .then((response) => {
-        if (response.data.status === "Success") {
-            setProjectTypes(response.data.data);
-            setLoading(false);
+        if (projectTypesResponse.data.status === "Success") {
+          setProjectTypes(projectTypesResponse.data.data);
         }
-      })
-      .catch((error) => console.error("Error fetching data:", error));
-  }, []);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
 
+    fetchData();
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -173,93 +139,70 @@ const Addprojectinfo = ({ show, editData }) => {
 
   const handleAmenitiesChange = (event) => {
     const { value } = event.target;
-    const selectedAmenities = Array.isArray(value) ? value : [value];
     setFormData({
       ...formData,
-      amenitiesIDs: selectedAmenities,
+      amenitiesIDs: value,
     });
   };
 
-  const handleDelete = (event, valueToDelete) => {
-    event.stopPropagation();
-    setFormData((prevState) => ({
-      ...prevState,
-      amenitiesIDs: prevState.amenitiesIDs.filter(
-        (value) => value !== valueToDelete
-      ),
-    }));
-  };
-
-  const [cookies, setCookie, removeCookie] = useCookies(["amr"]);
-
-  const handleSubmitData = (event) => {
+  const handleSubmitData = async (event) => {
     event.preventDefault();
-    console.log("Form submitted");
+    
     const body = {
-      LaunchDate: formData.projectstartdate ? formData.projectstartdate.toISOString() : "",
-      CompletionDate: formData.completiondate ? formData.completiondate.toISOString() : "",
-      PossessionDate: formData.possessiondate ? formData.possessiondate.toISOString() : "",
-      ProjectCode: formData.ProjectCode,
+      ProjectDetailsID: formData.ProjectDetailsID,
+      LaunchDate: formData.projectstartdate.toISOString(),
+      CompletionDate: formData.completiondate.toISOString(),
+      PossessionDate: formData.possessiondate.toISOString(),
       ProjectID: formData.ProjectID,
-      ProjectManager: formData.ProjectManager,
-      Areasqft: parseFloat(formData.PlotAreaInSqft) || 0,
-      VirtualLink: formData.virtualvideo,
-      VideoLink: formData.video,
+      ProjectCode: formData.ProjectCode,
       Remark: formData.WelcomeMessage,
-      CreateUID: cookies.amr?.UserID || 1,
-      AmenitiesIDs: formData.amenitiesIDs,
-      Para: formData.Para, // Include new fields
+      Para: formData.Para,
       Latitude: formData.Latitude,
       Cc: formData.Cc,
       Oc: formData.Oc,
       FacebookLink: formData.FacebookLink,
       InstagramLink: formData.InstagramLink,
+      VideoLink: formData.video,
+      VirtualLink: formData.virtualvideo,
+      ModifyUID: cookies.amr?.UserID || 1,
+      AmenitiesIDs: formData.amenitiesIDs,
+      Areasqft: formData.PlotAreaInSqft,
+      ProjectManager: formData.ProjectManager,
     };
-
-    const url = editData
-    ? "https://proxy-forcorners.vercel.app/api/proxy/api-update-projectmaster.php"
-    : "https://proxy-forcorners.vercel.app/api/proxy/api-insert-projectdetails.php";
-
-    axios
-    .post(url, body)
-    .then((response) => {
+  
+    const url = formData.ProjectDetailsID
+      ? "https://proxy-forcorners.vercel.app/api/proxy/api-update-projectdetails.php"
+      : "https://proxy-forcorners.vercel.app/api/proxy/api-insert-projectdetails.php";
+  
+    try {
+      const response = await axios.post(url, body);
       if (response.data.status === "Success") {
-        // Reset only the relevant fields, including amenitiesIDs as an empty array
-   
-        setErrors({});
-        setSubmitSuccess(true);
-        setSubmitError(false);
         show(false);
-
         Swal.fire({
           icon: "success",
-          title: editData ? "Data Updated Successfully" : "Data Added Successfully",
+          title: formData.ProjectDetailsID ? "Data Updated Successfully" : "Data Added Successfully",
           showConfirmButton: false,
           timer: 1000,
         });
       } else {
-        setSubmitSuccess(false);
-        setSubmitError(true);
         Swal.fire({
           icon: "error",
           title: "Oops...",
           text: "Something went wrong!",
         });
       }
-    })
-    .catch((error) => {
+    } catch (error) {
       console.error("Error submitting data:", error);
-      setSubmitSuccess(false);
-      setSubmitError(true);
       Swal.fire({
         icon: "error",
         title: "Oops...",
         text: "Something went wrong!",
       });
-    });
-};
-
+    }
+  };
+  
   if (loading) return <p>Loading...</p>;
+
 
   return (
     <Card>
@@ -278,21 +221,14 @@ const Addprojectinfo = ({ show, editData }) => {
               <Grid item xs={12} md={4}>
                 <DatePicker
                   selected={formData.projectstartdate}
-                  onChange={(date) =>
-                    handleDateChange(date, "projectstartdate")
-                  }
+                  onChange={(date) => handleDateChange(date, "projectstartdate")}
                   dateFormat="dd-MM-yyyy"
-                  className="form-control"
                   customInput={
                     <TextField
                       fullWidth
                       label="Launch date"
-                      value={
-                        formData.projectstartdate
-                          ? formData.projectstartdate.toLocaleDateString()
-                          : ""
-                      }
-                      InputProps={{ readOnly: true, sx: { width: "100%" } }}
+                      value={formData.projectstartdate ? formData.projectstartdate.toLocaleDateString() : ""}
+                      InputProps={{ readOnly: true }}
                     />
                   }
                 />
@@ -303,17 +239,12 @@ const Addprojectinfo = ({ show, editData }) => {
                   selected={formData.completiondate}
                   onChange={(date) => handleDateChange(date, "completiondate")}
                   dateFormat="dd-MM-yyyy"
-                  className="form-control"
                   customInput={
                     <TextField
                       fullWidth
                       label="Completion date"
-                      value={
-                        formData.completiondate
-                          ? formData.completiondate.toLocaleDateString()
-                          : ""
-                      }
-                      InputProps={{ readOnly: true, sx: { width: "100%" } }}
+                      value={formData.completiondate ? formData.completiondate.toLocaleDateString() : ""}
+                      InputProps={{ readOnly: true }}
                     />
                   }
                 />
@@ -324,17 +255,12 @@ const Addprojectinfo = ({ show, editData }) => {
                   selected={formData.possessiondate}
                   onChange={(date) => handleDateChange(date, "possessiondate")}
                   dateFormat="dd-MM-yyyy"
-                  className="form-control"
                   customInput={
                     <TextField
                       fullWidth
                       label="Possession date"
-                      value={
-                        formData.possessiondate
-                          ? formData.possessiondate.toLocaleDateString()
-                          : ""
-                      }
-                      InputProps={{ readOnly: true, sx: { width: "100%" } }}
+                      value={formData.possessiondate ? formData.possessiondate.toLocaleDateString() : ""}
+                      InputProps={{ readOnly: true }}
                     />
                   }
                 />
@@ -348,56 +274,55 @@ const Addprojectinfo = ({ show, editData }) => {
                   value={formData.ProjectCode}
                   onChange={handleInputChange}
                 />
-                {errors.ProjectCode && (
-                  <Alert severity="error">{errors.ProjectCode}</Alert>
-                )}
+                {errors.ProjectCode && <Alert severity="error">{errors.ProjectCode}</Alert>}
+              </Grid>
+
+              <Grid item xs={12} md={4}>
+              <FormControl fullWidth>
+  <InputLabel id="project-manager-label">Project Manager</InputLabel>
+  <Select
+    labelId="project-manager-label"
+    id="ProjectManager"
+    name="ProjectManager"
+    value={formData.ProjectManager || ""} // Ensure it reflects the formData correctly
+    onChange={handleInputChange}
+  >
+    {userMaster.map((user) => (
+      <MenuItem key={user.UserID} value={user.UserID}>
+        {user.Name}
+      </MenuItem>
+    ))}
+  </Select>
+</FormControl>
+
               </Grid>
 
               <Grid item xs={12} md={4}>
                 <FormControl fullWidth>
-                  <InputLabel id="project-manager-label">Project Manager</InputLabel>
+                  <InputLabel id="project-type-label">Project Name</InputLabel>
                   <Select
-                    labelId="project-manager-label"
-                    id="ProjectManager"
-                    name="ProjectManager"
-                    value={formData.UserID}
-                    onChange={handleInputChange}
+                    labelId="project-type-label"
+                    id="ProjectName"
+                    name="ProjectID"
+                    value={formData.ProjectID}
+                    onChange={(e) => {
+                      const selectedProject = projectTypes.find(type => type.ProjectID === e.target.value);
+                      setFormData(prevState => ({
+                        ...prevState,
+                        ProjectID: e.target.value,
+                        ProjectName: selectedProject ? selectedProject.ProjectName : "",
+                      }));
+                    }}
+                    label="Project Name"
                   >
-                    {userMaster.map((user) => (
-                      <MenuItem key={user.UserID} value={user.UserID}>
-                        {user.Name}
+                    {projectTypes.map((type) => (
+                      <MenuItem key={type.ProjectID} value={type.ProjectID}>
+                        {type.ProjectName}
                       </MenuItem>
                     ))}
                   </Select>
-                  {errors.ProjectManager && <Alert severity="error">{errors.ProjectManager}</Alert>}
                 </FormControl>
               </Grid>
-              <Grid item xs={12} md={4}>
-  <FormControl fullWidth>
-    <InputLabel id="project-type-label">Project Name</InputLabel>
-    <Select
-      labelId="project-type-label"
-      id="ProjectName"
-      name="ProjectID" // Change the name to ProjectID
-      value={formData.ProjectID} // Ensure this is linked to ProjectID
-      onChange={(e) => {
-        const selectedProject = projectTypes.find(type => type.ProjectID === e.target.value);
-        setFormData(prevState => ({
-          ...prevState,
-          ProjectID: e.target.value,
-          ProjectName: selectedProject ? selectedProject.ProjectName : "", // Set ProjectName based on selection
-        }));
-      }}
-      label="Project Name"
-    >
-      {projectTypes.map((type) => (
-        <MenuItem key={type.ProjectID} value={type.ProjectID}>
-          {type.ProjectName}
-        </MenuItem>
-      ))}
-    </Select>
-  </FormControl>
-</Grid>
 
               <Grid item xs={12} md={4}>
                 <TextField
@@ -412,38 +337,8 @@ const Addprojectinfo = ({ show, editData }) => {
                 />
               </Grid>
 
-              <Grid item xs={12} md={4}>
-                <FormControl fullWidth>
-                  <InputLabel>Amenities</InputLabel>
-                  <Select
-                    label="Amenities"
-                    multiple
-                    value={formData.amenitiesIDs}
-                    onChange={handleAmenitiesChange}
-                    input={<Input />}
-                    renderValue={(selected) => (
-                      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                        {selected.map((value) => (
-                          <Chip
-                            key={value}
-                            label={
-                              amenities.find((amenity) => amenity.amenitiesID === value)?.amenitiesName ||
-                              ""
-                            }
-                            onDelete={(event) => handleDelete(event, value)}
-                          />
-                        ))}
-                      </Box>
-                    )}
-                  >
-                    {amenities.map((amenity) => (
-                      <MenuItem key={amenity.amenitiesID} value={amenity.amenitiesID}>
-                        {amenity.amenitiesName	}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
+   
+
               <Grid item xs={12} md={4}>
                 <TextField
                   fullWidth
@@ -452,12 +347,11 @@ const Addprojectinfo = ({ show, editData }) => {
                   value={formData.video}
                   onChange={handleInputChange}
                   InputProps={{
-                    endAdornment: (
-                      <YouTubeIcon sx={{ color: "red", fontSize: "24px" }} />
-                    ),
+                    endAdornment: <YouTubeIcon sx={{ color: "red", fontSize: "24px" }} />,
                   }}
                 />
               </Grid>
+
               <Grid item xs={12} md={4}>
                 <TextField
                   fullWidth
@@ -466,22 +360,22 @@ const Addprojectinfo = ({ show, editData }) => {
                   value={formData.virtualvideo}
                   onChange={handleInputChange}
                   InputProps={{
-                    endAdornment: (
-                      <YouTubeIcon sx={{ color: "red", fontSize: "24px" }} />
-                    ),
+                    endAdornment: <YouTubeIcon sx={{ color: "red", fontSize: "24px" }} />,
                   }}
                 />
               </Grid>
-              <Grid item xs={4}>
-                  <TextField
-                    fullWidth
-                    label="Remarks"
-                    name="WelcomeMessage"
-                    value={formData.WelcomeMessage}
-                    onChange={handleInputChange}
-                  />
-                </Grid>
-                <Grid item xs={12} md={4}>
+
+              <Grid item xs={12} md={4}>
+                <TextField
+                  fullWidth
+                  label="Remarks"
+                  name="WelcomeMessage"
+                  value={formData.WelcomeMessage}
+                  onChange={handleInputChange}
+                />
+              </Grid>
+
+              <Grid item xs={12} md={4}>
                 <TextField
                   fullWidth
                   label="Para"
@@ -490,6 +384,7 @@ const Addprojectinfo = ({ show, editData }) => {
                   onChange={handleInputChange}
                 />
               </Grid>
+
               <Grid item xs={12} md={4}>
                 <TextField
                   fullWidth
@@ -499,6 +394,7 @@ const Addprojectinfo = ({ show, editData }) => {
                   onChange={handleInputChange}
                 />
               </Grid>
+
               <Grid item xs={12} md={4}>
                 <TextField
                   fullWidth
@@ -508,6 +404,7 @@ const Addprojectinfo = ({ show, editData }) => {
                   onChange={handleInputChange}
                 />
               </Grid>
+
               <Grid item xs={12} md={4}>
                 <TextField
                   fullWidth
@@ -517,6 +414,7 @@ const Addprojectinfo = ({ show, editData }) => {
                   onChange={handleInputChange}
                 />
               </Grid>
+
               <Grid item xs={12} md={4}>
                 <TextField
                   fullWidth
@@ -526,6 +424,7 @@ const Addprojectinfo = ({ show, editData }) => {
                   onChange={handleInputChange}
                 />
               </Grid>
+
               <Grid item xs={12} md={4}>
                 <TextField
                   fullWidth
@@ -535,8 +434,36 @@ const Addprojectinfo = ({ show, editData }) => {
                   onChange={handleInputChange}
                 />
               </Grid>
+              <Grid item xs={12} md={12}>
+              <FormControl fullWidth>
+  <InputLabel>Amenities</InputLabel>
+  <Select
+    label="Amenities"
+    multiple
+    value={formData.amenitiesIDs}
+    onChange={handleAmenitiesChange}
+    input={<Input />}
+    renderValue={(selected) => (
+      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+        {selected.map((value) => (
+          <Chip
+            key={value}
+            label={amenities.find((amenity) => amenity.amenitiesID === value)?.amenitiesName || ""}
+          />
+        ))}
+      </Box>
+    )}
+  >
+    {amenities.map((amenity) => (
+      <MenuItem key={amenity.amenitiesID} value={amenity.amenitiesID}>
+        {amenity.amenitiesName}
+      </MenuItem>
+    ))}
+  </Select>
+</FormControl>
 
-            <Grid item xs={12} textAlign="center">
+              </Grid>
+              <Grid item xs={12} textAlign="center">
                 <Button type="submit" variant="contained" color="primary" disabled={loading}>
                   {editData ? "Update Project" : "Add Project"}
                 </Button>
