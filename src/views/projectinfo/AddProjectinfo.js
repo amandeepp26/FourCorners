@@ -168,6 +168,7 @@ const Addprojectinfo = ({ show, editData }) => {
       AmenitiesIDs: formData.amenitiesIDs,
       Areasqft: formData.PlotAreaInSqft,
       ProjectManager: formData.ProjectManager,
+      CreateUID:cookies.amr?.UserID || 1,
     };
   
     const url = formData.ProjectDetailsID

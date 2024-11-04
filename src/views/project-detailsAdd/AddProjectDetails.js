@@ -74,7 +74,7 @@ const AddProjectDetails = ({ show, setShowUploadExcel, editData }) => {
 
   const fetchProject = () => {
     axios
-      .get("https://apiforcornershost.cubisysit.com/api/api-fetch-projectmaster.php")
+      .get("https://apiforcornershost.cubisysit.com/api/api-singel-projectdetails.php")
       .then((response) => {
         if (response.data.status === "Success") {
           setProjectTypeData(response.data.data);

@@ -299,7 +299,7 @@ const ListContact = ({ item, onDelete, onEdit, onHistoryClick }) => {
   const fetchProjects = async () => {
     try {
       const response = await axios.get(
-        "https://apiforcornershost.cubisysit.com/api/api-fetch-projectmaster.php"
+        "https://apiforcornershost.cubisysit.com/api/api-singel-projectdetails.php"
       );
       console.log("API Response project:", response.data);
       setProjects(response.data.data || []);

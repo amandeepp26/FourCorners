@@ -60,7 +60,7 @@ const SidebarProjectinfo = ({ onEdit, onItemClick, onCreate }) => {
   const fetchData = async () => {
     try {
       const response = await axios.get(
-        "https://apiforcornershost.cubisysit.com/api/api-fetch-projectmaster.php"
+        "https://apiforcornershost.cubisysit.com/api/api-singel-projectdetails.php"
       );
       console.log("API Response:", response.data);
       setRows(response.data.data || []);
