@@ -165,17 +165,16 @@ const ListContact = ({ item, onDelete, onEdit, onHistoryClick }) => {
 
 
 
-
   const handleSubmit = async () => {
     if (!selectedProject) {
       console.error('Project not selected.');
       return;
     }
-
+  
     try {
       const projectResponse = await axios.get(`https://apiforcornershost.cubisysit.com/api/api-fetch-projectdetails.php?ProjectID=${selectedProject.ProjectID}`);
       const projectData = projectResponse.data.data[0];
-      debugger;
+  
       // Prepare email data with project details and amenities
       const emailData = {
         projectID: projectData.ProjectID,
@@ -195,38 +194,52 @@ const ListContact = ({ item, onDelete, onEdit, onHistoryClick }) => {
         latitude: projectData.Latitude,
         para: projectData.Para,
         projectName: projectData.ProjectName,
-        amenities: projectData.AmenitiesNames.join(', '), // Convert amenities array to string
-        amenitieIcons: projectData.AmenitiesIcon.join(', '), // Convert amenities array to string
+        amenities: projectData.AmenitiesNames.join(', '),
+        amenitieIcons: projectData.AmenitiesIcon.join(', '),
         name: item.CName,
         email: item.Email,
       };
-
-      // Send email (use your email API endpoint)
-      debugger;
+  
+      // Send email request
       const emailResponse = await axios.post("https://proxy-forcorners.vercel.app/api/proxy/api-email.php", emailData, {
         headers: {
           "Content-Type": "application/json",
         },
       });
-
-      // Check email response
-      if (emailResponse.data.status === "Success") {
-        Swal.fire({
-          icon: 'success',
-          title: 'Email Sent!',
-          text: 'The email has been sent successfully.',
-        });
-      } else {
-        Swal.fire({
-          icon: 'error',
-          title: 'Oops...',
-          text: 'Failed to send the email. Please try again.',
-        });
+  
+      if (emailResponse.data.status !== "Success") {
+        throw new Error('Failed to send email');
       }
-
+  
+      // Now, send SMS
+      const smsData = {
+        projectID: projectData.ProjectID,
+        projectName: projectData.ProjectName,
+        projectCode: projectData.ProjectCode,
+        name: item.CName,
+        phone: item.Mobile,
+      };
+  
+      const smsResponse = await axios.post("https://proxy-forcorners.vercel.app/api/proxy/api-sms.php", smsData, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+  
+      if (smsResponse.data.status !== "Success") {
+        throw new Error('Failed to send SMS');
+      }
+  
+      Swal.fire({
+        icon: 'success',
+        title: 'Email & SMS Sent!',
+        text: 'The email and SMS have been sent successfully.',
+      });
+  
+      // Close the modal after successful submission
       setModalVisible(false);
     } catch (error) {
-      console.error("Error submitting data:", error);
+      console.error("Error sending email and SMS:", error);
       Swal.fire({
         icon: 'error',
         title: 'Error',
@@ -234,7 +247,7 @@ const ListContact = ({ item, onDelete, onEdit, onHistoryClick }) => {
       });
     }
   };
-
+  
 
   const jsonToCSV = (json) => {
     const header = Object.keys(json[0]).join(",");
@@ -565,26 +578,7 @@ const ListContact = ({ item, onDelete, onEdit, onHistoryClick }) => {
                 <PhoneIcon />
               </IconButton>
             </a>
-            <a style={{ marginRight: 10 }}>
-
-              <IconButton
-                aria-label="share"
-                size="small"
-                sx={{
-                  color: "blue",
-                  backgroundColor: "#e3f2fd",
-                  borderRadius: "50%",
-                  padding: "10px",
-                  marginRight: 15,
-                  "&:hover": {
-                    backgroundColor: "#bbdefb",
-                  },
-                }}
-              >
-                <ShareIcon />
-              </IconButton>
-            </a>
-
+        
             <a onClick={() => setModalVisible(true)} style={{ marginRight: 35 }}>
               <IconButton
                 aria-label="email"
@@ -599,7 +593,7 @@ const ListContact = ({ item, onDelete, onEdit, onHistoryClick }) => {
                   },
                 }}
               >
-                <EmailIcon />
+                <ShareIcon />
               </IconButton>
             </a>
             <a
