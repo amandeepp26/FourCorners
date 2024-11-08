@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import {
@@ -114,20 +113,30 @@ const Cancelform = ({ bookingID }) => {
         bookingcancelremarksDate: detail.cancelDate,
       })),
     };
-  
+
     try {
       const response = await axios.post(
         'https://proxy-forcorners.vercel.app/api/proxy/api-insert-bookingcancel.php',
         payload
       );
       console.log('API response:', response.data);
+
+      // Hide the modal after successful submission
+      setBookingData(null); // This will close the modal (or reset the form)
+
+      // Trigger SweetAlert
       Swal.fire({
         icon: 'success',
         title: 'Success',
         text: response.data.message,
       });
+      setTimeout(() => {
+        window.location.reload(); // This will refresh the page
+      }, 2000); 
     } catch (error) {
       console.error('API error:', error);
+
+      // Show error message
       Swal.fire({
         icon: 'error',
         title: 'Error',
@@ -135,6 +144,7 @@ const Cancelform = ({ bookingID }) => {
       });
     }
   };
+
   if (loading) {
     return <CircularProgress />;
   }

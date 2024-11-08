@@ -1250,9 +1250,9 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
             maxWidth: "800px",
             margin: "auto",
             marginTop: "50px",
-            height: "90vh", // Set height relative to the viewport
+            height: "90vh", 
             padding: "20px",
-            overflowY: "auto", // Enable vertical scrolling if content overflows
+            overflowY: "auto", 
           }}
         >
           <TemplatePayment
@@ -1268,9 +1268,9 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
             maxWidth: "800px",
             margin: "auto",
             marginTop: "50px",
-            height: "90vh", // Set height relative to the viewport
+            height: "90vh", 
             padding: "20px",
-            overflowY: "auto", // Enable vertical scrolling if content overflows
+            overflowY: "auto",
           }}
         >
           <IconButton
@@ -1299,7 +1299,7 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
             <IconButton
               aria-label="cancel"
               onClick={handleCloseReport}
-              // sx={{ position: "absolute", top: 6, right: 10 }}
+           
             >
               <CancelIcon sx={{ color: "red" }} />
             </IconButton>
