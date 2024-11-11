@@ -3,8 +3,10 @@ import { useState } from 'react'
 
 // ** MUI Imports
 import Fab from '@mui/material/Fab'
+import IconButton from '@mui/material/IconButton'
 import { styled } from '@mui/material/styles'
 import Box from '@mui/material/Box'
+import MenuIcon from '@mui/icons-material/Menu'  // Add Menu icon for the hamburger
 
 // ** Icons Imports
 import ArrowUp from 'mdi-material-ui/ArrowUp'
@@ -62,13 +64,36 @@ const VerticalLayout = props => {
   return (
     <>
       <VerticalLayoutWrapper className='layout-wrapper'>
-        <Navigation
-          navWidth={navWidth}
-          navVisible={navVisible}
-          setNavVisible={setNavVisible}
-          toggleNavVisibility={toggleNavVisibility}
-          {...props}
-        />
+        {/* Hamburger Icon for Mobile and Tablet */}
+        <IconButton 
+          onClick={toggleNavVisibility} 
+          sx={{
+            position: 'fixed',
+            top: 16,
+            left: 16,
+            zIndex: 1300,
+            display: { lg: 'none' } // Show on mobile and tablet, hide on desktop and larger
+          }}
+        >
+          <MenuIcon />
+        </IconButton>
+
+        {/* Navigation Component */}
+        <Box 
+          sx={{ 
+            display: { xs: navVisible ? 'block' : 'none', md: 'block' }, // Hide on mobile/tablet if navVisible is false, always show on desktop
+            width: navWidth
+          }}
+        >
+          <Navigation
+            navWidth={navWidth}
+            navVisible={navVisible}
+            setNavVisible={setNavVisible}
+            toggleNavVisibility={toggleNavVisibility}
+            {...props}
+          />
+        </Box>
+
         <MainContentWrapper className='layout-content-wrapper'>
           <AppBar toggleNavVisibility={toggleNavVisibility} {...props} />
 
