@@ -63,15 +63,23 @@ const SalesManagerNavigation = () => {
         },
       ],
     },
-    
     {
-      sectionTitle: "All Booking Cancel",
+      title: "Availibilty List",
+      icon: TrendingUpIcon,
+      path: "/availableList",
+     
+    },
+    {
+      sectionTitle: "Transfered to Booking",
     },
 
     {
-      icon: PaymentsIcon,
-      title: "Cancel Bookings",
-      path: "/bookingcancel",
+      title: "Transfer Booking",
+      icon: ContactPhoneIcon,
+      path: "/opportunity/BookingTransfer",
+    },
+    {
+      sectionTitle: "All Booking Cancel",
     },
     {
       title: "Followup Booking Cancel",
@@ -98,26 +106,6 @@ const SalesManagerNavigation = () => {
         },
       ],
     },
-      
-    {
-      sectionTitle: "Availibilty List",
-    },
-    {
-      title: "Availibilty List",
-      icon: TrendingUpIcon,
-      path: "/availableList",
-     
-    },
-    {
-      sectionTitle: "Transfered to Booking",
-    },
-
-    {
-      title: "Transfer Booking",
-      icon: ContactPhoneIcon,
-      path: "/opportunity/BookingTransfer",
-    },
-    
     {
       sectionTitle: "Post Sales",
     },

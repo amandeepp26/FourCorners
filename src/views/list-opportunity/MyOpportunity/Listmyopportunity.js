@@ -15,6 +15,7 @@ import GroupIcon from "@mui/icons-material/Group";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import { Modal, TextField, IconButton, Menu, MenuItem , FormControl , InputLabel , Select} from "@mui/material";
 import CancelIcon from "@mui/icons-material/Cancel";
+import CloseIcon from "@mui/icons-material/Close";
 import Swal from 'sweetalert2';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { useCookies } from "react-cookie";
@@ -46,6 +47,10 @@ console.log(item , 'dekh bhai ');
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitError, setSubmitError] = useState(false);
 
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [projects, setProjects] = useState([]);
+  const [selectedProject, setSelectedProject] = useState(null);
   const [bhkOptions, setBhkOptions] = useState([]);
   const [currentUpdate, setCurrentUpdate] = useState([]);
 
@@ -97,7 +102,88 @@ console.log(item , 'dekh bhai ');
   const handleDropdownClose = () => {
     setAnchorEl(null);
   };
-
+  const handleSubmitProject = async () => {
+    if (!selectedProject) {
+      console.error('Project not selected.');
+      return;
+    }
+  
+    try {
+      const projectResponse = await axios.get(`https://apiforcornershost.cubisysit.com/api/api-fetch-projectdetails.php?ProjectID=${selectedProject.ProjectID}`);
+      const projectData = projectResponse.data.data[0];
+  
+      // Prepare email data with project details and amenities
+      const emailData = {
+        projectID: projectData.ProjectID,
+        projectCode: projectData.ProjectCode,
+        projectManager: projectData.ProjectManager,
+        areaSqft: projectData.Areasqft,
+        videoLink: projectData.VideoLink,
+        virtualLink: projectData.VirtualLink,
+        launchDate: projectData.LaunchDate,
+        completionDate: projectData.CompletionDate,
+        possessionDate: projectData.PossessionDate,
+        remark: projectData.Remark,
+        cc: projectData.Cc,
+        oc: projectData.Oc,
+        facebookLink: projectData.FacebookLink,
+        instagramLink: projectData.InstagramLink,
+        latitude: projectData.Latitude,
+        para: projectData.Para,
+        projectName: projectData.ProjectName,
+        amenities: projectData.AmenitiesNames.join(', '),
+        amenitieIcons: projectData.AmenitiesIcon.join(', '),
+        name: item.CName,
+        email: item.Email,
+      };
+  
+      // Send email request
+      const emailResponse = await axios.post("https://apiforcornershost.cubisysit.com/api/api-email.php", emailData, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+  
+      if (emailResponse.data.status !== "Success") {
+        throw new Error('Failed to send email');
+      }
+  
+      // Now, send SMS
+      const smsData = {
+        projectID: projectData.ProjectID,
+        projectName: projectData.ProjectName,
+        projectCode: projectData.ProjectCode,
+        name: item.CName,
+        phone: item.Mobile,
+      };
+  
+      const smsResponse = await axios.post("https://apiforcornershost.cubisysit.com/api/api-sms.php", smsData, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+  
+      if (smsResponse.data.status !== "Success") {
+        throw new Error('Failed to send SMS');
+      }
+  
+      Swal.fire({
+        icon: 'success',
+        title: 'Email & SMS Sent!',
+        text: 'The email and SMS have been sent successfully.',
+      });
+  
+      // Close the modal after successful submission
+      setModalVisible(false);
+    } catch (error) {
+      console.error("Error sending email and SMS:", error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'An error occurred while processing your request. Please try again later.',
+      });
+    }
+  };
   const handleAddFollowUpClick = () => {
     handleDropdownClose();
     setOpen(true);
@@ -111,6 +197,22 @@ console.log(item , 'dekh bhai ');
     fetchUserMasterData();
   };
 
+
+  useEffect(() => {
+    fetchProjects();
+  }, []);
+
+  const fetchProjects = async () => {
+    try {
+      const response = await axios.get(
+        "https://apiforcornershost.cubisysit.com/api/api-singel-projectdetails.php"
+      );
+      console.log("API Response project:", response.data);
+      setProjects(response.data.data || []);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -168,7 +270,7 @@ console.log(item , 'dekh bhai ');
       Oid: item.Oid
     };
   
-    const url = "https://proxy-forcorners.vercel.app/api/proxy/api-insert-opportunityfollowup.php";
+    const url = "https://apiforcornershost.cubisysit.com/api/api-insert-opportunityfollowup.php";
   
     try {
       const response = await axios.post(url, formDataWithNid, {
@@ -240,7 +342,7 @@ console.log(item , 'dekh bhai ');
     console.log(formData, "COVERT TO Booking Data 1");
 
     const url =
-      "https://proxy-forcorners.vercel.app/api/proxy/api-insert-convertbooking.php";
+      "https://apiforcornershost.cubisysit.com/api/api-insert-convertbooking.php";
 
     try {
       const response = await axios.post(url, formData, {
@@ -330,6 +432,62 @@ console.log(item , 'dekh bhai ');
 
   return (
     <>
+      <Modal open={modalVisible} onClose={() => setModalVisible(false)}>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            width: { xs: '90%', sm: '500px' },
+            bgcolor: 'background.paper',
+            borderRadius: 2,
+            boxShadow: 24,
+            p: 4,
+            mx: 'auto',
+            mt: '10%',
+          }}
+        >
+          <IconButton onClick={() => setModalVisible(false)} sx={{ alignSelf: 'flex-end' }}>
+            <CloseIcon />
+          </IconButton>
+
+          <Typography variant="h6" component="h2" sx={{ mb: 2 }}>
+            Share Details
+          </Typography>
+
+          <Grid container spacing={2}>
+            {/* Project Selection */}
+            <Grid item xs={12}>
+              <FormControl fullWidth variant="outlined">
+                <InputLabel>Projects</InputLabel>
+                <Select
+                  value={selectedProject || ""}
+                  onChange={(event) => setSelectedProject(event.target.value)}
+                  label="Projects"
+                >
+                  {projects.map((project) => (
+                    <MenuItem key={project.ProjectID} value={project}>
+                      {project.ProjectName}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+
+            {/* Submit Button */}
+            <Grid item xs={12}>
+              <Button
+                variant="contained"
+                color="primary"
+                fullWidth
+                onClick={handleSubmitProject}
+                sx={{ mt: 2 }}
+              >
+                Submit
+              </Button>
+            </Grid>
+          </Grid>
+        </Box>
+      </Modal>
       <Grid
         container
         justifyContent="center"
@@ -715,24 +873,23 @@ console.log(item , 'dekh bhai ');
         <PhoneIcon />
       </IconButton>
     </a>
-    <a style={{ marginRight: 10 }}>
-      <IconButton
-        aria-label="share"
-        size="small"
-        sx={{
-          color: "blue",
-          backgroundColor: "#e3f2fd",
-          borderRadius: "50%",
-          padding: "10px",
-          marginRight: 15,
-          "&:hover": {
-            backgroundColor: "#bbdefb",
-          },
-        }}
-      >
-        <ShareIcon />
-      </IconButton>
-    </a>
+    <a onClick={() => setModalVisible(true)} style={{ marginRight: 35 }}>
+              <IconButton
+                aria-label="email"
+                size="small"
+                sx={{
+                  color: "red",
+                  backgroundColor: "#ffebee",
+                  borderRadius: "50%",
+                  padding: "10px",
+                  "&:hover": {
+                    backgroundColor: "#ffcdd2",
+                  },
+                }}
+              >
+                <ShareIcon />
+              </IconButton>
+            </a>
     <a style={{ marginRight:50 }}>
                 <IconButton
                   aria-label="share"

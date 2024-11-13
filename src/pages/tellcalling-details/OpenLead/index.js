@@ -12,7 +12,7 @@ import {
 import axios from "axios";
 import AddTellecallingDetails from "src/views/add-tellecallingDetails/AddTellecallingDetails";
 import OpenLeadSidebar from "src/views/TellecallingSidebar/OpenLead/OpenLeadSidebar";
-import ListOpenLead from "src/views/list-tellecalling/OpenLead/ListOpenLead";
+import Listbacklog from 'src/views/list-tellecalling/Backlog/Listbacklog';
 import PieChartIcon from "@mui/icons-material/PieChart";
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import ScheduleIcon from "@mui/icons-material/Schedule";
@@ -270,7 +270,7 @@ const OpenLead = () => {
         return <AddTellecallingDetails show={handleBack} editData={editData} />;
       case "list":
         return (
-          <ListOpenLead
+          <Listbacklog
             item={rowDataToUpdate}
             onDelete={handleDelete}
             onHistoryClick={handleShowHistory}

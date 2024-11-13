@@ -30,118 +30,119 @@ import {
 import Sidebar from "src/views/campaignSidebar/Sidebar";
 import AddcampaignDetails from "src/views/AddcampaignDetail/AddcampaignDetail";
 
-const salesData = [
-  {
-    stats: "245k",
-    title: "Sales",
-    color: "primary",
-    icon: <TrendingUp sx={{ fontSize: "1.75rem" }} />,
-  },
-  {
-    stats: "12.5k",
-    title: "Customers",
-    color: "success",
-    icon: <AccountOutline sx={{ fontSize: "1.75rem" }} />,
-  },
-  {
-    stats: "1.54k",
-    color: "warning",
-    title: "Products",
-    icon: <CellphoneLink sx={{ fontSize: "1.75rem" }} />,
-  },
-  {
-    stats: "$88k",
-    color: "info",
-    title: "Revenue",
-    icon: <CurrencyUsd sx={{ fontSize: "1.75rem" }} />,
-  },
-];
 
-const pieData = [
-  { name: "Sales", value: 2000, color: "#3f51b5" },
-  { name: "Customers", value: 1200, color: "#4caf50" },
-  { name: "Products", value: 1540, color: "#ff9800" },
-  { name: "Revenue", value: 8000, color: "#00acc1" },
-];
-
-const renderStats = () => {
-  return salesData.map((item, index) => (
-    <Grid item xs={12} sm={3} key={index}>
-      <Box key={index} sx={{ display: "flex", alignItems: "center" }}>
-        <Avatar
-          variant="rounded"
-          sx={{
-            mr: 3,
-            width: 44,
-            height: 44,
-            boxShadow: 3,
-            color: "common.white",
-            backgroundColor: `${item.color}.main`,
-          }}
-        >
-          {item.icon}
-        </Avatar>
-        <Box sx={{ display: "flex", flexDirection: "column" }}>
-          <Typography variant="caption">{item.title}</Typography>
-          <Typography variant="h6">{item.stats}</Typography>
-        </Box>
-      </Box>
-    </Grid>
-  ));
-};
 
 const StatisticsCard = () => {
+  const [pieData, setPieData] = useState([]);
+  const [totalCampaigns, setTotalCampaigns] = useState(0);  // Store totalCampaigns
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch campaign data
+  const fetchCampaignData = async () => {
+    try {
+      const response = await axios.get("https://apiforcornershost.cubisysit.com/api/api-graph-campaign.php");
+      if (response.data.status === "Success") {
+        const totalCampaigns = parseInt(response.data.counts.totalCampaigns, 10);
+        setTotalCampaigns(totalCampaigns);  // Set the fetched totalCampaigns
+        setPieData([
+          { name: "Campaigns", value: totalCampaigns, color: "#3f51b5" },
+         // Example, adjust as needed
+        ]);
+      }
+      setLoading(false);
+    } catch (error) {
+      setError(error);
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCampaignData();
+  }, []);
+
+  const salesData = [
+    {
+      stats: totalCampaigns, 
+      title: "Total Campaigns", 
+      color: "success", 
+      icon: <TrendingUp sx={{ fontSize: "1.75rem" }} /> 
+    },
+   
+  ];
+
+  const renderStats = () => {
+    return salesData.map((item, index) => (
+      <Grid item  key={index} sx={{ display: "flex", alignItems: "center",justifyContent:"right" }}>
+        <Box sx={{ display: "flex", alignItems: "center",justifyContent:"center" }}>
+          <Avatar
+            variant="rounded"
+            sx={{
+              mr: 3,
+              width: 44,
+              height: 44,
+              boxShadow: 3,
+              color: "common.white",
+              backgroundColor: `${item.color}.main`,
+            }}
+          >
+            {item.icon}
+          </Avatar>
+          <Box sx={{ display: "flex", flexDirection: "column" }}>
+            <Typography variant="caption">{item.title}</Typography>
+            <Typography variant="h6">{item.stats}</Typography>
+          </Box>
+        </Box>
+      </Grid>
+    ));
+  };
+
   return (
-    <>
+    <Card>
       <CardHeader
         title="Statistics Card"
         subheader={
           <Typography variant="body2">
-            <Box
-              component="span"
-              sx={{ fontWeight: 600, color: "text.primary" }}
-            >
+            <Box component="span" sx={{ fontWeight: 600, color: "text.primary" }}>
               Total 48.5% growth
             </Box>{" "}
             😎 this month
           </Typography>
         }
-        titleTypographyProps={{
-          sx: {
-            mb: 2.5,
-            lineHeight: "2rem !important",
-            letterSpacing: "0.15px !important",
-          },
-        }}
       />
       <CardContent sx={{ pt: (theme) => `${theme.spacing(3)} !important` }}>
         <Grid container spacing={[5, 0]}>
           {renderStats()}
           <Grid item xs={12}>
-            <ResponsiveContainer width="100%" height={400}>
-              <PieChart>
-                <Pie
-                  data={pieData}
-                  dataKey="value"
-                  nameKey="name"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={120}
-                  fill="#8884d8"
-                  label
-                >
-                  {pieData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
+            {loading ? (
+              <CircularProgress />
+            ) : error ? (
+              <Alert severity="error">Error fetching data: {error.message}</Alert>
+            ) : (
+              <ResponsiveContainer width="100%" height={400}>
+                <PieChart>
+                  <Pie
+                    data={pieData}
+                    dataKey="value"
+                    nameKey="name"
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={120}
+                    label
+                  >
+                    {pieData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            )}
           </Grid>
         </Grid>
       </CardContent>
-    </>
+    </Card>
   );
 };
 
@@ -153,13 +154,14 @@ const WelcomeScreen = () => {
         <Typography variant="h5" sx={{ marginTop: 2, fontWeight: "bold" }}>
           Welcome to Campaign Dashboard
         </Typography>
-        <Grid variant="body1" sx={{ marginTop: 10, marginLeft: 20 }}>
+        <Grid variant="body1" sx={{ marginTop: 10 }}>
           <StatisticsCard />
         </Grid>
       </Box>
     </Card>
   );
 };
+
 
 const Tellecalling = () => {
   const router = useRouter();
@@ -211,7 +213,7 @@ const Tellecalling = () => {
   const handleDelete = async (id) => {
     try {
       const response = await axios.post(
-        "https://proxy-forcorners.vercel.app/api/proxy/api-delete-telecalling.php",
+        "https://ideacafe-backend.vercel.app/api/proxy/api-delete-telecalling.php",
         {
           Tid: id,
           DeleteUID: 1,

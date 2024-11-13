@@ -21,16 +21,16 @@ const AddcampaignDetails = () => {
   const [formData, setFormData] = useState({
     campaignName: '',
     campaignTypeID: '',
-    templateID: '',
+    templateID: [], // Array for multiple template selections
     date: '',
     time: '',
-    CreateUID: 1, // Set default CreateUID or get from cookies if needed
+    CreateUID: '123', // Ensure CreateUID is a string if required
     contactCids: [], // For storing selected contact CIDs
-    ProjectID: 5, // Example ProjectID
+    ProjectID: 1, // Example ProjectID
   });
   
   const [campaignTypes, setCampaignTypes] = useState([]);
-  const [templates, setTemplates] = useState([]);
+  const [templates, setTemplates] = useState([]); // State for templates
   const [contacts, setContacts] = useState([]); // State for contacts
   const [cookies] = useCookies(["amr"]);
   const [submitSuccess, setSubmitSuccess] = useState(false);
@@ -94,19 +94,29 @@ const AddcampaignDetails = () => {
     });
   };
 
+  // Handle changes specifically for multiple template selection
+  const handleTemplateChange = (event) => {
+    const { value } = event.target;
+    setFormData({
+      ...formData,
+      templateID: value, // `value` will be an array of selected template IDs
+    });
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
+    // Payload to match the expected format
     const payload = {
       CampaignName: formData.campaignName,
-      CampaignTypeID: parseInt(formData.campaignTypeID),
-      TemplateID: parseInt(formData.templateID),
+      CampaignTypeID: parseInt(formData.campaignTypeID), // Ensure integer format
+      TemplateIDs: formData.templateID.map(id => parseInt(id)), // Ensure array of integers for template IDs
       Date: formData.date,
       Time: formData.time,
-      CreateUID: formData.CreateUID,
+      CreateUID: formData.CreateUID, // CreateUID as a string if required
       ContactCids: formData.contactCids,
       ProjectID: formData.ProjectID,
-    }; 
+    };
 
     try {
       const response = await axios.post('https://proxy-forcorners.vercel.app/api/proxy/api-insert-compaigns.php', payload);
@@ -121,12 +131,12 @@ const AddcampaignDetails = () => {
         setFormData({
           campaignName: '',
           campaignTypeID: '',
-          templateID: '',
+          templateID: [], // Reset templates after successful submission
           date: '',
           time: '',
-          CreateUID: 1,
+          CreateUID: '123', // Reset CreateUID to default
           contactCids: [],
-          ProjectID: 5,
+          ProjectID: 1, // Reset ProjectID to default
         });
       }
     } catch (error) {
@@ -178,9 +188,18 @@ const AddcampaignDetails = () => {
                 <InputLabel>Template</InputLabel>
                 <Select
                   name="templateID"
+                  multiple // Allow multiple selection
                   value={formData.templateID}
-                  onChange={handleChange}
+                  onChange={handleTemplateChange}
                   required
+                  renderValue={(selected) => {
+                    return selected
+                      .map((id) => {
+                        const template = templates.find((template) => template.templateID === id);
+                        return template ? template.TName : '';
+                      })
+                      .join(', ');
+                  }}
                 >
                   {templates.map((template) => (
                     <MenuItem key={template.templateID} value={template.templateID}>

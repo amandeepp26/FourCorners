@@ -3,7 +3,7 @@ import { Grid, CircularProgress, Alert, Typography, Box } from '@mui/material';
 import axios from 'axios';
 import AddTellecallingDetails from 'src/views/add-tellecallingDetails/AddTellecallingDetails';
 import MyleadSidebar from 'src/views/TellecallingSidebar/Mylead/MyleadSidebar';
-import Listmylead from 'src/views/list-tellecalling/Mylead/Listmylead';
+import Listbacklog from 'src/views/list-tellecalling/Backlog/Listbacklog';
 import HistoryTelecalling from 'src/views/history-telecalling/HistoryTelecalling';
 import PieChartIcon from '@mui/icons-material/PieChart';
 import Card from '@mui/material/Card'
@@ -287,7 +287,7 @@ const Tellecalling = () => {
         {firstVisit && !loading && !error && <WelcomeScreen />}
         
         {!loading && !error && rowDataToUpdate && !showHistory && !showAddDetails && !showDashboard && (
-          <Listmylead
+          <Listbacklog
             item={rowDataToUpdate}
             onDelete={handleDelete}
             onHistoryClick={handleShowHistory}

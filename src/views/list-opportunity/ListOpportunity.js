@@ -9,6 +9,7 @@ import axios from "axios";
 import Button from "@mui/material/Button";
 import AddIcon from "@mui/icons-material/Add";
 import HistoryIcon from "@mui/icons-material/History";
+import CloseIcon from "@mui/icons-material/Close";
 import EditIcon from "@mui/icons-material/Edit";
 import GetAppIcon from "@mui/icons-material/GetApp";
 import GroupIcon from "@mui/icons-material/Group";
@@ -49,7 +50,9 @@ const ListOpportunity = ({ item, onDelete, onEdit, onHistoryClick }) => {
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState(intialName);
   const [userMaster, setUserMaster] = useState([]);
-
+  const [modalVisible, setModalVisible] = useState(false);
+  const [projects, setProjects] = useState([]);
+  const [selectedProject, setSelectedProject] = useState(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitError, setSubmitError] = useState(false);
   const [anchorElOpportunity, setAnchorElOpportunity] = useState(null);
@@ -57,56 +60,8 @@ const ListOpportunity = ({ item, onDelete, onEdit, onHistoryClick }) => {
   const [currentUpdate, setCurrentUpdate] = useState([]);
 
   const [setRowDataToUpdate] = useState(null);
+
   const [anchorEl, setAnchorEl] = useState(null);
-
-  const [shareAnchorEl, setShareAnchorEl] = useState(null);
-  const [projectAnchorEl, setProjectAnchorEl] = useState(null);
-  const [error, setError] = useState(null);
-  const [emailSuccess, setEmailSuccess] = useState(false);
-  const [projects, setProjects] = useState([]); // Assuming this is populated with project dat
-
-  const handleShareClick = async (event) => {
-    setShareAnchorEl(event.currentTarget);
-    try {
-      const response = await axios.get("https://apiforcornershost.cubisysit.com/api/api-share-project.php");
-      if (response.data.status === "Success") {
-        setProjects(response.data.data); // Directly set the projects from the API response
-      } else {
-        setError("Failed to fetch projects.");
-      }
-    } catch (err) {
-      setError("An error occurred while fetching projects.");
-    }
-  };
-
-  const handleProjectClick = (event) => {
-    setProjectAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setShareAnchorEl(null);
-    setProjectAnchorEl(null);
-  };
-
-  const handleProjectSelect = async (project) => {
-    try {
-      const emailResponse = await axios.post("YOUR_EMAIL_API_ENDPOINT", {
-        email: project.Email, // Ensure the project object has an Email field
-        subject: `Project Details for ${project.ProjectName}`,
-        body: JSON.stringify(project), // You can format this as needed
-      });
-
-      if (emailResponse.data.status === "Success") {
-        setEmailSuccess(true);
-        alert("Project details sent successfully!");
-      } else {
-        alert("Failed to send email.");
-      }
-    } catch (err) {
-      alert("An error occurred while sending email.");
-    }
-    handleClose();
-  };
   const handleDropdownClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -131,7 +86,92 @@ const ListOpportunity = ({ item, onDelete, onEdit, onHistoryClick }) => {
     setOpen(true);
   };
 
+  const handleClose = () => {
+    setOpen(false);
+  };
 
+  const handleSubmitProject = async () => {
+    if (!selectedProject) {
+      console.error('Project not selected.');
+      return;
+    }
+  
+    try {
+      const projectResponse = await axios.get(`https://apiforcornershost.cubisysit.com/api/api-fetch-projectdetails.php?ProjectID=${selectedProject.ProjectID}`);
+      const projectData = projectResponse.data.data[0];
+  
+      // Prepare email data with project details and amenities
+      const emailData = {
+        projectID: projectData.ProjectID,
+        projectCode: projectData.ProjectCode,
+        projectManager: projectData.ProjectManager,
+        areaSqft: projectData.Areasqft,
+        videoLink: projectData.VideoLink,
+        virtualLink: projectData.VirtualLink,
+        launchDate: projectData.LaunchDate,
+        completionDate: projectData.CompletionDate,
+        possessionDate: projectData.PossessionDate,
+        remark: projectData.Remark,
+        cc: projectData.Cc,
+        oc: projectData.Oc,
+        facebookLink: projectData.FacebookLink,
+        instagramLink: projectData.InstagramLink,
+        latitude: projectData.Latitude,
+        para: projectData.Para,
+        projectName: projectData.ProjectName,
+        amenities: projectData.AmenitiesNames.join(', '),
+        amenitieIcons: projectData.AmenitiesIcon.join(', '),
+        name: item.CName,
+        email: item.Email,
+      };
+  
+      // Send email request
+      const emailResponse = await axios.post("https://proxy-forcorners.vercel.app/api/proxy/api-email.php", emailData, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+  
+      if (emailResponse.data.status !== "Success") {
+        throw new Error('Failed to send email');
+      }
+  
+      // Now, send SMS
+      const smsData = {
+        projectID: projectData.ProjectID,
+        projectName: projectData.ProjectName,
+        projectCode: projectData.ProjectCode,
+        name: item.CName,
+        phone: item.Mobile,
+      };
+  
+      const smsResponse = await axios.post("https://proxy-forcorners.vercel.app/api/proxy/api-sms.php", smsData, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+  
+      if (smsResponse.data.status !== "Success") {
+        throw new Error('Failed to send SMS');
+      }
+  
+      Swal.fire({
+        icon: 'success',
+        title: 'Email & SMS Sent!',
+        text: 'The email and SMS have been sent successfully.',
+      });
+  
+      // Close the modal after successful submission
+      setModalVisible(false);
+    } catch (error) {
+      console.error("Error sending email and SMS:", error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'An error occurred while processing your request. Please try again later.',
+      });
+    }
+  };
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -144,6 +184,22 @@ const ListOpportunity = ({ item, onDelete, onEdit, onHistoryClick }) => {
     if (onHistoryClick) {
       // toggleSidebar(false);
       onHistoryClick(item); // Pass item to parent component for showing history
+    }
+  };
+
+  useEffect(() => {
+    fetchProjects();
+  }, []);
+
+  const fetchProjects = async () => {
+    try {
+      const response = await axios.get(
+        "https://apiforcornershost.cubisysit.com/api/api-singel-projectdetails.php"
+      );
+      console.log("API Response project:", response.data);
+      setProjects(response.data.data || []);
+    } catch (error) {
+      console.error("Error fetching data:", error);
     }
   };
 
@@ -337,12 +393,68 @@ const ListOpportunity = ({ item, onDelete, onEdit, onHistoryClick }) => {
 
   const handleEdit = () => {
     if (onEdit) {
-      onEdit(item); 
+      onEdit(item); // Pass item to parent component for editing
     }
   };
 
   return (
     <>
+          <Modal open={modalVisible} onClose={() => setModalVisible(false)}>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            width: { xs: '90%', sm: '500px' },
+            bgcolor: 'background.paper',
+            borderRadius: 2,
+            boxShadow: 24,
+            p: 4,
+            mx: 'auto',
+            mt: '10%',
+          }}
+        >
+          <IconButton onClick={() => setModalVisible(false)} sx={{ alignSelf: 'flex-end' }}>
+            <CloseIcon />
+          </IconButton>
+
+          <Typography variant="h6" component="h2" sx={{ mb: 2 }}>
+            Share Details
+          </Typography>
+
+          <Grid container spacing={2}>
+            {/* Project Selection */}
+            <Grid item xs={12}>
+              <FormControl fullWidth variant="outlined">
+                <InputLabel>Projects</InputLabel>
+                <Select
+                  value={selectedProject || ""}
+                  onChange={(event) => setSelectedProject(event.target.value)}
+                  label="Projects"
+                >
+                  {projects.map((project) => (
+                    <MenuItem key={project.ProjectID} value={project}>
+                      {project.ProjectName}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+
+            {/* Submit Button */}
+            <Grid item xs={12}>
+              <Button
+                variant="contained"
+                color="primary"
+                fullWidth
+                onClick={handleSubmitProject}
+                sx={{ mt: 2 }}
+              >
+                Submit
+              </Button>
+            </Grid>
+          </Grid>
+        </Box>
+      </Modal>
       <Grid
         container
         justifyContent="center"
@@ -722,48 +834,24 @@ const ListOpportunity = ({ item, onDelete, onEdit, onHistoryClick }) => {
                   <PhoneIcon />
                 </IconButton>
               </a>
-              <Box>
-      <Menu
-        anchorEl={shareAnchorEl}
-        open={Boolean(shareAnchorEl)}
-        onClose={handleClose}
-      >
-        {error && <Alert severity="error">{error}</Alert>}
-        {/* Your share options here */}
-      </Menu>
-
-      <IconButton
-        aria-label="share"
-        size="small"
-        onClick={handleProjectClick}
-        sx={{
-          color: "blue",
-          backgroundColor: "#e3f2fd",
-          borderRadius: "50%",
-          padding: "10px",
-          marginRight: 15,
-          "&:hover": {
-            backgroundColor: "#bbdefb",
-          },
-        }}
-      >
-        <ShareIcon />
-      </IconButton>
-
-      <Menu
-        anchorEl={projectAnchorEl}
-        open={Boolean(projectAnchorEl)}
-        onClose={handleClose}
-      >
-        {projects.map((project) => (
-          <MenuItem key={project.ProjectID} onClick={() => handleProjectSelect(project)}>
-            <Typography>{project.ProjectName}</Typography>
-          </MenuItem>
-        ))}
-      </Menu>
-
-      {emailSuccess && <Alert severity="success">Email sent successfully!</Alert>}
-    </Box>
+           
+              <a onClick={() => setModalVisible(true)} style={{ marginRight: 35 }}>
+              <IconButton
+                aria-label="email"
+                size="small"
+                sx={{
+                  color: "red",
+                  backgroundColor: "#ffebee",
+                  borderRadius: "50%",
+                  padding: "10px",
+                  "&:hover": {
+                    backgroundColor: "#ffcdd2",
+                  },
+                }}
+              >
+                <ShareIcon />
+              </IconButton>
+            </a>
               <a style={{ marginRight: 30 }}>
                 <IconButton
                   aria-label="share"

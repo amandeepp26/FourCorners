@@ -22,124 +22,135 @@ import Avatar from '@mui/material/Avatar';
 import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer } from 'recharts';
 import  Photo  from 'src/pages/404'
 
-const salesData = [
-  {
-    stats: '245k',
-    title: 'Sales',
-    color: 'primary',
-    icon: <TrendingUp sx={{ fontSize: '1.75rem' }} />
-  },
-  {
-    stats: '12.5k',
-    title: 'Customers',
-    color: 'success',
-    icon: <AccountOutline sx={{ fontSize: '1.75rem' }} />
-  },
-  {
-    stats: '1.54k',
-    color: 'warning',
-    title: 'Products',
-    icon: <CellphoneLink sx={{ fontSize: '1.75rem' }} />
-  },
-  {
-    stats: '$88k',
-    color: 'info',
-    title: 'Revenue',
-    icon: <CurrencyUsd sx={{ fontSize: '1.75rem' }} />
-  }
-];
-
-const pieData = [
-  { name: 'Sales', value: 2000, color: '#3f51b5' },
-  { name: 'Customers', value: 1200, color: '#4caf50' },
-  { name: 'Products', value: 1540, color: '#ff9800' },
-  { name: 'Revenue', value: 8000, color: '#00acc1' }
-];
-
-const renderStats = () => {
-  return salesData.map((item, index) => (
-    <Grid item xs={12} sm={3} key={index}>
-      <Box key={index} sx={{ display: 'flex', alignItems: 'center' }}>
-        <Avatar
-          variant='rounded'
-          sx={{
-            mr: 3,
-            width: 44,
-            height: 44,
-            boxShadow: 3,
-            color: 'common.white',
-            backgroundColor: `${item.color}.main`
-          }}
-        >
-          {item.icon}
-        </Avatar>
-        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-          <Typography variant='caption'>{item.title}</Typography>
-          <Typography variant='h6'>{item.stats}</Typography>
-        </Box>
-      </Box>
-    </Grid>
-  ));
-};
-
 const StatisticsCard = () => {
+  const [pieData, setPieData] = useState([]);
+  const [totalTemplates, settotalTemplates] = useState(0);  // Store totalTemplates
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch campaign data
+  const fetchCampaignData = async () => {
+    try {
+      const response = await axios.get("https://apiforcornershost.cubisysit.com/api/api-graph-template.php");
+      if (response.data.status === "Success") {
+        const totalTemplates = parseInt(response.data.counts.totalTemplates, 10);
+        settotalTemplates(totalTemplates);  // Set the fetched totalTemplates
+        setPieData([
+          { name: "Templates", value: totalTemplates, color: "#3f51b5" },
+        ]);
+      }
+      setLoading(false);
+    } catch (error) {
+      setError(error);
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCampaignData();
+  }, []);
+
+  const salesData = [
+    {
+      stats: totalTemplates, 
+      title: "Total Templates", 
+      color: "success", 
+      icon: <TrendingUp sx={{ fontSize: "1.75rem" }} /> 
+    },
+   
+  ];
+
+  const renderStats = () => {
+    return salesData.map((item, index) => (
+      <Grid item  key={index} sx={{ display: "flex", alignItems: "center",justifyContent:"right" }}>
+        <Box sx={{ display: "flex", alignItems: "center",justifyContent:"center" }}>
+          <Avatar
+            variant="rounded"
+            sx={{
+              mr: 3,
+              width: 44,
+              height: 44,
+              boxShadow: 3,
+              color: "common.white",
+              backgroundColor: `${item.color}.main`,
+            }}
+          >
+            {item.icon}
+          </Avatar>
+          <Box sx={{ display: "flex", flexDirection: "column" }}>
+            <Typography variant="caption">{item.title}</Typography>
+            <Typography variant="h6">{item.stats}</Typography>
+          </Box>
+        </Box>
+      </Grid>
+    ));
+  };
+
   return (
-    <>
+    <Card>
       <CardHeader
-        title='Statistics Card'
+        title="Statistics Card"
         subheader={
-          <Typography variant='body2'>
-            <Box component='span' sx={{ fontWeight: 600, color: 'text.primary' }}>
-              Total 48.5% growth
-            </Box>{' '}
+          <Typography variant="body2">
+            <Box component="span" sx={{ fontWeight: 600, color: "text.primary" }}>
+              Total growth
+            </Box>{" "}
             😎 this month
           </Typography>
         }
-        titleTypographyProps={{
-          sx: {
-            mb: 2.5,
-            lineHeight: '2rem !important',
-            letterSpacing: '0.15px !important'
-          }
-        }}
       />
-      <CardContent sx={{ pt: theme => `${theme.spacing(3)} !important` }}>
+      <CardContent sx={{ pt: (theme) => `${theme.spacing(3)} !important` }}>
         <Grid container spacing={[5, 0]}>
           {renderStats()}
           <Grid item xs={12}>
-            <ResponsiveContainer width='100%' height={400}>
-              <PieChart>
-                <Pie data={pieData} dataKey='value' nameKey='name' cx='50%' cy='50%' outerRadius={120} fill='#8884d8' label>
-                  {pieData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
+            {loading ? (
+              <CircularProgress />
+            ) : error ? (
+              <Alert severity="error">Error fetching data: {error.message}</Alert>
+            ) : (
+              <ResponsiveContainer width="100%" height={400}>
+                <PieChart>
+                  <Pie
+                    data={pieData}
+                    dataKey="value"
+                    nameKey="name"
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={120}
+                    label
+                  >
+                    {pieData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            )}
           </Grid>
         </Grid>
       </CardContent>
-    </>
+    </Card>
   );
 };
 
 const WelcomeScreen = () => {
   return (
     <Card>
-      <Box sx={{ textAlign: 'center', marginTop: '20px' }}>
+      <Box sx={{ textAlign: "center", marginTop: "20px" }}>
         <PieChartIcon sx={{ fontSize: 60, color: "#333" }} />
         <Typography variant="h5" sx={{ marginTop: 2, fontWeight: "bold" }}>
           Welcome to Template Dashboard
         </Typography>
-        <Grid variant="body1" sx={{ marginTop: 10, marginLeft: 20 }}>
+        <Grid variant="body1" sx={{ marginTop: 10 }}>
           <StatisticsCard />
         </Grid>
       </Box>
     </Card>
   );
 };
+
 
 const Tellecalling = () => {
   const router = useRouter();
@@ -194,7 +205,7 @@ const Tellecalling = () => {
 
   const handleDelete = async (id) => {
     try {
-      const response = await axios.post('https://proxy-forcorners.vercel.app/api/proxy/api-delete-telecalling.php', {
+      const response = await axios.post('https://ideacafe-backend.vercel.app/api/proxy/api-delete-telecalling.php', {
         Tid: id,
         DeleteUID: 1
       });

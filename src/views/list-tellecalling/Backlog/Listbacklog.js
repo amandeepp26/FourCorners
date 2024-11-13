@@ -17,6 +17,7 @@ import PhoneIcon from "@mui/icons-material/Phone";
 import ShareIcon from "@mui/icons-material/Share";
 import EmailIcon from "@mui/icons-material/Email";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
+import CloseIcon from "@mui/icons-material/Close";
 import {
   Modal,
   TextField,
@@ -52,6 +53,10 @@ console.log(item, "seet<<<<<<<>>>>>>>></>");
   const [anchorElOpportunity, setAnchorElOpportunity] = useState(null);
   const [userMaster, setUserMaster] = useState([]);
   const [setRowDataToUpdate] = useState(null);
+  
+  const [modalVisible, setModalVisible] = useState(false);
+  const [projects, setProjects] = useState([]);
+  const [selectedProject, setSelectedProject] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
   const handleDropdownClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -315,6 +320,105 @@ console.log(item, "seet<<<<<<<>>>>>>>></>");
     document.body.removeChild(a);
   };
 
+  const handleSubmitProject = async () => {
+    if (!selectedProject) {
+      console.error('Project not selected.');
+      return;
+    }
+  
+    try {
+      const projectResponse = await axios.get(`https://apiforcornershost.cubisysit.com/api/api-fetch-projectdetails.php?ProjectID=${selectedProject.ProjectID}`);
+      const projectData = projectResponse.data.data[0];
+  
+      // Prepare email data with project details and amenities
+      const emailData = {
+        projectID: projectData.ProjectID,
+        projectCode: projectData.ProjectCode,
+        projectManager: projectData.ProjectManager,
+        areaSqft: projectData.Areasqft,
+        videoLink: projectData.VideoLink,
+        virtualLink: projectData.VirtualLink,
+        launchDate: projectData.LaunchDate,
+        completionDate: projectData.CompletionDate,
+        possessionDate: projectData.PossessionDate,
+        remark: projectData.Remark,
+        cc: projectData.Cc,
+        oc: projectData.Oc,
+        facebookLink: projectData.FacebookLink,
+        instagramLink: projectData.InstagramLink,
+        latitude: projectData.Latitude,
+        para: projectData.Para,
+        projectName: projectData.ProjectName,
+        amenities: projectData.AmenitiesNames.join(', '),
+        amenitieIcons: projectData.AmenitiesIcon.join(', '),
+        name: item.CName,
+        email: item.Email,
+      };
+  
+      // Send email request
+      const emailResponse = await axios.post("https://proxy-forcorners.vercel.app/api/proxy/api-email.php", emailData, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+  
+      if (emailResponse.data.status !== "Success") {
+        throw new Error('Failed to send email');
+      }
+  
+      // Now, send SMS
+      const smsData = {
+        projectID: projectData.ProjectID,
+        projectName: projectData.ProjectName,
+        projectCode: projectData.ProjectCode,
+        name: item.CName,
+        phone: item.Mobile,
+      };
+  
+      const smsResponse = await axios.post("https://proxy-forcorners.vercel.app/api/proxy/api-sms.php", smsData, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+  
+      if (smsResponse.data.status !== "Success") {
+        throw new Error('Failed to send SMS');
+      }
+  
+      Swal.fire({
+        icon: 'success',
+        title: 'Email & SMS Sent!',
+        text: 'The email and SMS have been sent successfully.',
+      });
+  
+      // Close the modal after successful submission
+      setModalVisible(false);
+    } catch (error) {
+      console.error("Error sending email and SMS:", error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'An error occurred while processing your request. Please try again later.',
+      });
+    }
+  };
+  useEffect(() => {
+    fetchProjects();
+  }, []);
+
+  const fetchProjects = async () => {
+    try {
+      const response = await axios.get(
+        "https://apiforcornershost.cubisysit.com/api/api-singel-projectdetails.php"
+      );
+      console.log("API Response project:", response.data);
+      setProjects(response.data.data || []);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+
   const handleEdit = () => {
     if (onEdit) {
       onEdit(item); // Pass item to parent component for editing
@@ -323,6 +427,62 @@ console.log(item, "seet<<<<<<<>>>>>>>></>");
 
   return (
     <>
+        <Modal open={modalVisible} onClose={() => setModalVisible(false)}>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            width: { xs: '90%', sm: '500px' },
+            bgcolor: 'background.paper',
+            borderRadius: 2,
+            boxShadow: 24,
+            p: 4,
+            mx: 'auto',
+            mt: '10%',
+          }}
+        >
+          <IconButton onClick={() => setModalVisible(false)} sx={{ alignSelf: 'flex-end' }}>
+            <CloseIcon />
+          </IconButton>
+
+          <Typography variant="h6" component="h2" sx={{ mb: 2 }}>
+            Share Details
+          </Typography>
+
+          <Grid container spacing={2}>
+            {/* Project Selection */}
+            <Grid item xs={12}>
+              <FormControl fullWidth variant="outlined">
+                <InputLabel>Projects</InputLabel>
+                <Select
+                  value={selectedProject || ""}
+                  onChange={(event) => setSelectedProject(event.target.value)}
+                  label="Projects"
+                >
+                  {projects.map((project) => (
+                    <MenuItem key={project.ProjectID} value={project}>
+                      {project.ProjectName}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+
+            {/* Submit Button */}
+            <Grid item xs={12}>
+              <Button
+                variant="contained"
+                color="primary"
+                fullWidth
+                onClick={handleSubmitProject}
+                sx={{ mt: 2 }}
+              >
+                Submit
+              </Button>
+            </Grid>
+          </Grid>
+        </Box>
+      </Modal>
       <Grid
         container
         justifyContent="center"
@@ -686,7 +846,7 @@ console.log(item, "seet<<<<<<<>>>>>>>></>");
             </div>
           </Box>
 
-          <Box sx={{ display: "flex",  mt: 10 , ml:20}}>
+          <Box sx={{ display: "flex",  mt: 10 , justifyContent:"center"}}>
         <a href={`tel:${item?.Mobile}`} style={{ marginRight: 40 }}>
           <IconButton
             aria-label="phone"
@@ -704,25 +864,24 @@ console.log(item, "seet<<<<<<<>>>>>>>></>");
             <PhoneIcon />
           </IconButton>
         </a>
-        <a style={{ marginRight: 1 }}>
-                <IconButton
-                  aria-label="share"
-                  size="small"
-                  sx={{
-                    color: "blue",
-                    backgroundColor: "#e3f2fd",
-                    borderRadius: "50%",
-                    padding: "10px",
-                    marginRight: 15,
-                    "&:hover": {
-                      backgroundColor: "#bbdefb",
-                    },
-                  }}
-                >
-                  <ShareIcon />
-                </IconButton>
-              </a>
-              <a style={{ marginRight:1 }}>
+        <a onClick={() => setModalVisible(true)} style={{ marginRight: 40 }}>
+              <IconButton
+                aria-label="email"
+                size="small"
+                sx={{
+                  color: "red",
+                  backgroundColor: "#ffebee",
+                  borderRadius: "50%",
+                  padding: "10px",
+                  "&:hover": {
+                    backgroundColor: "#ffcdd2",
+                  },
+                }}
+              >
+                <ShareIcon />
+              </IconButton>
+            </a>
+              <a style={{ marginRight:40 }}>
                 <IconButton
                   aria-label="share"
                   size="small"
@@ -731,7 +890,6 @@ console.log(item, "seet<<<<<<<>>>>>>>></>");
                     backgroundColor: "#e3f2fd",
                     borderRadius: "50%",
                     padding: "10px",
-                    marginRight: 15,
                     "&:hover": {
                       backgroundColor: "#bbdefb",
                     },
@@ -741,7 +899,7 @@ console.log(item, "seet<<<<<<<>>>>>>>></>");
                   <HistoryIcon />
                 </IconButton>
               </a>
-              <a href={`mailto:${item?.Email}`} style={{ marginRight: 35 }}>
+              <a href={`mailto:${item?.Email}`} style={{ marginRight: 40 }}>
                 <IconButton
                   aria-label="email"
                   size="small"
