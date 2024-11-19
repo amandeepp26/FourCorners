@@ -138,7 +138,7 @@ const StatisticsCard = () => {
 const WelcomeScreen = () => {
   return (
     <Card>
-      <Box sx={{ textAlign: "center", marginTop: "20px" }}>
+      <Box sx={{ textAlign: "center", marginTop: "20px"}}>
         <PieChartIcon sx={{ fontSize: 60, color: "#333" }} />
         <Typography variant="h5" sx={{ marginTop: 2, fontWeight: "bold" }}>
           Welcome to Template Dashboard
@@ -260,57 +260,54 @@ const Tellecalling = () => {
   };
 
   return (
-    <Grid container spacing={6}>
-      <Grid item xs={4}>
-        <Sidebar rows={rows} onItemClick={handleShow} onEdit={handleEdit} onCreate={handleAddTelecaller} />
-      </Grid>
-      <Grid item xs={8}>
-        {loading && <CircularProgress />}
-        {/* {error && <Alert></Alert>} */}
+    <Grid container spacing={2}>
+    {/* Sidebar */}
+    <Grid item xs={12} md={4} style={{background:"white",zIndex:"99",display:"flex", flexWrap:"wrap"}}>
+      <Sidebar
 
-        {firstVisit && !loading && !error && !leadData && (
-          <WelcomeScreen />
-        )}
-
-        {leadData && (
-          <Box>
-            <Typography variant="h6" sx={{ mb: 2 }}>
-              Converted Lead Details
-            </Typography>
-            {/* Render lead data details */}
-            <pre>{JSON.stringify(leadData, null, 2)}</pre>
-          </Box>
-        )}
-
-        {showAddDetails && (
-          <Addtemplate show={handleBack} editData={editData} />
-        )}
-
-        {!loading && !error && rowDataToUpdate && !showHistory && !showAddDetails && (
-          <Listtemplate
-            item={rowDataToUpdate}
-            onDelete={handleDelete}
-            onHistoryClick={handleShowHistory}
-            onEdit={handleEdit}
-          />
-        )}
-
-        {!loading && !error && showHistory && (
-          <Box
-            display="flex"
-            flexDirection="column"
-            alignItems="center"
-            justifyContent="center"
-            minHeight="100vh"
-          >
-            <Typography variant="body2" sx={{ marginTop: 5, fontWeight: "bold", alignItems: 'center', textAlign: 'center', fontSize: 20 }}>
-              User History
-            </Typography>
-            <HistoryTelecalling item={rowDataToUpdate} onBack={handleBack} />
-          </Box>
-        )}
-      </Grid>
+        rows={rows}
+        onItemClick={handleShow}
+        onEdit={handleEdit}
+        onCreate={handleAddTelecaller}
+      />
     </Grid>
+  
+    {/* Main Content */}
+    <Grid item xs={12} md={8}>
+      {loading && <CircularProgress />}
+      {firstVisit && !loading && !error && !leadData && <WelcomeScreen />}
+      {leadData && (
+        <Box>
+          <Typography variant="h6" sx={{ mb: 2 }}>
+            Converted Lead Details
+          </Typography>
+          <pre>{JSON.stringify(leadData, null, 2)}</pre>
+        </Box>
+      )}
+      {showAddDetails && <Addtemplate show={handleBack} editData={editData} />}
+      {!loading && !error && rowDataToUpdate && !showHistory && !showAddDetails && (
+        <Listtemplate
+          item={rowDataToUpdate}
+          onDelete={handleDelete}
+          onHistoryClick={handleShowHistory}
+          onEdit={handleEdit}
+        />
+      )}
+      {!loading && !error && showHistory && (
+        <Box display="flex" flexDirection="column" alignItems="center">
+          <Typography
+            variant="body2"
+            sx={{ mt: 5, fontWeight: "bold", fontSize: 20 }}
+          >
+            User History
+          </Typography>
+          <HistoryTelecalling item={rowDataToUpdate} onBack={handleBack} />
+        </Box>
+      )}
+    </Grid>
+  </Grid>
+  
+  
   );
 };
 

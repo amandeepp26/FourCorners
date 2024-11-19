@@ -16,7 +16,7 @@ const CardStatsVertical = props => {
   return (
     <Card>
       <CardContent>
-        <Box sx={{ display: 'flex', marginBottom: 5.5, alignItems: 'flex-start', justifyContent: 'space-between' }}>
+        <Box sx={{ display: 'flex', marginBottom: 5.5, alignItems: 'flex-start', justifyContent: 'space-between'}}>
           <Avatar sx={{ boxShadow: 3, marginRight: 4, color: 'common.white', backgroundColor: `${color}.main` }}>
             {icon}
           </Avatar>
