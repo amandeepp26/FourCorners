@@ -23,7 +23,7 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import GetAppIcon from "@mui/icons-material/GetApp";
 import { Chip } from '@mui/material';
 import { useCookies } from "react-cookie";
-
+  
 const MyOpportunitySidebar = ({ onItemClick, onCreate }) => {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);

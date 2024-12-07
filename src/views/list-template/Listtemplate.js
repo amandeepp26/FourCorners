@@ -7,6 +7,7 @@ import GetAppIcon from "@mui/icons-material/GetApp";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { Menu, MenuItem , Paper ,Box, Typography} from "@mui/material";
+import GridViewIcon from "@mui/icons-material/GridView";
 
 import Swal from "sweetalert2";
 import axios from "axios";
@@ -112,86 +113,16 @@ const ListTemplate = ({ item, onEdit, onHistoryClick }) => {
         }}
       >
         {/* Avatar (if needed) */}
-        {/* <Avatar
-          alt="John Doe"
-          sx={{ width: 60, height: 60, mr: 6 }}
-          src="/images/avatars/1.png"
-        /> */}
+        <GridViewIcon sx={{mr: 6 }}/>
         <Box sx={{ flex: "1 1" }}>
-          <Typography variant="h6" sx={{ fontWeight: 500, fontSize: "1.0rem" }}>
-            {item?.CName}
+          <Typography variant="h6" sx={{ fontWeight: 900, fontSize: "1.0rem" }}>
+          Template Details
           </Typography>
-          <Typography sx={{ fontSize: "0.8rem" }}>
-            {item?.Mobile}
-          </Typography>
+          
         </Box>
       </Box>
 
-      <Box sx={{ width: "100%", display: "flex", alignItems: "center", ml: 20 }}>
-        {/* Source Name */}
-        <div style={{ mr: 5 }}>
-          <Typography
-            variant="body2"
-            sx={{
-              color: "#333333",
-              fontSize: "0.7rem",
-              minWidth: "auto",
-              padding: "5px",
-              backgroundColor: "#f0f0f0",
-              borderRadius: 2,
-              minHeight: 20,
-              marginLeft: 2,
-              "&:hover": {
-                backgroundColor: "#dcdcdc",
-              },
-            }}
-          >
-            Source Name: {item?.SourceName}
-          </Typography>
-        </div>
-        {/* Location */}
-        <div style={{ marginRight: 5 }}>
-          <Typography
-            variant="body2"
-            sx={{
-              color: "#333333",
-              fontSize: "0.7rem",
-              minWidth: "auto",
-              padding: "5px",
-              borderRadius: 2,
-              minHeight: 20,
-              marginLeft: 2,
-              backgroundColor: "#f0f0f0",
-              "&:hover": {
-                backgroundColor: "#dcdcdc",
-              },
-            }}
-          >
-            Location: {item?.Location}
-          </Typography>
-        </div>
-        {/* Attended By */}
-        <div style={{ marginRight: 5 }}>
-          <Typography
-            variant="body2"
-            sx={{
-              color: "#333333",
-              fontSize: "0.7rem",
-              minWidth: "auto",
-              padding: "5px",
-              borderRadius: 2,
-              minHeight: 20,
-              marginLeft: 2,
-              backgroundColor: "#f0f0f0",
-              "&:hover": {
-                backgroundColor: "#dcdcdc",
-              },
-            }}
-          >
-            Attended By: {item?.TelecallAttendedByName}
-          </Typography>
-        </div>
-      </Box>
+      
 
       {/* Additional Details */}
       <Box
@@ -201,7 +132,7 @@ const ListTemplate = ({ item, onEdit, onHistoryClick }) => {
           alignItems: "center",
           justifyContent: "center",
           ml: 12,
-          mt: 15,
+        
         }}
       >
         <Grid container spacing={3}>
@@ -256,22 +187,7 @@ const ListTemplate = ({ item, onEdit, onHistoryClick }) => {
             </Card>
           </Grid>
 
-          <Grid item xs={4}>
-            <Card
-              variant="outlined"
-              sx={{
-                borderRadius: 1,
-                padding: "10px",
-              }}
-            >
-              <Typography variant="body2" sx={{ fontWeight: 600, fontSize: "0.8rem" }}>
-                File
-              </Typography>
-              <Typography variant="body2" sx={{ fontSize: "0.7rem" }}>
-                {item?.file}
-              </Typography>
-            </Card>
-          </Grid>
+       
 
           <Grid item xs={4}>
             <Card
@@ -286,23 +202,6 @@ const ListTemplate = ({ item, onEdit, onHistoryClick }) => {
               </Typography>
               <Typography variant="body2" sx={{ fontSize: "0.7rem" }}>
                 {item?.url}
-              </Typography>
-            </Card>
-          </Grid>
-
-          <Grid item xs={4}>
-            <Card
-              variant="outlined"
-              sx={{
-                borderRadius: 1,
-                padding: "10px",
-              }}
-            >
-              <Typography variant="body2" sx={{ fontWeight: 600, fontSize: "0.8rem" }}>
-                Status
-              </Typography>
-              <Typography variant="body2" sx={{ fontSize: "0.7rem" }}>
-                {item?.Status}
               </Typography>
             </Card>
           </Grid>
@@ -340,6 +239,24 @@ const ListTemplate = ({ item, onEdit, onHistoryClick }) => {
               </Typography>
             </Card>
           </Grid>
+          <Grid item xs={12}>
+  <Card
+    variant="outlined"
+    sx={{
+      borderRadius: 1,
+      padding: "10px",
+    }}
+  >
+    <Typography variant="body2" sx={{ fontWeight: 600, fontSize: "0.8rem" }}>
+      Content
+    </Typography>
+    <Box 
+      sx={{ fontSize: "0.7rem", whiteSpace: "pre-wrap" }} 
+      dangerouslySetInnerHTML={{ __html: item?.content || "" }}  // This will render HTML content
+    />
+  </Card>
+</Grid>
+
         </Grid>
       </Box>
     </Paper>

@@ -24,6 +24,7 @@ import {
   FormControlLabel,
   RadioGroup,
   Radio,
+  CircularProgress,
   FormLabel,
   Autocomplete,
 } from "@mui/material";
@@ -36,10 +37,7 @@ const AddTellecallingDetails = ({
   contactDataTele,
   onDashboardClick,
 }) => {
-  console.log(
-    contactDataTele,
-    "contactDataTele data aaya<<<<<<<<<<<<><>>>>>>>>>>>>>>>>>>"
-  );
+
   const initialFormData = {
     titleprefixID: "",
     Cid: "",
@@ -82,7 +80,7 @@ const AddTellecallingDetails = ({
   const [userMaster, setUserMaster] = useState([]);
   const [tellecallingID, setTellecallingID] = useState([]);
   const [bhkOptions, setBhkOptions] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitError, setSubmitError] = useState(false);
   const [cookies, setCookie] = useCookies(["amr"]);
@@ -102,7 +100,7 @@ const AddTellecallingDetails = ({
       setFormData({
         ...contactDataTele,
         NextFollowUpDate: contactDataTele.NextFollowUpDate
-          ? new Date(contactDataTele.NextFollowUpDate)
+          ? new Date(contactDataTele.NextFollowUpDate) 
           : null,
         NextFollowUpTime: contactDataTele.NextFollowUpTime || "",
         TelecallAttendedByID: cookies?.amr?.UserID || 1,
@@ -211,16 +209,6 @@ const AddTellecallingDetails = ({
     }
   };
 
-  // const fetchDataTellecalling = async () => {
-  //   try {
-  //     const response = await axios.get(
-  //       "https://apiforcornershost.cubisysit.com/api/api-fetch-telecalling.php"
-  //     );
-  //     setTellecallingID(response.data.data || []);
-  //   } catch (error) {
-  //     console.error("Error fetching data:", error);
-  //   }
-  // };
 
   const fetchDataTitle = async () => {
     try {
@@ -382,7 +370,7 @@ const AddTellecallingDetails = ({
   };
   const handleSubmit = async (event) => {
     event.preventDefault();
-
+    setLoading(true);
     const url = editData
       ? "https://proxy-forcorners.vercel.app/api/proxy/api-update-telecalling.php"
       : "https://proxy-forcorners.vercel.app/api/proxy/api-insert-telecalling.php";
@@ -404,7 +392,7 @@ const AddTellecallingDetails = ({
           "Content-Type": "application/json",
         },
       });
-
+      setLoading(false);
       if (response.data.status === "Success") {
         setFormData(initialFormData);
         setSubmitError(false);
@@ -428,6 +416,7 @@ const AddTellecallingDetails = ({
           title: "Oopsii...",
           text: "Something went wrong!",
         });
+       
       }
     } catch (error) {
       console.error("There was an error!", error);
@@ -437,6 +426,7 @@ const AddTellecallingDetails = ({
         title: "Oops...",
         text: "An error occurred!",
       });
+    
     }
   };
 
@@ -619,29 +609,7 @@ const AddTellecallingDetails = ({
                 {/* Add error handling for Mobile if needed */}
               </Grid>
 
-              {/* <Grid item xs={8} sm={4}>
-                <TextField
-                  fullWidth
-                  label={
-                    <>
-                      Mobile <RequiredIndicator />
-                    </>
-                  }
-                  type="tel"
-                  name="Mobile"
-                  value={formData.Mobile}
-                  onChange={handleChange}
-                  inputProps={{
-                    pattern: "[0-9]*",
-                    maxLength: 10,
-                  }}
-                />
-                {errors.Mobile && (
-                  <Typography variant="caption" color="error">
-                    {errors.Mobile}
-                  </Typography>
-                )}
-              </Grid> */}
+           
 
               <Grid item xs={8} sm={4}>
                 <FormControl fullWidth>
@@ -682,21 +650,6 @@ const AddTellecallingDetails = ({
                 </FormControl>
               </Grid>
 
-              {/* <Grid item xs={8} sm={4}>
-                <TextField
-                  fullWidth
-                  type="tel"
-                  name="AlternateMobileNo"
-                  label="Alternate Mobile Number"
-                  placeholder="Alternate Mobile Number"
-                  value={formData.AlternateMobileNo}
-                  onChange={handleChange}
-                  inputProps={{
-                    pattern: "[0-9]*",
-                    maxLength: 10,
-                  }}
-                />
-              </Grid> */}
 
               <Grid item xs={8} sm={4}>
                 <TextField
@@ -709,25 +662,7 @@ const AddTellecallingDetails = ({
                 {/* Add error handling for Email if needed */}
               </Grid>
 
-              {/* <Grid item xs={8} sm={4}>
-                <TextField
-                  fullWidth
-                  label={
-                    <>
-                      Email <RequiredIndicator />
-                    </>
-                  }
-                  name="Email"
-                  placeholder="E-Mail"
-                  value={formData.Email}
-                  onChange={handleChange}
-                />
-                {errors.Email && (
-                  <Typography variant="caption" color="error">
-                    {errors.Email}
-                  </Typography>
-                )}
-              </Grid> */}
+            
 
               <Grid item xs={8} sm={4}>
                 <FormControl fullWidth>
@@ -889,56 +824,7 @@ const AddTellecallingDetails = ({
                 </FormControl>
               </Grid>
 
-              {/* <Grid item xs={8} sm={4}>
-                <TextField
-                  fullWidth
-                  label={
-                    <>
-                      Source Name <RequiredIndicator />
-                    </>
-                  }
-                  name="SourceName"
-                  placeholder="Source Name"
-                  value={formData.SourceName}
-                  onChange={handleChange}
-                />
-              </Grid> */}
-
-              {/* <Grid item xs={8} sm={4}>
-              <TextField
-                fullWidth
-                label="Source Description"
-                placeholder="Source Description"
-                name="SourceDescription"
-                value={formData.SourceDescription}
-                onChange={handleChange}
-            
-            </Grid>
-
-            <Grid item xs={8} sm={4}>
-                <FormControl fullWidth>
-                  <InputLabel>
-                    Telecall Attended By
-                    <RequiredIndicator />
-                  </InputLabel>
-                  <Select
-                    value={formData.TelecallAttendedByID}
-                    onChange={handleTelecaller}
-                    label="Telecall Attended By"
-                  >
-                    {userMaster.map((bhk) => (
-                      <MenuItem key={bhk.UserID} value={bhk.UserID}>
-                        {bhk.Name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                  {errors.TelecallAttendedByID && (
-                    <Typography variant="caption" color="error">
-                      {errors.TelecallAttendedByID}
-                    </Typography>
-                  )}
-                </FormControl>
-              </Grid> */}
+         
 
               <Grid item xs={8} sm={4}>
                 <DatePicker
@@ -1026,18 +912,23 @@ const AddTellecallingDetails = ({
               </Grid>
 
               <Grid item xs={12}>
-                <Button
-                  variant="contained"
-                  sx={{
-                    marginRight: 3.5,
-                    marginTop: 5,
-                    backgroundColor: "#9155FD",
-                    color: "#FFFFFF",
-                  }}
-                  onClick={handleSubmit}
-                >
-                  Submit
-                </Button>
+              <Button
+        variant="contained"
+        sx={{
+          marginRight: 3.5,
+          marginTop: 5,
+          backgroundColor: "#9155FD",
+          color: "#FFFFFF",
+        }}
+        onClick={handleSubmit}
+        disabled={loading} 
+      >
+        {loading ? (
+          <CircularProgress size={24} sx={{ color: "#fff" }} />
+        ) : (
+          "Submit"
+        )}
+      </Button>
               </Grid>
             </Grid>
           </form>

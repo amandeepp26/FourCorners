@@ -8,77 +8,100 @@ import {
   FormControl,
   InputLabel,
   Select,
+  Grid,
   MenuItem,
   IconButton,
+  Button,
   TableCell,
   TableContainer,
   TableRow,
   Paper,
-  Button,
   Avatar,
   ListItemAvatar,
 } from "@mui/material";
 import { createGlobalStyle } from "styled-components";
 import styled from "styled-components";
+
 import { useRouter } from "next/router";
 import CancelIcon from "@mui/icons-material/Cancel";
-const GlobalStyle = createGlobalStyle`
+
+const TemplatePayment = ({ bookingID, handleCancel }) => {
+  const router = useRouter();
+  
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+ 
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [filterOption, setFilterOption] = useState("remarksWithCreateDate");
+  const [payments, setPayments] = useState([]);
+
+
+  const GlobalStyle = createGlobalStyle`
   @media print {
-    body * {
+    body {
+      margin: 0;
+      padding: 0;
+      color: #000;
+      font-size: 12px; /* Adjust font size for print */
+    }
+
+
+      .invoice-box {
+    page-break-after: always; /* Ensures each invoice is on a new page */
+    page-break-inside: avoid; /* Prevents breaking inside the box */
+    display: block; /* Fixes potential layout issues */
+  }
+
+  .non-printable {
+    display: none !important;
+  }
+
+    @page {
+      size: auto; /* auto is the initial value */
+      margin: 10mm; /* Add margin for print */
+    }
+
+    /* Hide unwanted elements */
+    * {
       visibility: hidden;
     }
+
     .printableArea, .printableArea * {
       visibility: visible;
     }
+
     .printableArea {
       position: absolute;
       left: 0;
       top: 0;
       width: 100%;
+      page-break-inside: avoid;
+         page-break-before: always;
+      /* Prevent page breaks inside this area */
+    }
+
+    /* Prevent breaking inside tables */
+    table {
+     page-break-before: always;
+      page-break-inside: avoid;
+      border-collapse: collapse; /* For better control over breaks */
     }
   }
 `;
 
-const StyledTableCell = styled(TableCell)({
-  textAlign: "center",
-  borderBottom: "none",
-  border: "1px solid #ccc",
-  borderRadius: "8px 0 0 8px",
-});
-
-const InvoiceBox = styled(Box)({
-  maxWidth: "890px",
-  margin: "auto",
-  padding: "10px",
-  border: "1px solid #eee",
-  fontSize: "11px",
-  lineHeight: "18px",
-  fontFamily: "Helvetica Neue, Helvetica, Arial, sans-serif",
-});
-
-const TemplatePayment = ({ bookingID, handleCancel }) => {
-  const router = useRouter();
-  console.log(bookingID, "row data aaayaa<<<<>>>>>>>>>>> ");
-  const printRef = useRef();
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [filterOption, setFilterOption] = useState("remarksWithCreateDate");
-  const [payments, setPayments] = useState([]);
-
   useEffect(() => {
     fetchData();
   }, []);
-
+  
   const fetchData = async (selectedFilter) => {
     try {
       const response = await axios.get(
         `https://apiforcornershost.cubisysit.com/api/api-fetch-projectbooking.php?BookingID=${bookingID}&filter=${selectedFilter}`
       );
-      console.log("data aaya dekh<<<<<>>>>>>>>>>>>>", response.data);
+    
       setData(response.data.data);
-      setPayments(response.data.data.payments); // Assuming you need to set payments here
+      setPayments(response.data.data.payments);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -86,11 +109,38 @@ const TemplatePayment = ({ bookingID, handleCancel }) => {
       setLoading(false);
     }
   };
-
+  const printRef = useRef();
   const handleFilterChange = (event) => {
     setFilterOption(event.target.value);
   };
-
+  const handlePrint = () => {
+    if (printRef.current) {
+      window.print();
+    }
+  };
+  const StyledTableCell = styled(TableCell)({
+    textAlign: "center",
+    borderBottom: "none",
+    border: "1px solid #ddd",
+    borderRadius: "8px",
+    padding: "8px",
+  });
+  
+  const InvoiceBox = styled(Box)({
+    maxWidth: "890px",
+    margin: "auto",
+    padding: "16px",
+    border: "1px solid #eee",
+    display:"block",
+    backgroundColor: "#f9f9f9",
+    borderRadius: "8px",
+    fontSize: "14px",
+    lineHeight: "1.5",
+    fontFamily: "Arial, sans-serif",
+    boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
+    pageBreakAfter: "always", 
+  breakAfter: "page", // For modern browsers
+  });
   const filteredRemarks =
     filterOption === "remarksWithCreateDate"
       ? data?.remarksWithCreateDate
@@ -106,13 +156,12 @@ const TemplatePayment = ({ bookingID, handleCancel }) => {
   );
   const totalAPlusB = totalCash + totalCheque;
 
-  let balance = data?.TotalCost; // Start with the total cost as the initial balance
+  let balance = data?.TotalCost;
 
   finalRows = finalRows?.map((row, index) => {
     const currentAPlusB = row.Cash + row.ChequeAmount;
-    const currentBalance = balance - currentAPlusB; // Calculate the current balance
+    const currentBalance = balance - currentAPlusB;
 
-    // Update the balance in the row and for the next iteration
     const updatedRow = {
       ...row,
       TotalAPlusB: currentAPlusB,
@@ -140,7 +189,7 @@ const TemplatePayment = ({ bookingID, handleCancel }) => {
 
     // Prepare the row data with the current balance
     const row = {
-      Date: displayDate, // Use displayDate instead of payment.Date
+      Date: displayDate, 
       Cash: cash,
       ChequeAmount: chequeAmount,
       TotalAPlusB: totalAPlusB,
@@ -158,7 +207,7 @@ const TemplatePayment = ({ bookingID, handleCancel }) => {
   });
 
   // Ensure there are always 15 rows displayed
-  const totalRows = 25;
+  const totalRows = 23;
   const defaultRowsCount = Math.max(totalRows - rows.length, 0);
   const defaultRows = new Array(defaultRowsCount).fill({
     Date: "",
@@ -172,25 +221,8 @@ const TemplatePayment = ({ bookingID, handleCancel }) => {
     Type: "",
   });
 
-  // Combine actual and default rows
   const finalRows = [...rows, ...defaultRows];
-  const handlePrint = () => {
-    const printWindow = window.open("", "", "height=800,width=800");
-    const printContent = Array.from(document.querySelectorAll(".printableArea"))
-      .map((el) => el.innerHTML)
-      .join('<div style="page-break-after: always;"></div>'); // Page break after each invoice
 
-    printWindow.document.write("<html><head><title>Print</title>");
-    printWindow.document.write(
-      "<style>@media print { .no-print { display: none; } }</style>"
-    );
-    printWindow.document.write("</head><body >");
-    printWindow.document.write(printContent);
-    printWindow.document.write("</body></html>");
-    printWindow.document.close();
-    printWindow.focus();
-    printWindow.print();
-  };
   if (loading) {
     return <Typography>Loading...</Typography>;
   }
@@ -202,35 +234,45 @@ const TemplatePayment = ({ bookingID, handleCancel }) => {
   return (
     <>
       <GlobalStyle />
-
       <Box
         display="flex"
         alignItems="center"
         justifyContent="space-between"
         marginBottom={2}
       >
-        <FormControl style={{ minWidth: 150, marginRight: 20 }}>
-          <InputLabel id="filter-label">Filter</InputLabel>
-          <Select
-            labelId="filter-label"
-            id="filter-select"
-            label="Filter"
-            value={filterOption}
-            onChange={handleFilterChange}
+        <Grid>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => handlePrint()}
+            sx={{ width: "100%" }}
           >
-            <MenuItem value="remarksWithCreateDate">Original Remark</MenuItem>
-            <MenuItem value="all">All</MenuItem>
-            <MenuItem value="otherRemarks">Updated Remark</MenuItem>
-          </Select>
-        </FormControl>
+            Print
+          </Button>
+        </Grid>
+        <Grid>
+          <FormControl style={{ minWidth: 150, marginRight: 20 }}>
+            <InputLabel id="filter-label">Filter</InputLabel>
+            <Select
+              labelId="filter-label"
+              id="filter-select"
+              label="Filter"
+              value={filterOption}
+              onChange={handleFilterChange}
+            >
+              <MenuItem value="remarksWithCreateDate">Original Remark</MenuItem>
+              <MenuItem value="all">All</MenuItem>
+              <MenuItem value="otherRemarks">Updated Remark</MenuItem>
+            </Select>
+          </FormControl>
 
-        <IconButton onClick={handleCancel}>
-          <CancelIcon style={{ color: "red" }} />
-        </IconButton>
+          <IconButton onClick={handleCancel}>
+            <CancelIcon style={{ color: "red" }} />
+          </IconButton>
+        </Grid>
       </Box>
-      {/* )} */}
-
-      <InvoiceBox className="printableArea" ref={printRef}>
+<Grid className="printableArea" ref={printRef}>
+      <InvoiceBox >
         <TableContainer component={Paper}>
           <Table>
             <TableBody>
@@ -276,24 +318,15 @@ const TemplatePayment = ({ bookingID, handleCancel }) => {
               <TableRow
                 sx={{ padding: 0, display: "flex", alignItems: "center" }}
               >
-                <StyledTableCell style={{ textAlign: "center" , padding:1 }}>
-                  <ListItemAvatar>
-                    <Avatar
-                      alt="John Doe"
-                      sx={{
-                        width: 'auto',
-                        height:160,
-                        margin: 2,
-                        borderRadius: 1,
-                      }}
-                      src="/images/avatars/rosenagar.png"
-                    />
-                  </ListItemAvatar>
+                <StyledTableCell style={{ textAlign: "center", padding: 1 ,width: "150px" }}>
+                               
+                <img src={`https://apiforcornershost.cubisysit.com/projectimage/${data.images || "image.png"}`} alt="Logo"  width={350}  height={160}/>
+
                 </StyledTableCell>
                 <Box
                   sx={{
                     marginLeft: 2,
-                    flexGrow: 1,
+                    flexGrow: 1,  
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
@@ -303,6 +336,7 @@ const TemplatePayment = ({ bookingID, handleCancel }) => {
                     Photo
                   </Typography>
                 </Box>
+            
               </TableRow>
             </TableBody>
           </Table>
@@ -604,18 +638,8 @@ const TemplatePayment = ({ bookingID, handleCancel }) => {
                 </StyledTableCell>
               </TableRow>
               <TableRow sx={{ padding: 0 }}>
-                <StyledTableCell
-                  style={{ width: "30%", padding: 0, textAlign: "left" }}
-                  colSpan={4}
-                >
-                  Parking Facility
-                </StyledTableCell>
-                <StyledTableCell
-                  style={{ width: "20%", padding: 0 }}
-                  colSpan={1}
-                >
-                  {data.ParkingFacility}
-                </StyledTableCell>
+                <StyledTableCell style={{ width: '30%', padding: 0, textAlign: "left" }} colSpan={4}>Parking Facility  | {data.ParkingAvilability} </StyledTableCell>
+                <StyledTableCell style={{ width: '20%', padding: 0 }} colSpan={1}>{data.ParkingFacility}</StyledTableCell>
                 <StyledTableCell
                   style={{ width: "30%", padding: 0, textAlign: "left" }}
                   colSpan={4}
@@ -869,13 +893,11 @@ const TemplatePayment = ({ bookingID, handleCancel }) => {
         </TableContainer>
       </InvoiceBox>
 
-      <InvoiceBox className="printableArea" ref={printRef}>
+      <InvoiceBox >
         <TableContainer component={Paper}>
           <Table>
             <TableBody>
-              {/* Payment Summary Row */}
-
-              {/* Table Headers */}
+          
               <TableRow>
                 <StyledTableCell
                   colSpan={5}
@@ -909,20 +931,20 @@ const TemplatePayment = ({ bookingID, handleCancel }) => {
 
               <TableRow>
               <StyledTableCell style={{ textAlign: "center" }}>
-                 Sr No.
+                  Sr no.
                 </StyledTableCell>
                 <StyledTableCell style={{ textAlign: "center" }}>
-                 Date
+                  DATE
                 </StyledTableCell>
-         
+               
                 <StyledTableCell colSpan={4} style={{ textAlign: "center" }}>
                   Amount
                 </StyledTableCell>
-               
+              
                 <StyledTableCell style={{ textAlign: "center" }}>
                   Balance
                 </StyledTableCell>
-                <StyledTableCell colSpan={2} style={{ textAlign: "center" }}>
+                <StyledTableCell style={{ textAlign: "center" }}>
                   Sign.
                 </StyledTableCell>
               </TableRow>
@@ -931,19 +953,20 @@ const TemplatePayment = ({ bookingID, handleCancel }) => {
               {finalRows?.map((row, index) => (
                 <TableRow key={index}>
                    <StyledTableCell style={{ textAlign: "center" }}>
-                    {index+1}
-                  </StyledTableCell>
+      {index + 1}
+    </StyledTableCell>
                   <StyledTableCell style={{ textAlign: "center" }}>
                     {row.Date}
                   </StyledTableCell>
-            
+                  
                   <StyledTableCell colSpan={4} style={{ textAlign: "center" }}>
                     {row.ChequeAmount}
                   </StyledTableCell>
+                 
                   <StyledTableCell style={{ textAlign: "center" }}>
                     {row.Balance}
                   </StyledTableCell>
-                  <StyledTableCell colSpan={2} style={{ textAlign: "center" }}>
+                  <StyledTableCell style={{ textAlign: "center" }}>
                     {" "}
                     {/* Signature here */}{" "}
                   </StyledTableCell>
@@ -957,7 +980,7 @@ const TemplatePayment = ({ bookingID, handleCancel }) => {
         </Typography>
       </InvoiceBox>
 
-      <InvoiceBox className="printableArea" ref={printRef}>
+      <InvoiceBox >
         <TableContainer component={Paper}>
           <Table>
             <TableBody>
@@ -1189,209 +1212,129 @@ const TemplatePayment = ({ bookingID, handleCancel }) => {
         </Box>
       </InvoiceBox>
 
-      <InvoiceBox className="printableArea" ref={printRef}>
-        <TableContainer component={Paper} sx={{ padding: 2, marginBottom: 4 }}>
-          <Table>
-            <TableBody>
-              <TableRow>
-                <TableCell
-                  colSpan={2}
-                  style={{ border: "none", paddingBottom: 16 }}
-                >
-                  <Typography variant="h6" align="right">
-                    Date :{data.BookingDate}
-                  </Typography>
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell style={{ border: "none" }}>
-                  <Typography variant="body1" gutterBottom>
-                    TO,
-                  </Typography>
-                  <Typography variant="body1" gutterBottom>
-                    <strong> {data.BookingName}</strong>
-                  </Typography>
-                  <Typography
-                    variant="body1"
-                    gutterBottom
-                    sx={{ marginBottom: 10 }}
-                  >
-                 {data.Address}
-                  </Typography>
-                  <Typography
-                    variant="body1"
-                    gutterBottom
-                    sx={{ marginBottom: 8 }}
-                  >
-                    Dear Sir/Madam,
-                  </Typography>
-                  <Typography variant="body1" gutterBottom>
-                    "On behalf of the entire <strong>{data.CompanyName}</strong>{" "}
-                    staff, I'd like to take this opportunity to welcome you as a
-                    new customer. We are thrilled to have you with us."
-                  </Typography>
-                  <Typography variant="body1" gutterBottom>
-                    You’re booking details as follows:
-                  </Typography>
-                </TableCell>
-              </TableRow>
+      <InvoiceBox  >
+  <TableContainer component={Paper} sx={{ padding: 2, marginBottom: 4 }}>
+    <Table>
+      <TableBody>
+        <TableRow>
+          <TableCell colSpan={2} style={{ border: "none", paddingBottom: 16 }}>
+            <Typography variant="h6" align="right">
+              Date : {data.BookingDate}
+            </Typography>
+          </TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell style={{ border: "none" }}>
+            <Typography variant="body1" gutterBottom>
+              TO,
+            </Typography>
+            <Typography variant="body1" gutterBottom>
+              <strong>{data.BookingName}</strong>
+            </Typography>
+            <Typography variant="body1" gutterBottom sx={{ marginBottom: 10 }}>
+              {data.Address}
+            </Typography>
+            <Typography variant="body1" gutterBottom sx={{ marginBottom: 8 }}>
+              Dear Sir/Madam,
+            </Typography>
+            <Typography variant="body1" gutterBottom>
+              "On behalf of the entire <strong>{data.CompanyName}</strong> staff, I'd like to take this opportunity to welcome you as a new customer. We are thrilled to have you with us."
+            </Typography>
+            <Typography variant="body1" gutterBottom>
+              You’re booking details as follows:
+            </Typography>
+          </TableCell>
+        </TableRow>
 
-              <TableRow>
-                <TableCell
-                  colSpan={2}
-                  style={{ border: "none", paddingTop: 8 }}
-                >
-                  <TableContainer
-                    component={Paper}
-                    sx={{
-                      maxWidth: 400,
-                      margin: "auto",
-                      marginTop: 2,
-                      marginBottom: 2,
-                    }}
-                  >
-                    <Table sx={{ border: "2px solid black" }}>
-                      <TableBody>
-                        <TableRow>
-                          <TableCell
-                            align="center"
-                            sx={{
-                              fontWeight: "bold",
-                              border: "2px solid black",
-                            }}
-                          >
-                            PROJECT NAME
-                          </TableCell>
-                          <TableCell
-                            align="center"
-                            sx={{ border: "2px solid black" }}
-                          >
-                            {data.ProjectName}
-                          </TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell
-                            align="center"
-                            sx={{
-                              fontWeight: "bold",
-                              border: "2px solid black",
-                            }}
-                          >
-                            TYPE
-                          </TableCell>
-                          <TableCell
-                            align="center"
-                            sx={{ border: "2px solid black" }}
-                          >
-                            {data.UnittypeName}
-                          </TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell
-                            align="center"
-                            sx={{
-                              fontWeight: "bold",
-                              border: "2px solid black",
-                            }}
-                          >
-                            WING
-                          </TableCell>
-                          <TableCell
-                            align="center"
-                            sx={{ border: "2px solid black" }}
-                          >
-                            {data.WingName}
-                          </TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell
-                            align="center"
-                            sx={{
-                              fontWeight: "bold",
-                              border: "2px solid black",
-                            }}
-                          >
-                            FLOOR
-                          </TableCell>
-                          <TableCell
-                            align="center"
-                            sx={{ border: "2px solid black" }}
-                          >
-                            {data.FloorNo}
-                          </TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell
-                            align="center"
-                            sx={{
-                              fontWeight: "bold",
-                              border: "2px solid black",
-                            }}
-                          >
-                            FLAT NO.
-                          </TableCell>
-                          <TableCell
-                            align="center"
-                            sx={{ border: "2px solid black" }}
-                          >
-                            {data.FlatNo}
-                          </TableCell>
-                        </TableRow>
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell style={{ border: "none" }}>
-                  <Typography
-                    variant="body1"
-                    gutterBotto
-                    sx={{ marginBottom: 10 }}
-                  >
-                    "At <strong>{data.CompanyName}</strong>, we pride ourselves
-                    on offering our customers responsive, competent, and
-                    excellent service. Our customers are the most important part
-                    of our business, and we work tirelessly to ensure your
-                    complete satisfaction, now and for as long as you are a
-                    customer."
-                  </Typography>
-                  <Typography variant="body1" gutterBottom>
-                    "I am also happy to inform you that I will be your primary
-                    point of contact at the company, and I encourage you to
-                    contact me at any time with your questions, comments, and
-                    feedback."
-                  </Typography>
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell
-                  colSpan={2}
-                  style={{ border: "none", paddingTop: 16 }}
-                >
-                  <TableCell style={{ textAlign: "right", border: "none" }}>
-                    <Typography
-                      variant="body1"
-                      gutterBottom
-                      sx={{ marginLeft: 65 }}
-                    >
-                      <strong>{data.CompanyName}</strong>
-                      {/* <br /> */}
-                      {/* {data.CompanyName} */}
-                      <br />
-                      Contact No. 99309 60449 / 90044 75240
-                      <br />
-                      Email: {data.companyemail}
-                      <br />
-                      Website: {data.Website}
-                    </Typography>
-                  </TableCell>
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </InvoiceBox>
+        <TableRow>
+          <TableCell colSpan={2} style={{ border: "none", paddingTop: 8 }}>
+            <TableContainer
+              component={Paper}
+              sx={{
+                maxWidth: 400,
+                margin: "auto",
+                marginTop: 2,
+                marginBottom: 2,
+              }}
+            >
+              <Table sx={{ border: "2px solid black" }}>
+                <TableBody>
+                  <TableRow>
+                    <TableCell align="center" sx={{ fontWeight: "bold", border: "2px solid black" }}>
+                      PROJECT NAME
+                    </TableCell>
+                    <TableCell align="center" sx={{ border: "2px solid black" }}>
+                      {data.ProjectName}
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell align="center" sx={{ fontWeight: "bold", border: "2px solid black" }}>
+                      TYPE
+                    </TableCell>
+                    <TableCell align="center" sx={{ border: "2px solid black" }}>
+                      {data.UnittypeName}
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell align="center" sx={{ fontWeight: "bold", border: "2px solid black" }}>
+                      WING
+                    </TableCell>
+                    <TableCell align="center" sx={{ border: "2px solid black" }}>
+                      {data.WingName}
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell align="center" sx={{ fontWeight: "bold", border: "2px solid black" }}>
+                      FLOOR
+                    </TableCell>
+                    <TableCell align="center" sx={{ border: "2px solid black" }}>
+                      {data.FloorNo}
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell align="center" sx={{ fontWeight: "bold", border: "2px solid black" }}>
+                      FLAT NO.
+                    </TableCell>
+                    <TableCell align="center" sx={{ border: "2px solid black" }}>
+                      {data.FlatNo}
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </TableCell>
+        </TableRow>
+
+        <TableRow>
+          <TableCell style={{ border: "none" }}>
+            <Typography variant="body1" gutterBottom sx={{ marginBottom: 10 }}>
+              "At <strong>{data.CompanyName}</strong>, we pride ourselves on offering our customers responsive, competent, and excellent service. Our customers are the most important part of our business, and we work tirelessly to ensure your complete satisfaction, now and for as long as you are a customer."
+            </Typography>
+            <Typography variant="body1" gutterBottom>
+              "I am also happy to inform you that I will be your primary point of contact at the company, and I encourage you to contact me at any time with your questions, comments, and feedback."
+            </Typography>
+          </TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell colSpan={2} style={{ border: "none", paddingTop: 16 }}>
+            <TableCell style={{ textAlign: "right", border: "none" }}>
+              <Typography variant="body1" gutterBottom sx={{ marginLeft: 65 }}>
+                <strong>{data.CompanyName}</strong>
+                <br />
+                Contact No. 99309 60449 / 90044 75240
+                <br />
+                Email: {data.companyemail}
+                <br />
+                Website: {data.Website}
+              </Typography>
+            </TableCell>
+          </TableCell>
+        </TableRow>
+      </TableBody>
+    </Table>
+  </TableContainer>
+</InvoiceBox>
+</Grid>
     </>
   );
 };

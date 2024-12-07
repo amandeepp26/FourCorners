@@ -25,7 +25,6 @@ import {
   ListItemIcon,
   Popover,
 } from "@mui/material";
-import PersonIcon from "@mui/icons-material/Person";
 import { Divider } from "@mui/material";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import EditIcon from "@mui/icons-material/Edit";
@@ -36,6 +35,8 @@ import GetAppIcon from "@mui/icons-material/GetApp";
 import SortIcon from "@mui/icons-material/Sort";
 import { useCookies } from "react-cookie";
 import { Dashboard } from "@mui/icons-material";
+import FormatAlignLeftIcon from "@mui/icons-material/FormatAlignLeft";
+import GridViewIcon from "@mui/icons-material/GridView";
 
 
 const BacklogSidebar = ({ onEdit, onItemClick, onCreate , onDashboardClick}) => {
@@ -320,7 +321,7 @@ Template
                 edge="end"
                 sx={{ color: "grey" }}
               >
-                <PersonIcon />
+                <FormatAlignLeftIcon />
               </IconButton>
             </InputAdornment>
           ),
@@ -366,12 +367,8 @@ Template
         <React.Fragment key={item.bookingcancelID}>
           <Card sx={{ marginBottom: 2 }}>
             <ListItem disablePadding onClick={() => handleListItemClick(item)}>
-              <ListItemAvatar>
-                <Avatar
-                  alt="John Doe"
-                  sx={{ width: 40, height: 40, margin: 2 }}
-                  src="/images/avatars/1.png"
-                />
+              <ListItemAvatar> 
+                <GridViewIcon sx={{ml: 3 }}/>
               </ListItemAvatar>
               <ListItemText
                 primary={

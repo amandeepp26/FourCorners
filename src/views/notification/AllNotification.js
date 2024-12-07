@@ -265,13 +265,7 @@ const AllNotifications = ({ onEdit }) => {
               >
                 Recent Activity
               </Typography>
-              {/* <Button
-          variant="contained"
-          onClick={onDashboardClick}
-          style={{ marginTop: 0 }}
-        >
-          Dashboard
-        </Button> */}
+          
             </Box>
            
           </Grid>

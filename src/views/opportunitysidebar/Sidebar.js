@@ -251,13 +251,7 @@ const Sidebar = ({ onEdit, onItemClick, onCreate , onDashboardClick}) => {
             >
               <Dashboard />
             </IconButton>
-          {/* <IconButton
-              aria-label="filter"
-              sx={{ color: "grey" }}
-              onClick={onCreate}
-            >
-              <AddIcon />
-            </IconButton> */}
+         
             <IconButton
               aria-label="filter"
               sx={{ color: "grey" }}
@@ -293,36 +287,7 @@ const Sidebar = ({ onEdit, onItemClick, onCreate , onDashboardClick}) => {
               </MenuItem>
             </Popover>
 
-            {/* <IconButton
-              aria-label="more"
-              aria-controls="menu"
-              aria-haspopup="true"
-              onClick={handleDotsMenuOpen}
-              sx={{ color: "grey" }}
-            >
-              <MoreVertIcon />
-            </IconButton> */}
-            <Popover
-              id="menu"
-              anchorEl={anchorElDots}
-              open={Boolean(anchorElDots)}
-              onClose={handleDotsMenuClose}
-              anchorOrigin={{
-                vertical: "bottom",
-                horizontal: "right",
-              }}
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-            >
-              <MenuItem onClick={handleDownload}>
-                <ListItemIcon>
-                  <GetAppIcon fontSize="small" />
-                </ListItemIcon>
-                Download All Data
-              </MenuItem>
-            </Popover>
+
           </Box>
         </Box>
       </Grid>
@@ -374,7 +339,7 @@ const Sidebar = ({ onEdit, onItemClick, onCreate , onDashboardClick}) => {
             variant="contained"
             color="primary"
             startIcon={<AddIcon />}
-            // onClick={onCreate}
+            onClick={onCreate}
             sx={{ mt: 2 }}
           >
             Create Opportunity

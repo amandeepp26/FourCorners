@@ -26,7 +26,7 @@ import { useCookies } from "react-cookie";
 
 const OpenPaymentSidebar = ({ onItemClick, onCreate }) => {
   const [rows, setRows] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [filteredRows, setFilteredRows] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -331,13 +331,13 @@ const OpenPaymentSidebar = ({ onItemClick, onCreate }) => {
                     }
                     secondary={
                       <>
-                        <Typography variant="body2" style={{ fontSize: 10 }}>
+                        <Typography variant="body2" style={{ fontSize: 10,fontWeight:600 }}>
                           Phone: {item.Mobile}
                         </Typography>
-                        <Typography variant="body2" style={{ fontSize: 10 }}>
+                        <Typography variant="body2" style={{ fontSize: 10 ,fontWeight:600}}>
                          Remark Date: {item.RemarkDate} 
                         </Typography>
-                        <Typography variant="body2" style={{ fontSize: 10 }}>
+                        <Typography variant="body2" style={{ fontSize: 10,fontWeight:600}}>
                           Remark Amount: {item.Remarkamount}
                         </Typography>
                       </>

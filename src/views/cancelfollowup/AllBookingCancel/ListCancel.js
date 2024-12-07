@@ -199,16 +199,7 @@ const ListCancel = ({ item, onDelete, onEdit, onHistoryClick }) => {
           >
             Next Follow Up
           </Button>
-          <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleDropdownClose}>
-            <MenuItem onClick={handleAddFollowUpClick}>
-              <AddIcon sx={{ mr: 1 }} />
-              Add Follow Up
-            </MenuItem>
-            <MenuItem onClick={onHistoryClick}>
-              <HistoryIcon sx={{ mr: 1 }} />
-              History
-            </MenuItem>
-          </Menu>
+          
         </Grid>
       </Grid>
 
@@ -269,7 +260,7 @@ const ListCancel = ({ item, onDelete, onEdit, onHistoryClick }) => {
         {currentRemark.length > 0 ? (
           currentRemark.map((remark) => (
             <MenuItem key={remark.bookingcancelremarksID} value={remark.bookingcancelremarksID}>
-              {remark.bookingcancelremarksRemark}  ({remark.bookingcancelremarksDate})
+              {remark.bookingcancelremarksRemark}
             </MenuItem>
           ))
         ) : (
@@ -297,7 +288,7 @@ const ListCancel = ({ item, onDelete, onEdit, onHistoryClick }) => {
       <Grid item xs={6}>
         <TextField
           fullWidth
-          label="Remark"
+          label="New Remark"
           type="text"
           name="bookingcancelremarksRemark"
           value={formData.bookingcancelremarksRemark}
@@ -424,46 +415,7 @@ const ListCancel = ({ item, onDelete, onEdit, onHistoryClick }) => {
                 Aadhar Card: {item?.bookingcancelAadhar}
               </Typography>
             </Box>
-            <Box sx={{ display: "flex", ml: 35, mt: 7 }}>
-              <a href={`tel:${item?.bookingcancelMobile}`} style={{ marginRight: 40 }}>
-                <IconButton
-                  aria-label="phone"
-                  size="small"
-                  sx={{
-                    color: "green",
-                    backgroundColor: "#e0f7fa",
-                    borderRadius: "50%",
-                    padding: "10px",
-                    "&:hover": {
-                      backgroundColor: "#b2ebf2",
-                    },
-                  }}
-                >
-                  <PhoneIcon />
-                </IconButton>
-              </a>
-          
-              <a style={{ marginRight: 30 }}>
-                <IconButton
-                  aria-label="share"
-                  size="small"
-                  sx={{
-                    color: "#000",
-                    backgroundColor: "#e3f2fd",
-                    borderRadius: "50%",
-                    padding: "10px",
-                    marginRight: 1,
-                    "&:hover": {
-                      backgroundColor: "#bbdefb",
-                    },
-                  }}
-                  // onClick={handleHistoryClick}
-                >
-                  <HistoryIcon />
-                </IconButton>
-              </a>
-             
-            </Box>
+     
           </Box>
 
           <Box

@@ -25,6 +25,7 @@ import {
   CurrencyExchange,
   EventNote,
   AttachMoney,
+  Group,
   List,
   Cancel,
 } from "@mui/icons-material";
@@ -90,154 +91,161 @@ const StatisticsCard = () => {
           </Typography>
         </Box>
         <Grid
-          container
-          spacing={2}
-          sx={{ flexWrap: "nowrap", overflowX: "auto", mt: 5 }}
-        >
-          <Grid item xs={12} sm={6} md={3}>
-            <Box sx={{ display: "flex", alignItems: "center" }}>
-              <Avatar
-                variant="rounded"
-                sx={{
-                  mr: 3,
-                  width: 44,
-                  height: 44,
-                  boxShadow: 3,
-                  color: "common.white",
-                  backgroundColor: "primary.main",
-                }}
-              >
-                <TrendingUp sx={{ fontSize: "1.75rem" }} />
-              </Avatar>
-              <Box sx={{ display: "flex", flexDirection: "column" }}>
-                <Typography variant="caption">Today's Follow Up</Typography>
-                <Typography variant="h6">
-                  {apiData?.data?.nextFollowupCounts?.todayFollowupCount || 0}
-                </Typography>
-              </Box>
-            </Box>
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <Box sx={{ display: "flex", alignItems: "center" }}>
-              <Avatar
-                variant="rounded"
-                sx={{
-                  mr: 3,
-                  width: 44,
-                  height: 44,
-                  boxShadow: 3,
-                  color: "common.white",
-                  backgroundColor: "success.main",
-                }}
-              >
-                <History sx={{ fontSize: "1.75rem" }} />
-              </Avatar>
-              <Box sx={{ display: "flex", flexDirection: "column" }}>
-                <Typography variant="caption">Backlog Follow Up</Typography>
-                <Typography variant="h6">
-                  {apiData?.data?.nextFollowupCounts?.backlogFollowupCount || 0}
-                </Typography>
-              </Box>
-            </Box>
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <Box sx={{ display: "flex", alignItems: "center" }}>
-              <Avatar
-                variant="rounded"
-                sx={{
-                  mr: 3,
-                  width: 44,
-                  height: 44,
-                  boxShadow: 3,
-                  color: "common.white",
-                  backgroundColor: "warning.main",
-                }}
-              >
-                <PhoneInTalk sx={{ fontSize: "1.75rem" }} />
-              </Avatar>
-              <Box sx={{ display: "flex", flexDirection: "column" }}>
-                <Typography variant="caption">Next Follow Up</Typography>
-                <Typography variant="h6">
-                  {apiData?.data?.nextFollowupCounts?.nextFollowupCount || 0}
-                </Typography>
-              </Box>
-            </Box>
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <Box sx={{ display: "flex", alignItems: "center" }}>
-              <Avatar
-                variant="rounded"
-                sx={{
-                  mr: 3,
-                  width: 44,
-                  height: 44,
-                  boxShadow: 3,
-                  color: "common.white",
-                  backgroundColor: "info.main",
-                }}
-              >
-                <CurrencyExchange sx={{ fontSize: "1.75rem" }} />
-              </Avatar>
-              <Box sx={{ display: "flex", flexDirection: "column" }}>
-                <Typography variant="caption">
-                  Transferred to Opportunity
-                </Typography>
-                <Typography variant="h6">
-                  {apiData?.data?.nextFollowupCounts?.transfertoOppCount ||
-                    0}
-                </Typography>
-              </Box>
-            </Box>
-          </Grid>
+  container
+  spacing={2}
+  sx={{ flexWrap: "nowrap", overflowX: "auto", mt: 5 }}
+>
+  {/* Today's Follow Up */}
+  <Grid item xs={12} sm={6} md={3}>
+    <Box sx={{ display: "flex", alignItems: "center" }}>
+      <Avatar
+        variant="rounded"
+        sx={{
+          mr: 3,
+          width: 44,
+          height: 44,
+          boxShadow: 3,
+          color: "common.white",
+          backgroundColor: "primary.main",
+        }}
+      >
+        <CalendarToday sx={{ fontSize: "1.75rem" }} />
+      </Avatar>
+      <Box sx={{ display: "flex", flexDirection: "column" }}>
+        <Typography variant="caption">Today's Follow Up</Typography>
+        <Typography variant="h6">
+          {apiData?.data?.nextFollowupCounts?.todayFollowupCount || 0}
+        </Typography>
+      </Box>
+    </Box>
+  </Grid>
 
-          <Grid item xs={12} sm={6} md={3}>
-            <Box sx={{ display: "flex", alignItems: "center" }}>
-              <Avatar
-                variant="rounded"
-                sx={{
-                  mr: 3,
-                  width: 44,
-                  height: 44,
-                  boxShadow: 3,
-                  color: "common.white",
-                  backgroundColor: "secondary.main",
-                }}
-              >
-                <Cancel sx={{ fontSize: "1.75rem" }} />
-              </Avatar>
-              <Box sx={{ display: "flex", flexDirection: "column" }}>
-                <Typography variant="caption">Not Interested</Typography>
-                <Typography variant="h6">
-                  {apiData?.data?.nextFollowupCounts?.notInterestedCount || 0}
-                </Typography>
-              </Box>
-            </Box>
-          </Grid>
+  {/* Backlog Follow Up */}
+  <Grid item xs={12} sm={6} md={3}>
+    <Box sx={{ display: "flex", alignItems: "center" }}>
+      <Avatar
+        variant="rounded"
+        sx={{
+          mr: 3,
+          width: 44,
+          height: 44,
+          boxShadow: 3,
+          color: "common.white",
+          backgroundColor: "success.main",
+        }}
+      >
+        <History sx={{ fontSize: "1.75rem" }} />
+      </Avatar>
+      <Box sx={{ display: "flex", flexDirection: "column" }}>
+        <Typography variant="caption">Backlog Follow Up</Typography>
+        <Typography variant="h6">
+          {apiData?.data?.nextFollowupCounts?.backlogFollowupCount || 0}
+        </Typography>
+      </Box>
+    </Box>
+  </Grid>
 
-          <Grid item xs={12} sm={6} md={3}>
-            <Box sx={{ display: "flex", alignItems: "center" }}>
-              <Avatar
-                variant="rounded"
-                sx={{
-                  mr: 3,
-                  width: 44,
-                  height: 44,
-                  boxShadow: 3,
-                  color: "common.white",
-                  backgroundColor: "warning.main",
-                }}
-              >
-                <List sx={{ fontSize: "1.75rem" }} />
-              </Avatar>
-              <Box sx={{ display: "flex", flexDirection: "column" }}>
-                <Typography variant="caption">Total Lead</Typography>
-                <Typography variant="h6">
-                  {apiData?.counts?.totalNextFollowupCount || 0}
-                </Typography>
-              </Box>
-            </Box>
-          </Grid>
-        </Grid>
+  {/* Next Follow Up */}
+  <Grid item xs={12} sm={6} md={3}>
+    <Box sx={{ display: "flex", alignItems: "center" }}>
+      <Avatar
+        variant="rounded"
+        sx={{
+          mr: 3,
+          width: 44,
+          height: 44,
+          boxShadow: 3,
+          color: "common.white",
+          backgroundColor: "warning.main",
+        }}
+      >
+        <EventNote sx={{ fontSize: "1.75rem" }} />
+      </Avatar>
+      <Box sx={{ display: "flex", flexDirection: "column" }}>
+        <Typography variant="caption">Next Follow Up</Typography>
+        <Typography variant="h6">
+          {apiData?.data?.nextFollowupCounts?.nextFollowupCount || 0}
+        </Typography>
+      </Box>
+    </Box>
+  </Grid>
+
+  {/* Transferred to Opportunity */}
+  <Grid item xs={12} sm={6} md={3}>
+    <Box sx={{ display: "flex", alignItems: "center" }}>
+      <Avatar
+        variant="rounded"
+        sx={{
+          mr: 3,
+          width: 44,
+          height: 44,
+          boxShadow: 3,
+          color: "common.white",
+          backgroundColor: "info.main",
+        }}
+      >
+        <CurrencyExchange sx={{ fontSize: "1.75rem" }} />
+      </Avatar>
+      <Box sx={{ display: "flex", flexDirection: "column" }}>
+        <Typography variant="caption">Transferred to Opportunity</Typography>
+        <Typography variant="h6">
+          {apiData?.data?.nextFollowupCounts?.transfertoOppCount || 0}
+        </Typography>
+      </Box>
+    </Box>
+  </Grid>
+
+  {/* Not Interested */}
+  <Grid item xs={12} sm={6} md={3}>
+    <Box sx={{ display: "flex", alignItems: "center" }}>
+      <Avatar
+        variant="rounded"
+        sx={{
+          mr: 3,
+          width: 44,
+          height: 44,
+          boxShadow: 3,
+          color: "common.white",
+          backgroundColor: "secondary.main",
+        }}
+      >
+        <Cancel sx={{ fontSize: "1.75rem" }} />
+      </Avatar>
+      <Box sx={{ display: "flex", flexDirection: "column" }}>
+        <Typography variant="caption">Not Interested</Typography>
+        <Typography variant="h6">
+          {apiData?.data?.nextFollowupCounts?.notInterestedCount || 0}
+        </Typography>
+      </Box>
+    </Box>
+  </Grid>
+
+  {/* Total Lead */}
+  <Grid item xs={12} sm={6} md={3}>
+    <Box sx={{ display: "flex", alignItems: "center" }}>
+      <Avatar
+        variant="rounded"
+        sx={{
+          mr: 3,
+          width: 44,
+          height: 44,
+          boxShadow: 3,
+          color: "common.white",
+          backgroundColor: "warning.main",
+        }}
+      >
+        <Group sx={{ fontSize: "1.75rem" }} />
+      </Avatar>
+      <Box sx={{ display: "flex", flexDirection: "column" }}>
+        <Typography variant="caption">Total Lead</Typography>
+        <Typography variant="h6">
+          {apiData?.counts?.totalNextFollowupCount || 0}
+        </Typography>
+      </Box>
+    </Box>
+  </Grid>
+</Grid>
+
 
         <Box>
           <Typography
@@ -267,7 +275,7 @@ const StatisticsCard = () => {
                   backgroundColor: "primary.main",
                 }}
               >
-                <TrendingUp sx={{ fontSize: "1.75rem" }} />
+              <CalendarToday sx={{ fontSize: "1.75rem" }} />
               </Avatar>
               <Box sx={{ display: "flex", flexDirection: "column" }}>
                 <Typography variant="caption">Today's Follow Up</Typography>
@@ -317,7 +325,7 @@ const StatisticsCard = () => {
                   backgroundColor: "warning.main",
                 }}
               >
-                <PhoneInTalk sx={{ fontSize: "1.75rem" }} />
+                  <EventNote sx={{ fontSize: "1.75rem" }} />
               </Avatar>
               <Box sx={{ display: "flex", flexDirection: "column" }}>
                 <Typography variant="caption">Next Follow Up</Typography>
@@ -560,10 +568,10 @@ const StatisticsCard = () => {
                       height: 44,
                       boxShadow: 3,
                       color: "common.white",
-                      backgroundColor: "error.main",
+                      backgroundColor: "success.main",
                     }}
                   >
-                    <EventNote sx={{ fontSize: "1.75rem" }} />
+                     <History sx={{ fontSize: "1.75rem" }} />
                   </Avatar>
                   <Box sx={{ display: "flex", flexDirection: "column" }}>
                     <Typography variant="caption">
@@ -590,7 +598,7 @@ const StatisticsCard = () => {
                       backgroundColor: "warning.main",
                     }}
                   >
-                    <AttachMoney sx={{ fontSize: "1.75rem" }} />
+                       <Payment sx={{ fontSize: "1.75rem" }} />
                   </Avatar>
                   <Box sx={{ display: "flex", flexDirection: "column" }}>
                     <Typography variant="caption">

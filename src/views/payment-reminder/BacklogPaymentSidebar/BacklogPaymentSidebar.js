@@ -14,29 +14,42 @@ import {
   IconButton,
   Popover,
   ListItemAvatar,
+  Modal,
+  Button,
+  Chip,
 } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+
 import axios from "axios";
 import PersonIcon from "@mui/icons-material/Person";
-import { Chip } from '@mui/material';
-
+// import  Chip from '@mui/material';
 import SortIcon from "@mui/icons-material/Sort";
 import AddIcon from "@mui/icons-material/Add";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import GetAppIcon from "@mui/icons-material/GetApp";
 import { useCookies } from "react-cookie";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
-const BacklogSidebar = ({ onItemClick, onCreate , onDashboardClick }) => {
+const BacklogPaymentSidebar = ({ onItemClick, onCreate }) => {
+  const initialFormData = {
+    AmountGiven: null,
+  };
+
+  const [formData, setFormData] = useState(initialFormData);
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filteredRows, setFilteredRows] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [totalCost, setTotalCost] = useState(0);
   const [anchorElFilter, setAnchorElFilter] = useState(null);
-  const [anchorElDots, setAnchorElDots] = useState(null);
   const [sortOption, setSortOption] = useState("");
   const [cookies, setCookie] = useCookies(["amr"]);
-
-  const userid = cookies.amr?.UserID || 'Role';
+  const [modalOpen, setModalOpen] = useState(false);
+  const [cashPaid, setCashPaid] = useState("");
+  const [chequePaid, setChequePaid] = useState("");
+  const userid = cookies.amr?.UserID || "Role";
 
   useEffect(() => {
     fetchData();
@@ -45,10 +58,10 @@ const BacklogSidebar = ({ onItemClick, onCreate , onDashboardClick }) => {
   const fetchData = async () => {
     try {
       const response = await axios.get(
-        `https://apiforcornershost.cubisysit.com/api/api-fetch-backlog.php?UserID=${userid}`,
-        
+        `https://apiforcornershost.cubisysit.com/api/api-fetch-backlogreminder.php?UserID=${userid}`
+        // https://apiforcornershost.cubisysit.com/api/api-fetch-backlog.php?UserID=${userid}
       );
-      console.log("API Response:", response.data);
+      console.log("BACKLOG PAYEMent DTAA", response.data);
       setRows(response.data.data || []);
       setLoading(false);
     } catch (error) {
@@ -69,7 +82,7 @@ const BacklogSidebar = ({ onItemClick, onCreate , onDashboardClick }) => {
     } else {
       const filteredData = rows.filter(
         (item) =>
-          item?.CName?.toLowerCase().includes(lowerCaseQuery) ||
+          item?.Name?.toLowerCase().includes(lowerCaseQuery) ||
           item?.Mobile?.toLowerCase().includes(lowerCaseQuery)
       );
       setFilteredRows(filteredData);
@@ -87,10 +100,14 @@ const BacklogSidebar = ({ onItemClick, onCreate , onDashboardClick }) => {
   const getDateStatus = (contactCreateDate) => {
     const date = new Date(contactCreateDate);
     const now = new Date();
-    
-    const isCurrentMonth = date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
-    const isPreviousMonth = date.getMonth() === now.getMonth() - 1 && date.getFullYear() === now.getFullYear();
-  
+
+    const isCurrentMonth =
+      date.getMonth() === now.getMonth() &&
+      date.getFullYear() === now.getFullYear();
+    const isPreviousMonth =
+      date.getMonth() === now.getMonth() - 1 &&
+      date.getFullYear() === now.getFullYear();
+
     if (isCurrentMonth) {
       return "New";
     } else if (isPreviousMonth) {
@@ -106,13 +123,8 @@ const BacklogSidebar = ({ onItemClick, onCreate , onDashboardClick }) => {
   const handleFilterMenuClose = () => {
     setAnchorElFilter(null);
   };
-
-  const handleDotsMenuOpen = (event) => {
-    setAnchorElDots(event.currentTarget);
-  };
-
-  const handleDotsMenuClose = () => {
-    setAnchorElDots(null);
+  const calculateBalance = () => {
+    return totalCost - handleAddition();
   };
 
   const handleSortOptionChange = (option) => {
@@ -126,21 +138,19 @@ const BacklogSidebar = ({ onItemClick, onCreate , onDashboardClick }) => {
     switch (option) {
       case "asc":
         sortedRows.sort(
-          (a, b) =>
-            new Date(a.NextFollowUpDate) - new Date(b.NextFollowUpDate)
+          (a, b) => new Date(a.RemarkDate) - new Date(b.RemarkDate)
         );
         break;
       case "desc":
         sortedRows.sort(
-          (a, b) =>
-            new Date(b.NextFollowUpDate) - new Date(a.NextFollowUpDate)
+          (a, b) => new Date(b.RemarkDate) - new Date(a.RemarkDate)
         );
         break;
       case "a-z":
-        sortedRows.sort((a, b) => a?.CName?.localeCompare(b.CName));
+        sortedRows.sort((a, b) => a.Name.localeCompare(b.Name));
         break;
       case "z-a":
-        sortedRows.sort((a, b) => b?.CName?.localeCompare(a.CName));
+        sortedRows.sort((a, b) => b.Name.localeCompare(a.Name));
         break;
       default:
         break;
@@ -148,24 +158,23 @@ const BacklogSidebar = ({ onItemClick, onCreate , onDashboardClick }) => {
     setFilteredRows(sortedRows);
   };
 
-  const jsonToCSV = (json) => {
-    const header = Object.keys(json[0]).join(",");
-    const values = json
-      .map((obj) => Object.values(obj).join(","))
-      .join("\n");
-    return `${header}\n${values}`;
+  const handleModalOpen = (totalCost) => {
+    setTotalCost(totalCost);
+    setModalOpen(true);
   };
 
-  const handleDownload = () => {
-    const csv = jsonToCSV(rows);
-    const blob = new Blob([csv], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "mylead.csv";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+  const handleModalClose = () => {
+    setModalOpen(false);
+  };
+
+  const handleAddition = () => {
+    const cashPaidNumber = parseFloat(cashPaid) || 0;
+    const chequePaidNumber = parseFloat(chequePaid) || 0;
+    return cashPaidNumber + chequePaidNumber;
+  };
+
+  const handleDateChange = (date) => {
+    setFormData({ ...formData, AmountGiven: date });
   };
 
   return (
@@ -177,20 +186,19 @@ const BacklogSidebar = ({ onItemClick, onCreate , onDashboardClick }) => {
         overflowY: "auto",
       }}
     >
-      <Grid item xs={12} sx={{ marginBottom: 3 }} style={{background:"white",zIndex:"99",display:"flex", flexWrap:"wrap"}}>
+      <Grid item xs={12} sx={{ marginBottom: 3 }}>
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Typography variant="body2" sx={{ fontWeight: "bold", fontSize: 20 }}>
-          My Backlog
+            Backlog Payment Reminder
           </Typography>
           <Box display="flex" alignItems="center">
-            <IconButton
+            {/* <IconButton
               aria-label="filter"
               sx={{ color: "grey" }}
-              onClick={onDashboardClick}
-
+              onClick={onCreate}
             >
               <AddIcon />
-            </IconButton>
+            </IconButton> */}
             <IconButton
               aria-label="filter"
               sx={{ color: "grey" }}
@@ -306,85 +314,44 @@ const BacklogSidebar = ({ onItemClick, onCreate , onDashboardClick }) => {
       ) : (
         <List>
           {filteredRows.map((item) => (
-            <React.Fragment key={item.Tid}>
-                  <Card sx={{ marginBottom: 2 }}>
-            <ListItem
-              key={item.Tid}
-              disablePadding   
-              onClick={() => onItemClick(item)}
-
-            >
-              <ListItemAvatar>
-                <Avatar
-                  alt={item.CName}
-                  sx={{ width: 40, height: 40, margin: 2 }}
-                  src="/images/avatars/1.png"                />
-              </ListItemAvatar>
-              <ListItemText
-                primary={
-                  <Typography
-                  variant="subtitle1"
-                  style={{ fontWeight: "bold" }}
+            <React.Fragment key={item.BookingID}>
+              <Card sx={{ marginBottom: 2 }}>
+                <ListItem
+                  key={item.BookingID}
+                  disablePadding
+                  onClick={() => onItemClick(item)}
                 >
-                  
-                  {item?.TitleName} {item.CName}
-                  </Typography>
-                }
-                secondary={ <>
-                  <Typography
-                    variant="body2"
-                    style={{ fontSize: 10 }}
-                  >
-                    Phone: {item.Mobile}
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    style={{ fontSize: 10 }}
-                  >
-                   Date: {item.NextFollowUpDate}  {item.NextFollowUpTime}
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    style={{ fontSize: 10 }}
-                  >
-                   Assign By: {item.AttendedByName}
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    style={{ fontSize: 10 }}
-                  >
-                  Source: {item.SourceName}
-                  </Typography>
-                </>}
-              />
-                   <Box
-                        display="flex"
-                        flexDirection="column"
-                        alignItems="flex-end"
-                      >
-                        <IconButton
-                          aria-label="edit"
-                         
-                          sx={{ color: "blue" }}
-                        >      
-                    {getDateStatus(item.ContactCreateDate) && (
-                            <Chip
-                              label={getDateStatus(item.ContactCreateDate)}
-                              size="small"
-                              color={getDateStatus(item.ContactCreateDate) === "New" ? "warning" : "default"}
-                              style={{
-                                fontSize: 8,
-                                marginLeft: 8,
-                                height: 20,
-                              }}
-                            />
-                          )}
-
-                        </IconButton>
-                      </Box>
-            </ListItem>
-            </Card>
-                </React.Fragment>
+                  <ListItemAvatar>
+                    <Avatar
+                      alt={item.Name}
+                      sx={{ width: 40, height: 40, margin: 2 }}
+                      src="/images/avatars/1.png"
+                    />
+                  </ListItemAvatar>
+                  <ListItemText
+                    primary={
+                      <Typography variant="subtitle1" style={{  fontWeight: "bold"}}>
+                       {item?.TitleName} {item.Name}
+                      </Typography>
+                    }
+                    secondary={
+                      <>
+                        <Typography variant="body2" style={{ fontSize: 10,fontWeight:600 }}>
+                          Remark: {item.RemarkName}
+                        </Typography>
+                        <Typography variant="body2" style={{ fontSize: 10,fontWeight:600 }}>
+                          Date: {item.RemarkDate}
+                        </Typography>
+                        <Typography variant="body2" style={{ fontSize: 10,fontWeight:600 }}>
+                        Remark amount: {item.Remarkamount}
+                        </Typography>
+                      </>
+                    }
+                  />
+                
+                </ListItem>
+              </Card>
+            </React.Fragment>
           ))}
         </List>
       )}
@@ -392,4 +359,4 @@ const BacklogSidebar = ({ onItemClick, onCreate , onDashboardClick }) => {
   );
 };
 
-export default BacklogSidebar;
+export default BacklogPaymentSidebar;

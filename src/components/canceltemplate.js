@@ -173,14 +173,21 @@ const TemplatePayment = ({ bookingcancelID, handleCancel }) => {
           <StyledTableCell style={{ textAlign: 'center', padding: 0 }}>
             <img src="{images}" alt="Logo" width="70" height="100" />
           </StyledTableCell>
-          <StyledTableCell sx={{ padding: 0 }}>
-            <img
-              src="https://i.postimg.cc/PJfmZCRv/Untitled-design-2024-04-12-T161558-455.png"
-              alt="200 * 200"
-              width="30"
-              height="100"
-            />
-          </StyledTableCell>
+          <StyledTableCell style={{ textAlign: "center", padding: 1 }}>
+                  <ListItemAvatar>
+                    <Avatar
+                      alt="Project Image"  // Alt text for accessibility
+                      sx={{
+                        width: '100%',
+                        height: 160,
+                        margin: 2,
+                        borderRadius: 1,
+                      }}
+                      // Dynamically set the image source using the API URL and data.images
+                      src={`https://apiforcornershost.cubisysit.com/projectimage/${data.bookingDetails.images || "rosenagar.png"}`}
+                    />
+                  </ListItemAvatar>
+                </StyledTableCell>
         </TableRow>
       </TableBody>
     </Table>

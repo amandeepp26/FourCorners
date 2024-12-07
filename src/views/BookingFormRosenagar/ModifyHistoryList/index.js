@@ -764,52 +764,7 @@ const handleSubmit = async () => {
   </FormControl>
 </Grid>
 
-{amountType === '1' ? (
-  <>
-    <Grid item xs={4}>
-      <TextField
-        label="Cash Paid"
-        type="number"
-        value={cashPaid}
-        onChange={(e) => setCashPaid(e.target.value)}
-        fullWidth
-        margin="normal"
-        InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">₹</InputAdornment>
-          ),
-        }}
-      />
-    </Grid>
-    <Grid item xs={3} mt={3.5}>
-      <DatePicker
-        selected={cashDate.CashDate}
-        onChange={handleDateChangeCash}
-        dateFormat="yyyy-MM-dd"
-        customInput={<TextField label="Cash date" fullWidth />}
-      />
-    </Grid>
-    <Grid item xs={4}>
-      <TextField
-        select
-        label="Select Payment Type"
-        value={selectedPaymentType}
-        onChange={handleChangePayment}
-        fullWidth
-        margin="normal"
-      >
-        {paymentTypes.map((option) => (
-          <MenuItem
-            key={option.paymenttypeID}
-            value={option.paymenttypeName}
-          >
-            {option.paymenttypeName}
-          </MenuItem>
-        ))}
-      </TextField>
-    </Grid>
-  </>
-) : (
+
   <>
     <Grid item xs={4}>
       <TextField
@@ -874,7 +829,7 @@ const handleSubmit = async () => {
       </TextField>
     </Grid>
   </>
-)}
+
 
             {selectedPaymentType === "Partial payment" && (
               <>

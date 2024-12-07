@@ -24,6 +24,7 @@ import {
   RadioGroup,
   Radio,
   FormLabel,
+  CircularProgress,
 } from "@mui/material";
 import MuiAlert from "@mui/material/Alert";
 import { useCookies } from "react-cookie";
@@ -47,7 +48,9 @@ const AddContact = ({ show, editData  , onDashboardClick}) => {
     CityID:"",
     LocationID:"",
     PinCode:"",
+    KeyWordID:1,
     SourceID:"",
+    SourceTypeID: "",
     UserID: cookies.amr?.UserID || 1 ,
     Status:1,
     CreateUID:1,
@@ -56,8 +59,13 @@ const AddContact = ({ show, editData  , onDashboardClick}) => {
 
     
   };
+
+
+  
   const [rows, setRows] = useState([]);
   const [localities, setLocalities] = useState([]);
+
+
   const [contactTypes, setContactTypes] = useState([]);
   const [countryCodes, setCountryCodes] = useState([]);
   const [cities, setCities] = useState([]);
@@ -462,14 +470,13 @@ const AddContact = ({ show, editData  , onDashboardClick}) => {
     if (!data.LocationID) {
       errors.LocationID = "Location is required";
     }
-    if (!data.PinCode) {
-      errors.PinCode = "Pin Code is required";
-    }
+  
     if (!data.SourceID) {
       errors.SourceID = "Source is required";
     }
-
+    setLoading(false); 
     return errors;
+   
   };
 
 
@@ -477,13 +484,13 @@ const handleSubmit = async (event) => {
 
   
     event.preventDefault();
+    setLoading(true); 
     const newErrors = validateForm(formData);
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
 
-    console.log(formData , 'hehehe');
   
     // Prepare API URL based on editData flag
     const url = editData
@@ -514,13 +521,15 @@ const handleSubmit = async (event) => {
         setSubmitSuccess(true);
         setSubmitError(false);
         show(false); // Hide the modal or close form
-  console.log()
+  
         Swal.fire({
           icon: "success",
           title: editData ? "Data Updated Successfully" : "Data Added Successfully",
           showConfirmButton: false,
           timer: 1000,
-        })
+        }).then(() => {
+          window.location.reload();
+        });
 
       } else {
         setSubmitSuccess(false);
@@ -542,6 +551,7 @@ const handleSubmit = async (event) => {
         title: 'Oops...',
         text: 'Mobile Number is already Exits!',
       });
+    setLoading(false);
     }
   };
 
@@ -832,7 +842,7 @@ const handleSubmit = async (event) => {
     fullWidth
     label={
       <>
-        Pincode <RequiredIndicator />
+        Pincode
       </>
     }
     name="PinCode"
@@ -923,8 +933,13 @@ const handleSubmit = async (event) => {
                   color: "#FFFFFF",
                 }}
                 onClick={handleSubmit}
-              >
-                Submit
+                disabled={loading} 
+                > 
+                  {loading ? (
+                    <CircularProgress size={24} sx={{ color: "white" }} />  
+                  ) : (
+                    "Submit"
+                  )}
               </Button>
             </Grid>
           </Grid>

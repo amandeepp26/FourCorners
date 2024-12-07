@@ -76,6 +76,9 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
   const [openCheque, setOpenCheque] = useState(false);
   const [opencancel, setopencancel] = useState(false);
   const [upcomingPayments, setUpcomingPayments] = React.useState([]);
+  const [UpcomingPaymentsloan, setUpcomingPaymentsloan] = React.useState([]);
+  const [ReceivedPaymentsloan, setReceivedPaymentsloan] = React.useState([]);
+  const [Booking, setBooking] = useState(false);
   const [receivedPayments, setReceivedPayments] = React.useState([]);
   const [amountType, setAmountType] = useState("");
   const [page, setPage] = useState(0);
@@ -99,6 +102,7 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
   const [selectedBookingRemark, setSelectedBookingRemark] = useState("");
   const [bookingRemarkDetails, setBookingRemarkDetails] = useState({});
   const [modalOpen, setModalOpen] = useState(false);
+  
 
   const [showAmountType, setShowAmountType] = useState(false);
 
@@ -377,6 +381,8 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
       });
       setUpcomingPayments([]);
       setReceivedPayments([]);
+      setUpcomingPaymentsloan([]);
+      setReceivedPaymentsloan([]);
     }
   }, [open]);
 
@@ -424,7 +430,110 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
       { Remarkamount: "", RemarkName: "", RemarkDate: new Date(), Loan: 0 },
     ]);
   };
+// 
 
+const downloadCSV = () => {
+  // Extra booking data
+           
+  const bookingHeaders = [
+    "BookingData", "Mobile", "Name", "Address", "Aadhar", "Pancard", "Email", 
+    "FloorNo", "FlatNo", "Area", "Ratesqft", "TtlAmount", "Charges", 
+    "ParkingFacility", "FlatCost", "FlatCostInWords", "Gst", "StampDuty", 
+    "Registration", "Advocate", "ExtraCost", "TotalCost", "UsableArea", "AgreementCarpet"
+  ];
+  let csvContent = "data:text/csv;charset=utf-8,";
+  // Add the header row for Booking Data
+  csvContent += bookingHeaders.join(",") + "\n";
+  Booking.forEach(item => {
+    const bookingValues = [
+      item.BookingDate, item.Mobile, item.Name, item.Address, item.Aadhar, 
+      item.Pancard, item.Email, item.FloorNo, item.FlatNo, item.Area, 
+      item.Ratesqft, item.TtlAmount, item.Charges, item.ParkingFacility, 
+      item.FlatCost, item.FlatCostInWords, item.Gst, item.StampDuty, 
+      item.Registration, item.Advocate, item.ExtraCost, item.TotalCost, 
+      item.UsableArea, item.AgreementCarpet
+    ];
+  
+  
+    // Append the values for each booking as a row in the CSV
+    csvContent += bookingValues.join(",") + "\n";
+  });
+  // Prepare the CSV content
+ 
+  // Headers for payment records
+  const headers = ['Remark', 'Amount', 'Payment Type', 'Date'];
+
+  // Upcoming Payments Section
+  csvContent += "Upcoming Payment Records\n";
+  csvContent += headers.join(",") + "\n"; // Header row for Upcoming Payments
+  upcomingPayments.forEach((item) => {
+    csvContent += [
+      item.RemarkName, 
+      item.Remarkamount, 
+      item.AmountTypeID === 1 ? "Current" : "Post", 
+      new Date(item.RemarkDate).toLocaleDateString("en-GB").replace(/\//g, "-")
+    ].join(",") + "\n";
+  });
+  if (upcomingPayments.length === 0) {
+    csvContent += "No Upcoming Payments\n";
+  }
+
+  // Received Payments Section
+  csvContent += "\nReceived Payment Records\n";
+  csvContent += "Remark,Amount,Payment Type,Date\n"; // Header row for Received Payments
+  receivedPayments.forEach((item) => {
+    csvContent += [
+      item.RemarkName,
+      item.Cash,
+      item.ChequeAmount,
+      new Date(item.Date).toLocaleDateString("en-GB").replace(/\//g, "-")
+    ].join(",") + "\n";
+  });
+  if (receivedPayments.length === 0) {
+    csvContent += "No Received Payments\n";
+  }
+
+  // Upcoming Loan Payments Section
+  csvContent += "\nUpcoming Loan Records\n";
+  csvContent += headers.join(",") + "\n"; // Header row for Upcoming Loan Payments
+  UpcomingPaymentsloan.forEach((item) => {
+    csvContent += [
+      item.RemarkName, 
+      item.Remarkamount, 
+      item.AmountTypeID === 1 ? "Current" : "Post", 
+      new Date(item.RemarkDate).toLocaleDateString("en-GB").replace(/\//g, "-")
+    ].join(",") + "\n";
+  });
+  if (UpcomingPaymentsloan.length === 0) {
+    csvContent += "No Upcoming Loan Payments\n";
+  }
+
+  // Received Loan Payments Section
+  csvContent += "\nReceived Loan Records\n";
+  csvContent += "Remark,Amount,Payment Type,Date\n"; // Header row for Received Loan Payments
+  ReceivedPaymentsloan.forEach((item) => {
+    csvContent += [
+      item.RemarkName,
+      item.Cash,
+      item.ChequeAmount,
+      new Date(item.Date).toLocaleDateString("en-GB").replace(/\//g, "-")
+    ].join(",") + "\n";
+  });
+  if (ReceivedPaymentsloan.length === 0) {
+    csvContent += "No Received Loan Payments\n";
+  }
+
+  // Create a download link and trigger the download
+  const encodedUri = encodeURI(csvContent);
+  const link = document.createElement("a");
+  link.setAttribute("href", encodedUri);
+  link.setAttribute("download", "payment_details.csv");
+  document.body.appendChild(link); // Append link to the DOM
+  link.click(); // Trigger the download
+  document.body.removeChild(link); // Remove the link after download
+};
+
+// 
   const handleRemoveRemark = (index) => {
     const newRemarks = remarks.filter((_, i) => i !== index);
     setRemarks(newRemarks);
@@ -498,9 +607,18 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
       if (response.data.status === "Success") {
         const bookingRemarks = response.data.data.bookingremark;
         const payments = response.data.data.payment;
-
+        const booking = response.data.data.booking;
         console.log(payments , 'agaaya dataa<<<<<>>>>>>>>');
-
+        const upcomingLoanPayments = [
+          ...bookingRemarks.loan, // Loan-related upcoming payments
+        ];
+  
+        const receivedLoanPayments = [
+          ...payments.loan, // Loan-related received payments
+        ];
+        setBooking(booking);
+        setUpcomingPaymentsloan(upcomingLoanPayments);
+        setReceivedPaymentsloan(receivedLoanPayments);
         setUpcomingPayments([...bookingRemarks.cash, ...bookingRemarks.cheque]);
         setReceivedPayments([...payments.cash, ...payments.cheque]);
         setFormData({
@@ -520,6 +638,8 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
   };
 
   const handleSubmit = async () => {
+    setLoading(true); // Set loading to true when submission starts
+  
     // Construct the payload
     const payload = {
       BookingID: selectedRow,
@@ -570,6 +690,7 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
         payload
       );
       console.log('API Response:', response.data);
+  
       if (response.data.status === "Success") {
         Swal.fire({
           icon: "success",
@@ -577,14 +698,16 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
           showConfirmButton: true,
           timer: 1000,
         });
-        // Refresh wing details
+        // Reset the form fields
         setCashPaid("");
         setChequePayments([]);
         setRemarks([]);
         setSelectedPaymentType("");
         setAmountType("1");
         setCashdate(null);
-        setModalOpen(false)
+  
+        // Close modal on success
+        setModalOpen(false);
         handleWingClick(selectedWing);
       } else {
         Swal.fire({
@@ -595,10 +718,15 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
       }
     } catch (error) {
       console.error("Error submitting payment:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Failed to Submit",
+        text: "An error occurred while submitting the payment.",
+      });
+    } finally {
+      setLoading(false); // Set loading to false after the process is done
     }
   };
-  
-  
   
   
   // Helper function to format date correctly for the API
@@ -735,20 +863,31 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
                         <SortableTableCell label="Project Name" />
                         <SortableTableCell label="Wing Name" />
                         <SortableTableCell label="Flat No" />
+                        <SortableTableCell label="Payment" />
                         <TableCell
                           sx={{ fontWeight: "bold", fontSize: "1rem" }}
                         >
                           Actions
                         </TableCell>
+                       
                       </TableRow>
                     </TableHead>
-                    <TableBody>
+                    <TableBody  sx={{ alignItems:"center"}}>
                       {(searchQuery ? filteredRows : wingDetails).map((row) => (
                         <TableRow key={row.RoomID}>
                           <TableCell>{row.Partyname}</TableCell>
                           <TableCell>{row.ProjectName}</TableCell>
                           <TableCell>{row.WingName}</TableCell>
                           <TableCell>{row.FlatNo}</TableCell>
+                          <TableCell>
+                            <IconButton
+                              onClick={() => handleAddPayment(row.BookingID)}
+                              variant="outlined"
+                              color="primary"
+                            >
+                              <PaymentIcon /> 
+                            </IconButton>
+                          </TableCell>
                           <TableCell>
                             <IconButton
                               onClick={(event) => handleMenuOpen(event, row)}
@@ -780,15 +919,7 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
                               </MenuItem>
                             </Menu>
                           </TableCell>
-                          <TableCell>
-                            <IconButton
-                              onClick={() => handleAddPayment(row.BookingID)}
-                              variant="outlined"
-                              color="primary"
-                            >
-                              <PaymentIcon /> 
-                            </IconButton>
-                          </TableCell>
+                         
                         </TableRow>
                       ))}
                     </TableBody>
@@ -857,6 +988,9 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
                   onChange={(e) => setSelectedBookingRemark(e.target.value)}
                   fullWidth
                   margin="normal"
+                  required // Make it required
+                  error={!selectedBookingRemark} // Show error if not selected
+                  helperText={selectedBookingRemark ? "" : "Booking Remark is required"}
                 >
                   {bookingRemarks.map((option) => (
                     <MenuItem
@@ -905,6 +1039,9 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
     onChange={handleChangePayment}
     fullWidth
     margin="normal"
+    required // Make it required
+    error={!selectedPaymentType} // Show error if not selected
+    helperText={selectedPaymentType ? "" : "Payment Type is required"}
   >
     {paymentTypes.map((option) => (
       <MenuItem
@@ -935,8 +1072,8 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
       </FormControl>
     </Grid>
 
-    {/* Handle amountType === 1 */}
-    {amountType === "1" && (
+   
+    {/* {amountType === "1" && (
       <>
         <Grid item xs={4} mt={3}>
           <FormControl fullWidth>
@@ -978,7 +1115,7 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
           />
         </Grid>
       </>
-    )}
+    )} */}
 
     {/* Handle amountType === 2 */}
     {amountType === "2" && (
@@ -1186,18 +1323,24 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
             )}
 
             <Grid item xs={12}>
-              <Button
-                variant="contained"
-                sx={{
-                  marginRight: 3.5,
-                  marginTop: 5,
-                  backgroundColor: "#9155FD",
-                  color: "#FFFFFF",
-                }}
-                onClick={handleSubmit}
-              >
-                Submit
-              </Button>
+            <Button
+  variant="contained"
+  sx={{
+    marginRight: 3.5,
+    marginTop: 5,
+    backgroundColor: "#9155FD",
+    color: "#FFFFFF",
+  }}
+  onClick={handleSubmit}
+  disabled={loading} 
+>
+  {loading ? (
+    <CircularProgress size={24} sx={{ color: "white" }} />
+  ) : (
+    "Submit"
+  )}
+</Button>
+
             </Grid>
           </Grid>
         </Box>
@@ -1250,9 +1393,9 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
             maxWidth: "800px",
             margin: "auto",
             marginTop: "50px",
-            height: "90vh", 
+            height: "90vh", // Set height relative to the viewport
             padding: "20px",
-            overflowY: "auto", 
+            overflowY: "auto", // Enable vertical scrolling if content overflows
           }}
         >
           <TemplatePayment
@@ -1268,9 +1411,9 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
             maxWidth: "800px",
             margin: "auto",
             marginTop: "50px",
-            height: "90vh", 
+            height: "90vh", // Set height relative to the viewport
             padding: "20px",
-            overflowY: "auto",
+            overflowY: "auto", // Enable vertical scrolling if content overflows
           }}
         >
           <IconButton
@@ -1299,7 +1442,7 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
             <IconButton
               aria-label="cancel"
               onClick={handleCloseReport}
-           
+              // sx={{ position: "absolute", top: 6, right: 10 }}
             >
               <CancelIcon sx={{ color: "red" }} />
             </IconButton>
@@ -1307,8 +1450,8 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
               Payment Details
             </Typography>
 
-            <Grid container spacing={4} mb={3}>
-              <Grid item xs={12} sm={6} md={4}>
+            <Grid container spacing={4} mb={3} display="flex" justifyContent="center" alignItems="center">
+              <Grid item xs={12} sm={6} md={3}>
                 <DatePicker
                   selected={formData.fromdate}
                   onChange={(date) => handleDateChangePayment(date, "fromdate")}
@@ -1327,7 +1470,7 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
                 />
               </Grid>
 
-              <Grid item xs={12} sm={6} md={4}>
+              <Grid item xs={12} sm={6} md={3}>
                 <DatePicker
                   selected={formData.todate}
                   onChange={(date) => handleDateChangePayment(date, "todate")}
@@ -1350,10 +1493,7 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
                 item
                 xs={12}
                 sm={12}
-                md={4}
-                display="flex"
-                justifyContent="center"
-                alignItems="center"
+                md={3}
               >
                 <Button
                   variant="contained"
@@ -1363,8 +1503,18 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
                   Search
                 </Button>
               </Grid>
+              <Grid item xs={12} sm={6} md={3}>
+            <Button
+            variant="contained"
+            color="primary"
+            onClick={downloadCSV}
+           
+          >
+            Download CSV
+          </Button>
+              </Grid>
             </Grid>
-            
+          
 
             <Grid container spacing={3}>
               {/* Upcoming Payments */}
@@ -1417,7 +1567,7 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
                       <TableRow>
                       <TableCell>RemarkName</TableCell>
 
-                        <TableCell>Current </TableCell>
+                       
                         <TableCell>Post</TableCell>
                         <TableCell>Date</TableCell>
                       </TableRow>
@@ -1428,7 +1578,7 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
                           <TableRow key={index}>
                             <TableCell>{item.RemarkName}</TableCell>
 
-                            <TableCell>{item.Cash}</TableCell>
+                         
                             <TableCell>{item.ChequeAmount}</TableCell>
                             <TableCell>  {new Date(item.Date).toLocaleDateString("en-GB").replace(/\//g, "-")}
 </TableCell>
@@ -1446,6 +1596,81 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
                 </TableContainer>
               </Grid>
             </Grid>
+            <Grid container spacing={3} sx={{marginTop:10}}>
+  {/* Upcoming Payments Loan */}
+  <Grid item xs={12}>
+    <Typography variant="h6">Upcoming Payments Loan</Typography>
+    <TableContainer component={Paper} style={{ maxHeight: 400 }}>
+      <Table>
+        <TableHead> 
+          <TableRow>
+            <TableCell>Remark</TableCell>
+            <TableCell>Amount</TableCell>
+            <TableCell>Payment Type</TableCell>
+            <TableCell>Date</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {UpcomingPaymentsloan.length > 0 ? (
+            UpcomingPaymentsloan.map((item, index) => (
+              <TableRow key={index}>
+                <TableCell>{item.RemarkName}</TableCell>
+                <TableCell>{item.Remarkamount}</TableCell>
+                <TableCell>
+                  {item.AmountTypeID === 1 ? "Post" : "Post"}
+                </TableCell>
+                <TableCell>
+                  {new Date(item.RemarkDate).toLocaleDateString("en-GB").replace(/\//g, "-")}
+                </TableCell>
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={4} align="center">
+                No Upcoming Payments Loan
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  </Grid>
+
+  <Grid item xs={12}>
+    <Typography variant="h6">Received Payments Loan</Typography>
+    <TableContainer component={Paper} style={{ maxHeight: 400 }}>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>RemarkName</TableCell>
+            <TableCell>Post</TableCell>
+            <TableCell>Date</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {ReceivedPaymentsloan.length > 0 ? (
+            ReceivedPaymentsloan.map((item, index) => (
+              <TableRow key={index}>
+                <TableCell>{item.RemarkName}</TableCell>
+                <TableCell>{item.ChequeAmount}</TableCell>
+                <TableCell>
+                  {new Date(item.Date).toLocaleDateString("en-GB").replace(/\//g, "-")}
+                </TableCell>
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={4} align="center">
+                No Received Payments Loan
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  </Grid>
+</Grid>
+
           </CardContent>
         </Card>
       </Modal>

@@ -121,8 +121,7 @@ const Cancelform = ({ bookingID }) => {
       );
       console.log('API response:', response.data);
 
-      // Hide the modal after successful submission
-      setBookingData(null); // This will close the modal (or reset the form)
+      setBookingData(null); 
 
       // Trigger SweetAlert
       Swal.fire({

@@ -83,7 +83,7 @@ const [totalFollowup, setTotalFollowup] = useState(0);
     return (
       <Grid container spacing={2} justifyContent="space-between" alignItems="center">
         {dynamicSalesData.map((item, index) => (
-          <Grid item xs={3} key={index}> {/* Adjust xs value based on how many items you want in a row */}
+          <Grid item xs={3} key={index}> 
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <Avatar
                 variant='rounded'
@@ -163,13 +163,11 @@ const WelcomeScreen = () => {
 };
 
 
-
-
 useEffect(() => {
   // Fetch data on initial render
   fetchData();
 
-  // Retrieve the notification flag and selected notification from localStorage
+  
   const showAddDetailsFlag = localStorage.getItem('showAddDetails');
   const selectedNotification = localStorage.getItem('selectedNotification');
   
@@ -185,19 +183,12 @@ useEffect(() => {
     setShowAddDetails(false);
   }
 
-  // If the route query has showAddDetails parameter, set the state
   if (router.query.showAddDetails) {
     setShowAddDetails(true);
     setFirstVisit(false);
   }
 
-  // Log route query parameters
-  console.log('Router Query:>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', router.query);
-
 }, [router.query]);
-
-
-
 
   const handleDelete = async (id) => {
     try {
@@ -269,7 +260,7 @@ useEffect(() => {
 
   return (
     <Grid container spacing={6}>
-      <Grid item xs={4}>
+     <Grid item xs={12} md={4} style={{background:"white",zIndex:"99",display:"flex", flexWrap:"wrap"}}>
         <Sidebar 
           rows={rows} 
           onItemClick={handleShow} 
@@ -292,11 +283,6 @@ useEffect(() => {
             leadData={leadData}
           />
         )}
-
-       
-
-     
-
         {!loading && !error && rowDataToUpdate && !showHistory && !showAddDetails && !showDashboard && (
           <ListCancel
             item={rowDataToUpdate}
@@ -305,7 +291,6 @@ useEffect(() => {
             onEdit={handleEdit}
           />
         )}
-
        
       </Grid>
     </Grid>
@@ -313,3 +298,5 @@ useEffect(() => {
 };
 
 export default cancelfollowup;
+
+

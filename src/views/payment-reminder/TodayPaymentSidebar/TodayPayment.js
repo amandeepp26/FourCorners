@@ -77,7 +77,7 @@ const TodayPayment = ({ onItemClick, onCreate }) => {
       const filteredData = rows.filter(
         (item) =>
           item.Name.toLowerCase().includes(lowerCaseQuery) ||
-          item.Mobile.toLowerCase().includes(lowerCaseQuery)
+          item.Mobile.toLowerCase().includes(lowerCaseQuery) 
       );
       setFilteredRows(filteredData);
     }
@@ -190,13 +190,7 @@ const TodayPayment = ({ onItemClick, onCreate }) => {
          Today Payment
           </Typography>
           <Box display="flex" alignItems="center">
-            {/* <IconButton
-              aria-label="filter"
-              sx={{ color: "grey" }}
-              onClick={onCreate}
-            >
-              <AddIcon />
-            </IconButton> */}
+          
             <IconButton
               aria-label="filter"
               sx={{ color: "grey" }}
@@ -232,33 +226,7 @@ const TodayPayment = ({ onItemClick, onCreate }) => {
               </MenuItem>
             </Popover>
 
-            {/* <IconButton
-              aria-label="more"
-              aria-controls="menu"
-              aria-haspopup="true"
-              onClick={handleDotsMenuOpen}
-              sx={{ color: "grey" }}
-            >
-              <MoreVertIcon />
-            </IconButton> */}
-            {/* <Popover
-              id="menu"
-              anchorEl={anchorElDots}
-              open={Boolean(anchorElDots)}
-              onClose={handleDotsMenuClose}
-              anchorOrigin={{
-                vertical: "bottom",
-                horizontal: "right",
-              }}
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-            >
-              <MenuItem onClick={handleDownload}>
-                Download All Data
-              </MenuItem>
-            </Popover> */}
+           
           </Box>
         </Box>
       </Grid>
@@ -339,22 +307,19 @@ const TodayPayment = ({ onItemClick, onCreate }) => {
                 secondary={ <>
                   <Typography
                     variant="body2"
-                    style={{ fontSize: 10 }}
+                    style={{ fontSize: 10,fontWeight:600 }}
                   >
                     Remark :  {item.RemarkName}
                   </Typography>
                   <Typography
                     variant="body2"
-                    style={{ fontSize: 10 }}
+                    style={{ fontSize: 10,fontWeight:600 }}
                   >
                    Remark Date : {item.RemarkDate}
                   </Typography>
-                  {/* <Typography
-                    variant="body2"
-                    style={{ fontSize: 10 }}
-                  >
-                   Assign By: {item.Name}
-                  </Typography> */}
+                  <Typography variant="body2" style={{ fontSize: 10,fontWeight:600 }}>
+                    Remark amount: {item?.Remarkamount}
+                    </Typography>
                 </>}
               />
                    <Box

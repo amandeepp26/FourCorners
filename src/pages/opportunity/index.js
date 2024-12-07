@@ -4,6 +4,7 @@ import axios from 'axios';
 import AddOpportunityDetails from 'src/views/add-opportunitydetails/AddOpportunityDetails';
 import Sidebar from 'src/views/opportunitysidebar/Sidebar';
 import ListOpportunity from 'src/views/list-opportunity/ListOpportunity';
+import HistoryOpportunity from 'src/views/history-apportunity/HistoryOpportunity';
 import PieChartIcon from '@mui/icons-material/PieChart';
 import Card from '@mui/material/Card';
 import TrendingUp from 'mdi-material-ui/TrendingUp';
@@ -12,6 +13,7 @@ import CellphoneLink from 'mdi-material-ui/CellphoneLink';
 import AccountOutline from 'mdi-material-ui/AccountOutline';
 import CardContent from '@mui/material/CardContent';
 import CardHeader from '@mui/material/CardHeader';
+import IconButton from '@mui/material/IconButton';
 import Avatar from '@mui/material/Avatar';
 import { useRouter } from 'next/router';
 
@@ -180,7 +182,7 @@ const WelcomeScreen = () => {
       <Box sx={{ textAlign: 'center', marginTop: '20px' }}>
         <PieChartIcon sx={{ fontSize: 60, color: "#333" }} />
         <Typography variant="h5" sx={{ marginTop: 2, fontWeight: "bold" }}>
-          Welcome to Booking Cancel Dashboard
+          Welcome to Opportunity Dashboard
         </Typography>
         <Grid variant="body1" sx={{ marginTop: 10, marginLeft: 20 }}>
           <StatisticsCard />
@@ -201,10 +203,6 @@ useEffect(() => {
   const showAddDetailsFlag = localStorage.getItem('showAddDetails');
   const selectedNotification = localStorage.getItem('selectedNotification');
   
-  // Log the retrieved data
-  console.log('showAddDetailsFlag:>>>>>>>>>>>>>>>>>>', showAddDetailsFlag);
-  console.log('selectedNotification:>>>>>>>>>>>>>>>>>>>>>>>>>>>', selectedNotification ? JSON.parse(selectedNotification) : null);
-
   if (showAddDetailsFlag === 'true') {
     setShowAddDetails(true);
     setLeadData(selectedNotification ? JSON.parse(selectedNotification) : null);
@@ -213,15 +211,15 @@ useEffect(() => {
     setShowAddDetails(false);
   }
 
+  // If the route query has showAddDetails parameter, set the state
   if (router.query.showAddDetails) {
     setShowAddDetails(true);
     setFirstVisit(false);
   }
 
-  // Log route query parameters
-  console.log('Router Query:>', router.query);
-
 }, [router.query]);
+
+
 
   const handleDelete = async (id) => {
     try {
@@ -291,7 +289,7 @@ useEffect(() => {
 
   return (
     <Grid container spacing={6}>
-      <Grid item xs={4}>
+     <Grid item xs={12} md={4} style={{background:"white",zIndex:"99",display:"flex", flexWrap:"wrap"}}>
         <Sidebar 
           rows={rows} 
           onItemClick={handleShow} 
@@ -327,7 +325,21 @@ useEffect(() => {
           />
         )}
 
-       
+        {!loading && !error && showHistory && (
+          <Box 
+            display="flex"
+            flexDirection="row"
+            alignItems="flex-start"
+            minHeight="100vh"
+          >
+            <Box flex="1">
+              <Typography variant="body2" sx={{ marginTop: 5, fontWeight: "bold", fontSize: 20 }}>
+                User History
+              </Typography>
+              <HistoryOpportunity item={rowDataToUpdate} onBack={handleBack} />
+            </Box>
+          </Box>
+        )}
       </Grid>
     </Grid>
   );

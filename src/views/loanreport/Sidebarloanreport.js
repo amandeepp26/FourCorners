@@ -29,6 +29,7 @@ import PersonIcon from "@mui/icons-material/Person";
 import FaceIcon from '@mui/icons-material/Face';
 
 import { Divider } from "@mui/material";
+import ApartmentIcon from '@mui/icons-material/Apartment';
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -36,10 +37,9 @@ import AddIcon from "@mui/icons-material/Add";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import GetAppIcon from "@mui/icons-material/GetApp";
 import SortIcon from "@mui/icons-material/Sort";
-import { useCookies } from "react-cookie";
-import DashboardIcon from '@mui/icons-material/Dashboard';
 
-const Sidebar = ({ onEdit, onItemClick, onCreate  , onDashboardClick}) => {
+
+const Sidebarloanreport = ({ onEdit, onItemClick, onCreate }) => {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -52,22 +52,15 @@ const Sidebar = ({ onEdit, onItemClick, onCreate  , onDashboardClick}) => {
   const [anchorElFilter, setAnchorElFilter] = useState(null);
   const [anchorElDots, setAnchorElDots] = useState(null);
   const [sortOption, setSortOption] = useState("");
-  const [cookies, setCookie] = useCookies(["amr"]);
-  const userName = cookies.amr?.FullName || 'User';
-  const roleName = cookies.amr?.RoleName || 'Admin';
 
-  console.log(userName, 'ye dekh username');
-  console.log(roleName, 'ye dekh rolname');
-  // console.log(userid, 'ye dekh roleide');
   useEffect(() => {
     fetchData();
   }, []);
 
   const fetchData = async () => {
-    const userid = cookies.amr?.UserID || 'Role';
     try {
       const response = await axios.get(
-        `https://apiforcornershost.cubisysit.com/api/api-fetch-telecalling.php?UserID=${userid}`
+        "https://apiforcornershost.cubisysit.com/api/api-fetch-projectmaster.php"
       );
       console.log("API Response:", response.data);
       setRows(response.data.data || []);
@@ -90,8 +83,8 @@ const Sidebar = ({ onEdit, onItemClick, onCreate  , onDashboardClick}) => {
     } else {
       const filteredData = rows.filter(
         (item) =>
-          item?.CName?.toLowerCase().includes(lowerCaseQuery) ||
-          item?.Mobile?.toLowerCase().includes(lowerCaseQuery)
+          item?.ProjectName?.toLowerCase().includes(lowerCaseQuery) ||
+          item?.CompanyName?.toLowerCase().includes(lowerCaseQuery)
       );
       setFilteredRows(filteredData);
     }
@@ -142,7 +135,7 @@ const Sidebar = ({ onEdit, onItemClick, onCreate  , onDashboardClick}) => {
   const getDateStatus = (contactCreateDate) => {
     const date = new Date(contactCreateDate);
     const now = new Date();
-
+    
     const isCurrentMonth = date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
     const isPreviousMonth = date.getMonth() === now.getMonth() - 1 && date.getFullYear() === now.getFullYear();
   
@@ -202,10 +195,10 @@ const Sidebar = ({ onEdit, onItemClick, onCreate  , onDashboardClick}) => {
         );
         break;
       case "a-z":
-        sortedRows.sort((a, b) => a?.CName?.localeCompare(b.CName));
+        sortedRows.sort((a, b) => a.PartyName.localeCompare(b.PartyName));
         break;
       case "z-a":
-        sortedRows.sort((a, b) => b?.CName?.localeCompare(a.CName));
+        sortedRows.sort((a, b) => b.PartyName.localeCompare(a.PartyName));
         break;
       default:
         break;
@@ -221,43 +214,53 @@ const Sidebar = ({ onEdit, onItemClick, onCreate  , onDashboardClick}) => {
       return `${header}\n${values}`;
   };
 
+  const handleDownload = () => {
+    const csv = jsonToCSV(rows);
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "Telecalling.csv";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
 
   return (
     <Card
       sx={{
-        width: 390,
+        width: 410,
         padding: 5,
-        height: 700,
+        height: 800,
         overflowY: "auto",
+        "&::-webkit-scrollbar": {
+          width: "2px",
+        },
+        "&::-webkit-scrollbar-thumb": {
+          backgroundColor: "#cccccc", // Change the color as needed
+          borderRadius: "10px",
+        },
+        "&::-webkit-scrollbar-thumb:hover": {
+          backgroundColor: "#cccccc", // Change the color on hover
+        },
+        "&::-webkit-scrollbar-track": {
+          backgroundColor: "transparent",
+        },
       }}
     >
-      <Grid item xs={12} sx={{ marginBottom: 3 }} style={{background:"white",zIndex:"99",display:"flex", flexWrap:"wrap"}}>
+      <Grid item xs={12} sx={{ marginBottom: 3 }}>
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Typography variant="body2" sx={{ fontWeight: "bold", fontSize: 20 }}>
-            All Lead
+            All Projects
           </Typography>
           <Box display="flex" alignItems="center">
-          {/* <Button
-      variant="contained"
-      startIcon={<DashboardIcon />}
-      onClick={onDashboardClick}
-    >
-      Dashboard
-    </Button> */}
-          <IconButton
-              aria-label="filter"
-              sx={{ color: "grey" }}
-              onClick={onDashboardClick}
-            >
-             <DashboardIcon />
-            </IconButton>
-          <IconButton
+          {/* <IconButton
               aria-label="filter"
               sx={{ color: "grey" }}
               onClick={onCreate}
             >
               <AddIcon />
-            </IconButton>
+            </IconButton> */}
             <IconButton
               aria-label="filter"
               sx={{ color: "grey" }}
@@ -320,7 +323,7 @@ const Sidebar = ({ onEdit, onItemClick, onCreate  , onDashboardClick}) => {
                 <ListItemIcon>
                   <GetAppIcon fontSize="small" />
                 </ListItemIcon>
-                Download All Data
+            Download All Data
               </MenuItem>
             </Popover> */}
           </Box>
@@ -377,7 +380,7 @@ const Sidebar = ({ onEdit, onItemClick, onCreate  , onDashboardClick}) => {
             onClick={onCreate}
             sx={{ mt: 2 }}
           >
-            Create Contact
+            Create Project
           </Button>
         </Box>
       ) : (
@@ -386,24 +389,22 @@ const Sidebar = ({ onEdit, onItemClick, onCreate  , onDashboardClick}) => {
             {filteredRows
              
               .map((item) => (
-                <React.Fragment key={item.Tid}>
+                <React.Fragment key={item.ProjectID}>
                   <Card sx={{marginBottom:2}}>
                    <ListItem disablePadding onClick={() => handleListItemClick(item)}>
-                      <ListItemAvatar>
-                        <Avatar
-                          alt="John Doe"
-                          sx={{ width: 40, height: 40, margin: 2 }}
-                          src="/images/avatars/1.png"
-                        />
-                      </ListItemAvatar>
+                   <ListItemAvatar>
+ 
+        <ApartmentIcon style={{ width: 40, height: 40, margin: 2 ,color: '#b187fd' }} />
+
+    </ListItemAvatar>
                       <ListItemText
                        primary={
                         <div style={{ display: 'flex', alignItems: 'center' }}>
                           <Typography
                             variant="subtitle1"
-                            style={{ fontWeight: 600, fontSize: 13 }}
+                            style={{ fontWeight: 600, fontSize: 13 }}         
                           >
-                          {item?.TitleName}  {item.CName}
+                         {item.ProjectName}
                           </Typography>
                           {item.leadstatusName && (
                             <Chip
@@ -415,7 +416,7 @@ const Sidebar = ({ onEdit, onItemClick, onCreate  , onDashboardClick}) => {
                                 height: 12,
                                 p: 3,
                                 backgroundColor: getChipColor(item.leadstatusName),
-                                color: "#000000",
+                                color: "#000000", // Adjust text color for better contrast if needed
                               }}
                             />
                           )}
@@ -426,16 +427,16 @@ const Sidebar = ({ onEdit, onItemClick, onCreate  , onDashboardClick}) => {
                           <>
                       
                             <Typography variant="body2" style={{ fontSize: 10 }}>
-                             follow Up: {item.NextFollowUpDate}  
+                            Company Name :{item.CompanyName} 
                             
                             </Typography>
                             <Typography variant="body2" style={{ fontSize: 10 }}>
-                             Assign By:{item?.TelecallAttendedByName}
+                            Created By :{item?.Name}
 
                             
                             </Typography>
                             <Typography variant="body2" style={{ fontSize: 10 }}>
-                            Source :{item?.SourceName}
+                             Created Date : {item?.CreateDate}
 
                             
                             </Typography>
@@ -496,17 +497,6 @@ const Sidebar = ({ onEdit, onItemClick, onCreate  , onDashboardClick}) => {
   );
 };
 
-// Function to get chip color based on leadstatusName
-const getChipColor = (leadstatusName) => {
-  switch (leadstatusName) {
-    case "Warm":
-      return "#FFD700"; // Yellow
-    case "Hot":
-      return "#FF6347"; // Red
-    case "Cold":
-      return "#87CEEB"; // Blue
-    default:
-      return "#FFFFFF"; // Default color
-  }
-};
-export default Sidebar;
+
+
+export default Sidebarloanreport;

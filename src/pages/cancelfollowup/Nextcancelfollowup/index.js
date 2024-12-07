@@ -173,7 +173,7 @@ useEffect(() => {
   if (showAddDetailsFlag === 'true') {
     setShowAddDetails(true);
     setLeadData(selectedNotification ? JSON.parse(selectedNotification) : null);
-    localStorage.removeItem('showAddDetails'); // Clear flag
+    localStorage.removeItem('showAddDetails');
   } else {
     setShowAddDetails(false);
   }
@@ -255,7 +255,7 @@ useEffect(() => {
 
   return (
     <Grid container spacing={6}>
-      <Grid item xs={4}>
+     <Grid item xs={12} md={4} style={{background:"white",zIndex:"99",display:"flex", flexWrap:"wrap"}}>
         <NextSidebar 
           rows={rows} 
           onItemClick={handleShow} 

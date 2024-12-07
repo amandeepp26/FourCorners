@@ -205,7 +205,7 @@ const Tellecalling = () => {
 
   const handleDelete = async (id) => {
     try {
-      const response = await axios.post('https://ideacafe-backend.vercel.app/api/proxy/api-delete-telecalling.php', {
+      const response = await axios.post('https://proxy-forcorners.vercel.app/api/proxy/api-delete-telecalling.php', {
         Tid: id,
         DeleteUID: 1
       });
@@ -261,7 +261,7 @@ const Tellecalling = () => {
 
   return (
     <Grid container spacing={6}>
-      <Grid item xs={4}>
+     <Grid item xs={12} md={4} style={{background:"white",zIndex:"99",display:"flex", flexWrap:"wrap"}}>
         <Sidebar rows={rows} onItemClick={handleShow} onEdit={handleEdit} onCreate={handleAddTelecaller} />
       </Grid>
       <Grid item xs={8}>

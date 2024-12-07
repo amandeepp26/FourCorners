@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import axios from 'axios';
-import { Box, Typography, Table, TableBody, TableCell, TableContainer, TableRow, Paper, Button, Avatar, ListItemAvatar, } from '@mui/material';
+import { Box, Typography, Table, TableBody,FormControl , InputLabel,Select, MenuItem,  TableCell, TableContainer, TableRow, Paper, Button } from '@mui/material';
 import { createGlobalStyle } from 'styled-components';
 import styled from 'styled-components';
 import { useRouter } from 'next/router';
@@ -37,14 +37,15 @@ const InvoiceBox = styled(Box)({
   fontFamily: 'Helvetica Neue, Helvetica, Arial, sans-serif',
 });
 
-const TemplateRosenagar = ({ bookingID , onGoBack }) => {
+const TemplatePayment = ({ bookingID , onGoBack }) => {
   const router = useRouter();
   console.log(bookingID , 'booking id aaya');
   const printRef = useRef();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [filterOption, setFilterOption] = useState('remarksWithCreateDate');
   const handlePrint = () => {
     const printContents = printRef.current.innerHTML;
     const originalContents = document.body.innerHTML;
@@ -59,10 +60,12 @@ const TemplateRosenagar = ({ bookingID , onGoBack }) => {
     fetchData();
   }, [bookingID]);
 
-  const fetchData = async () => {
+  
+
+  const fetchData = async (selectedFilter) => {
     try {
-      const response = await axios.get(`https://apiforcornershost.cubisysit.com/api/api-fetch-projectbooking.php?BookingID=${bookingID}`);
-      console.log("data aaya dekh", response.data);
+      const response = await axios.get(https://apiforcornershost.cubisysit.com/api/api-fetch-projectbooking.php?BookingID=${bookingID}&filter=${selectedFilter});
+      console.log("data aaya dekh<<<<<>>>>>>>>>>>>>", response.data);
       setData(response.data.data);
       setLoading(false);
     } catch (error) {
@@ -71,7 +74,10 @@ const TemplateRosenagar = ({ bookingID , onGoBack }) => {
       setLoading(false);
     }
   };
-  
+  const handleFilterChange = (event) => {
+    setFilterOption(event.target.value);
+  };
+  const filteredRemarks = filterOption === 'remarksWithCreateDate' ? data?.remarksWithCreateDate : data?.otherRemarks;
 
 
   if (loading) {
@@ -86,9 +92,34 @@ const TemplateRosenagar = ({ bookingID , onGoBack }) => {
   return (
     <>
       <GlobalStyle />
-      {/* <Button variant="contained" color="primary"   onClick={onGoBack}  style={{ marginBottom: '10px' }}>
-        Go back 
-      </Button> */}
+      <Box display="flex" alignItems="center" justifyContent="space-between" marginBottom={2}>
+  <Button
+    variant="contained"
+    color="primary"
+    onClick={onGoBack}
+    style={{ padding: '10px 20px', fontWeight: 'bold'}}
+  >
+    Go back
+  </Button>
+
+  <FormControl style={{ minWidth: 150 , marginRight:20 }}>
+    <InputLabel id="filter-label">Filter</InputLabel>
+    <Select
+      labelId="filter-label"
+      id="filter-select"
+      label="Filter"
+      value={filterOption}
+      onChange={handleFilterChange}
+    >
+      <MenuItem value="remarksWithCreateDate">Original Remark</MenuItem>
+      <MenuItem value="all">All</MenuItem>
+      <MenuItem value="otherRemarks">Updated Remark</MenuItem>
+    </Select>
+  </FormControl>
+</Box>
+
+   
+    
 
       <InvoiceBox className="printableArea" ref={printRef}>
         <TableContainer component={Paper}>
@@ -107,11 +138,8 @@ const TemplateRosenagar = ({ bookingID , onGoBack }) => {
                 </StyledTableCell>
               </TableRow>
               <TableRow sx={{ padding: 0 }}>
-              <StyledTableCell style={{ textAlign: "center",width: "150px" }}>
-               
-                  <img src={`https://apiforcornershost.cubisysit.com/projectimage/${data.images || "image.png"}`} alt="Logo"  width={350}  height={160}/>
-
-                 
+                <StyledTableCell style={{ textAlign: 'center', padding: 0 }}>
+                  <img src="{images}" alt="Logo" width="70" height="100" />
                 </StyledTableCell>
                 <StyledTableCell sx={{ padding: 0 }}>
                   <img src="https://i.postimg.cc/PJfmZCRv/Untitled-design-2024-04-12-T161558-455.png" alt="200 * 200" width="30" height="100" />
@@ -129,7 +157,7 @@ const TemplateRosenagar = ({ bookingID , onGoBack }) => {
                   <Typography>Name Of Purchase</Typography>
                 </StyledTableCell>
                 <StyledTableCell style={{ width: '80%', padding: 0 }} colSpan={10}>
-                 {data.TitleName} {data.BookingName}
+                  {data.BookingName}
                 </StyledTableCell>
               </TableRow>
               <TableRow sx={{ padding: 0 }}>
@@ -158,7 +186,7 @@ const TemplateRosenagar = ({ bookingID , onGoBack }) => {
               </TableRow>
               <TableRow sx={{ padding: 0 }}>
                 <StyledTableCell style={{ textAlign: 'left', padding: 0 }} colSpan={2}>
-                  <Typography>Email Id.</Typography>
+                  <Typography>EMAIL ID.</Typography>
                 </StyledTableCell>
                 <StyledTableCell colSpan={10} style={{ textAlign: 'center', padding: 0 }}>{data.Email}</StyledTableCell>
               </TableRow>
@@ -241,9 +269,8 @@ const TemplateRosenagar = ({ bookingID , onGoBack }) => {
         <StyledTableCell style={{ width: '20%', padding: 0 }} colSpan={1}>{data.ExtraCost}</StyledTableCell>
       </TableRow>
       <TableRow sx={{ padding: 0 }}>
-        <StyledTableCell style={{ width: '30%', padding: 0 }} colSpan={4}>Parking Facility | {data.ParkingAvilability} </StyledTableCell>
+        <StyledTableCell style={{ width: '30%', padding: 0 }} colSpan={4}>Parking Facility</StyledTableCell>
         <StyledTableCell style={{ width: '20%', padding: 0 }} colSpan={1}>{data.ParkingFacility}</StyledTableCell>
-        
         <StyledTableCell style={{ width: '30%', padding: 0 }} colSpan={4}>Total (A + B)</StyledTableCell>
         <StyledTableCell style={{ width: '20%', padding: 0 }} colSpan={1}>{data.TotalCost}</StyledTableCell>
       </TableRow>
@@ -252,8 +279,6 @@ const TemplateRosenagar = ({ bookingID , onGoBack }) => {
         <StyledTableCell style={{ width: '20%', padding: 0 }} colSpan={1}>{data.FlatCost}</StyledTableCell>
         <StyledTableCell style={{ width: '30%', padding: 0 }} colSpan={4}>Booking Ref.Code (T & C)</StyledTableCell>
         <StyledTableCell style={{ width: '20%', padding: 0 }} colSpan={1}>{data.BookingRef}</StyledTableCell>
-        
-        
       </TableRow>
     </TableBody>
   </Table>
@@ -279,18 +304,43 @@ const TemplateRosenagar = ({ bookingID , onGoBack }) => {
   <StyledTableCell style={{ width: '20%', padding: 0 }} colSpan={1}>{data.AgreementCarpet}</StyledTableCell>
 </TableRow>
 
-      <TableRow sx={{ padding: 0 }}>
-  <StyledTableCell style={{ textAlign: 'left', fontSize: 15, fontWeight: 500, padding: 0 }} colSpan={10}>REMARKS :</StyledTableCell>
-</TableRow>
 
-{/* Map over remarks array */}
-{data?.remarksWithCreateDate && data.remarksWithCreateDate.map((remark, index) => (
-      <TableRow key={remark.BookingRemarkID} sx={{ padding: 0 }}>
-        <StyledTableCell style={{ textAlign: 'left', padding: 0 }} colSpan={10}>
-          {index + 1}. Rs. {remark.Remarkamount} {remark.RemarkName} {remark.RemarkDate}
+
+<TableRow sx={{ padding: 0 }}>
+        <StyledTableCell style={{ textAlign: 'left', fontSize: 15, fontWeight: 'bolder', padding: 0 }} colSpan={10}>
+          ORIGINAL REMARKS:
         </StyledTableCell>
       </TableRow>
-    ))}
+
+      {/* Render remarks based on the selected filter */}
+      {filterOption !== 'all' && filteredRemarks && filteredRemarks.map((remark, index) => (
+        <TableRow key={${filterOption}-${index}} sx={{ padding: 0 }}>
+          <StyledTableCell style={{ textAlign: 'left', padding: 0 }} colSpan={10}>
+            {index + 1}. {remark.Remarkamount} {remark.RemarkName} {remark.RemarkDate}
+          </StyledTableCell>
+        </TableRow>
+      ))}
+
+      {/* Render all remarks when 'all' is selected */}
+      {filterOption === 'all' && (
+        <>
+          {data?.remarksWithCreateDate && data?.remarksWithCreateDate.map((remark, index) => (
+            <TableRow key={remarksWithCreateDate-${index}} sx={{ padding: 0 }}>
+              <StyledTableCell style={{ textAlign: 'left', padding: 0 }} colSpan={10}>
+                {index + 1}. {remark.Remarkamount} {remark.RemarkName} {remark.RemarkDate}
+              </StyledTableCell>
+            </TableRow>
+          ))}
+
+          {data?.otherRemarks && data?.otherRemarks.map((remark, index) => (
+            <TableRow key={otherRemarks-${index}} sx={{ padding: 0 }}>
+              <StyledTableCell style={{ textAlign: 'left', padding: 0 }} colSpan={10}>
+                {index + 1}. {remark.Remarkamount} {remark.RemarkName} {remark.RemarkDate}
+              </StyledTableCell>
+            </TableRow>
+          ))}
+        </>
+      )}
 
     </TableBody>
   </Table>
@@ -319,5 +369,4 @@ const TemplateRosenagar = ({ bookingID , onGoBack }) => {
   );
 };
 
-export default TemplateRosenagar;
-
+export default TemplatePayment;
