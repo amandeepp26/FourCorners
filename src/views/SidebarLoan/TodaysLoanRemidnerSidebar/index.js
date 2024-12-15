@@ -95,9 +95,10 @@ const TodaysLoanRemidnerSidebar = ({
       setFilteredRows(rows);
     } else {
       const filteredData = rows.filter(
-        (item) =>
-          item?.Name?.toString().includes(lowerCaseQuery) ||
-          item?.Remarkamount?.toString().includes(lowerCaseQuery)
+       
+          (item) =>
+            item.Name.toLowerCase().includes(lowerCaseQuery) ||
+            item.Mobile.toLowerCase().includes(lowerCaseQuery) 
       );
       setFilteredRows(filteredData);
     }
@@ -223,7 +224,7 @@ const TodaysLoanRemidnerSidebar = ({
   return (
     <Card
       sx={{
-        width: 390,
+       
         padding: 5,
         height: 700,
         overflowY: "auto",
@@ -242,13 +243,7 @@ const TodaysLoanRemidnerSidebar = ({
             >
               <DashboardIcon />
             </IconButton>
-            <IconButton
-              aria-label="filter"
-              sx={{ color: "grey" }}
-              onClick={onCreate}
-            >
-              <AddIcon />
-            </IconButton>
+           
             <IconButton
               aria-label="filter"
               sx={{ color: "grey" }}
@@ -333,7 +328,8 @@ const TodaysLoanRemidnerSidebar = ({
             
             .map((row, index) => (
               <React.Fragment key={index}>
-                <ListItem button onClick={() => handleListItemClick(row)}>
+                <Card sx={{ marginBottom: 2 }}>
+                <ListItem  onClick={() => handleListItemClick(row)}>
                   <ListItemAvatar>
                     <Avatar  alt="John Doe"
                           sx={{ width: 40, height: 40, margin: 2 }}
@@ -347,80 +343,28 @@ const TodaysLoanRemidnerSidebar = ({
                       <Box display="flex" flexDirection="column">
                         <Typography
                           variant="subtitle1"
-                          style={{ fontWeight: 600, fontSize: 13 }}
+                          style={{ fontWeight: "bold" }}
                         >
                           {row.Name}
                         </Typography>
-                        <Typography variant="body2" color="textSecondary">
+                        <Typography variant="body2" style={{ fontSize: 10,fontWeight:600 }}>
                           Remark amount: {row.Remarkamount}
                         </Typography>
-                        <Typography variant="body2" color="textSecondary">
+                        <Typography variant="body2" style={{ fontSize: 10,fontWeight:600 }}>
                           Mobile: {row.Mobile}
                         </Typography>
-                        <Typography variant="body2" color="textSecondary">
+                        <Typography variant="body2" style={{ fontSize: 10,fontWeight:600 }}>
                       Remark Date: {row.RemarkDate}
                       </Typography>
                       </Box>
                     }
                   />
-                  <Box display="flex" alignItems="center">
-                    {row.Status === "open" && (
-                      <Chip
-                        label="Open"
-                        color="warning"
-                        sx={{ marginRight: 1 }}
-                      />
-                    )}
-                    {row.Status === "closed" && (
-                      <Chip
-                        label="Closed"
-                        color="success"
-                        sx={{ marginRight: 1 }}
-                      />
-                    )}
-                    <IconButton
-                      edge="end"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDotsMenuOpen(e);
-                      }}
-                    >
-                      <MoreVertIcon />
-                    </IconButton>
-                    <Menu
-                      anchorEl={anchorElDots}
-                      open={Boolean(anchorElDots)}
-                      onClose={handleDotsMenuClose}
-                    >
-                      <MenuItem
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDotsMenuClose();
-                          onEdit(row);
-                        }}
-                      >
-                        <ListItemIcon>
-                          <EditIcon />
-                        </ListItemIcon>
-                        Edit
-                      </MenuItem>
-                      <MenuItem
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDotsMenuClose();
-                          handleOpenConfirmDelete(row.Tid);
-                        }}
-                      >
-                        <ListItemIcon>
-                          <DeleteIcon />
-                        </ListItemIcon>
-                        Delete
-                      </MenuItem>
-                    </Menu>
-                  </Box>
+               
                 </ListItem>
-                {index < filteredRows.length - 1 && <Divider variant="inset" />}
+                </Card>
               </React.Fragment>
+               
+             
             ))
         ) : (
           <Box
@@ -433,22 +377,7 @@ const TodaysLoanRemidnerSidebar = ({
           </Box>
         )}
       </List>
-      <Dialog open={confirmDelete} onClose={handleCloseConfirmDelete}>
-        <DialogTitle>Delete Confirmation</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Are you sure you want to delete this item?
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseConfirmDelete} color="primary">
-            Cancel
-          </Button>
-          {/* <Button onClick={handleDelete} color="secondary">
-            Delete
-          </Button> */}
-        </DialogActions>
-      </Dialog>
+    
     </Card>
   );
 };

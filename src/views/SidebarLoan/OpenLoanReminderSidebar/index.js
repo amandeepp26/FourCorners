@@ -91,8 +91,9 @@ const OpenLoanReminderSidebar = ({ onEdit, onItemClick, onCreate, onDashboardCli
     } else {
       const filteredData = rows.filter(
         (item) =>
-          item?.Name?.toString().includes(lowerCaseQuery) ||
-          item?.Remarkamount?.toString().includes(lowerCaseQuery)
+      
+            item.Name.toLowerCase().includes(lowerCaseQuery) ||
+            item.Mobile.toLowerCase().includes(lowerCaseQuery) 
       );
       setFilteredRows(filteredData);
     }
@@ -226,9 +227,7 @@ const OpenLoanReminderSidebar = ({ onEdit, onItemClick, onCreate, onDashboardCli
             <IconButton aria-label="filter" sx={{ color: "grey" }} onClick={onDashboardClick}>
               <DashboardIcon />
             </IconButton>
-            <IconButton aria-label="filter" sx={{ color: "grey" }} onClick={onCreate}>
-              <AddIcon />
-            </IconButton>
+           
             <IconButton aria-label="filter" sx={{ color: "grey" }} onClick={handleFilterMenuOpen}>
               <SortIcon />
             </IconButton>
@@ -295,6 +294,9 @@ const OpenLoanReminderSidebar = ({ onEdit, onItemClick, onCreate, onDashboardCli
           {filteredRows
             .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
             .map((row) => (
+              <React.Fragment>
+                <Card sx={{ marginBottom: 2 }}>
+            
               <ListItem
                 key={row.BookingremarkID}
                 button
@@ -312,110 +314,31 @@ const OpenLoanReminderSidebar = ({ onEdit, onItemClick, onCreate, onDashboardCli
                     <Box display="flex" flexDirection="column">
                         <Typography
                               variant="subtitle1"
-                              style={{ fontWeight: 600, fontSize: 13 }}
+                              style={{ fontWeight: "bold"}}
                             >
                             {row.Name}
                             </Typography>
-                      <Typography variant="body2" color="textSecondary">
+                      <Typography variant="body2" style={{ fontSize: 10,fontWeight:600 }}>
                       Remark amount: {row.Remarkamount}
                       </Typography>
-                      <Typography variant="body2" color="textSecondary">
+                      <Typography variant="body2" style={{ fontSize: 10,fontWeight:600 }}>
                         Mobile: {row.Mobile}
                       </Typography>
-                      <Typography variant="body2" color="textSecondary">
+                      <Typography variant="body2" style={{ fontSize: 10,fontWeight:600 }}>
                       Remark Date: {row.RemarkDate}
                       </Typography>
                     </Box>
                   }
                 />
-                <Box display="flex" alignItems="center">
-                  {getDateStatus(row.contactCreateDate) && (
-                    <Chip
-                      label={getDateStatus(row.contactCreateDate)}
-                      color={
-                        getDateStatus(row.contactCreateDate) === "New"
-                          ? "success"
-                          : "warning"
-                      }
-                    />
-                  )}
-                 
-                  <Menu
-                    id="dots-menu"
-                    anchorEl={anchorElDots}
-                    open={Boolean(anchorElDots)}
-                    onClose={handleDotsMenuClose}
-                  >
-                    <MenuItem onClick={handleDownload}>
-                      <ListItemIcon>
-                        <GetAppIcon />
-                      </ListItemIcon>
-                      <ListItemText primary="Download CSV" />
-                    </MenuItem>
-                  </Menu>
-                </Box>
+                       
               </ListItem>
+              </Card>
+              </React.Fragment>
             ))}
-          <Divider />
-          <Box display="flex" justifyContent="space-between" alignItems="center" padding={1}>
-            <Typography variant="body2">
-              Page {page + 1} of {Math.ceil(filteredRows.length / rowsPerPage)}
-            </Typography>
-            <Box display="flex" alignItems="center">
-              <IconButton
-                onClick={(e) => handleChangePage(e, page - 1)}
-                disabled={page === 0}
-              >
-                {"<"}
-              </IconButton>
-              <TextField
-                select
-                value={rowsPerPage}
-                onChange={handleChangeRowsPerPage}
-                variant="outlined"
-                size="small"
-                sx={{ width: 60 }}
-              >
-                <MenuItem value={5}>5</MenuItem>
-                <MenuItem value={10}>10</MenuItem>
-                <MenuItem value={25}>25</MenuItem>
-              </TextField>
-              <IconButton
-                onClick={(e) => handleChangePage(e, page + 1)}
-                disabled={page >= Math.ceil(filteredRows.length / rowsPerPage) - 1}
-              >
-                {">"}
-              </IconButton>
-            </Box>
-          </Box>
+                   <Divider />
         </List>
       )}
-      <Dialog
-        open={confirmDelete}
-        onClose={handleCloseConfirmDelete}
-        aria-labelledby="confirm-delete-dialog-title"
-        aria-describedby="confirm-delete-dialog-description"
-      >
-        <DialogTitle id="confirm-delete-dialog-title">
-          Confirm Delete
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText id="confirm-delete-dialog-description">
-            Are you sure you want to delete this loan reminder?
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseConfirmDelete} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={() => {
-            // Implement delete logic here
-            handleCloseConfirmDelete();
-          }} color="primary" autoFocus>
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
+
     </Card>
   );
 };

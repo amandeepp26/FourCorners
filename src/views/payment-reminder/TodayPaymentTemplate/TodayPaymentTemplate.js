@@ -55,7 +55,7 @@ const InvoiceBox = styled(Box)({
   fontFamily: "Helvetica Neue, Helvetica, Arial, sans-serif",
 });
 
-const TodayPaymentTemplate = ({ item, onGoBack }) => {
+const TodayPaymentTemplate = ({ item }) => {
   const router = useRouter();
   console.log(item, "DEKHHH BHAIIIII id aaya");
   const printRef = useRef();
@@ -68,7 +68,7 @@ const TodayPaymentTemplate = ({ item, onGoBack }) => {
   const [selectedBookingRemark, setSelectedBookingRemark] = useState("");
   const [bookingRemarkDetails, setBookingRemarkDetails] = useState({});
   const [bookingRemarks, setBookingRemarks] = useState([]);
-
+  const [payments, setPayments] = useState([]);
   const [formData, setFormData] = useState("");
 
   const handlePrint = () => {
@@ -83,25 +83,107 @@ const TodayPaymentTemplate = ({ item, onGoBack }) => {
 
   const handleClose = () => setOpen(false);
 
+ 
   useEffect(() => {
+    const fetchData = async () => {
+      if (!item) return; // Exit if no item is provided
+      try {
+        const apiUrl = `https://apiforcornershost.cubisysit.com/api/api-singel-bookingremark.php?BookingID=${item?.BookingID}`;
+        const response = await axios.get(apiUrl);
+
+        if (response.data.status === "Success") {
+          console.log(response.data, "data aaya deh");
+          setData(response.data.data);
+          setPayments(response.data.data.payments);
+        } else {
+          setError("Failed to fetch data");
+        }
+      } catch (error) {
+        setError("Error fetching data");
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchData();
-  }, [item.bookingID]);
+  }, [item]);
 
-  const fetchData = async () => {
-    try {
-      const response = await axios.get(
-        `https://apiforcornershost.cubisysit.com/api/api-singel-bookingremark.php?BookingID=${item?.BookingID}`
-      );
-      console.log("data aaya dekh", response.data);
-      setData(response.data.data);
-      setLoading(false);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      setError(error);
-      setLoading(false);
-    }
-  };
+  const totalCash = payments.reduce(
+    (sum, payment) => sum + (payment.Cash || 0),
+    0
+  );
+  const totalCheque = payments.reduce(
+    (sum, payment) => sum + (payment.ChequeAmount || 0),
+    0
+  );
+  const totalAPlusB = totalCash + totalCheque;
 
+  let balance = data?.TotalCost;
+
+  finalRows = finalRows?.map((row, index) => {
+    const currentAPlusB = row.Cash + row.ChequeAmount;
+    const currentBalance = balance - currentAPlusB;
+
+    const updatedRow = {
+      ...row,
+      TotalAPlusB: currentAPlusB,
+      Balance: currentBalance,
+    };
+
+    // Update balance for the next row
+    balance = currentBalance;
+
+    return updatedRow;
+  });
+  // Start with the total cost as the initial running balance
+  let runningBalance = data?.TotalCost || 0;
+
+  const rows = payments.map((payment) => {
+    const cash = payment.Cash || 0;
+    const chequeAmount = payment.ChequeAmount || 0;
+    const totalAPlusB = cash + chequeAmount;
+
+    // Conditionally set the Date value based on the presence of ChequeAmount
+    const displayDate = payment.Date;
+
+    // Calculate the current balance by subtracting the current TotalAPlusB from the running balance
+    const currentBalance = runningBalance - totalAPlusB;
+
+    // Prepare the row data with the current balance
+    const row = {
+      Date: displayDate, 
+      Cash: cash,
+      ChequeAmount: chequeAmount,
+      TotalAPlusB: totalAPlusB,
+      Balance: currentBalance,
+      Wing: data?.WingName || "",
+      Floor: data?.FloorNo || "",
+      FlatNo: data?.FlatNumber || "",
+      Type: data?.Type || "",
+    };
+
+    // Update the running balance to the current balance for the next iteration
+    runningBalance = currentBalance;
+
+    return row;
+  });
+
+  // Ensure there are always 15 rows displayed
+  const totalRows = 23;
+  const defaultRowsCount = Math.max(totalRows - rows.length, 0);
+  const defaultRows = new Array(defaultRowsCount).fill({
+    Date: "",
+    Cash: "",
+    ChequeAmount: "",
+    TotalAPlusB: "",
+    Balance: "",
+    Wing: "",
+    Floor: "",
+    FlatNo: "",
+    Type: "",
+  });
+
+  const finalRows = [...rows, ...defaultRows];
   if (loading) {
     return <Typography>Loading...</Typography>;
   }
@@ -156,7 +238,7 @@ const TodayPaymentTemplate = ({ item, onGoBack }) => {
     if (bookingRemarkID) {
       await fetchBookingRemarkDetails(bookingRemarkID);
     } else {
-      setBookingRemarkDetails({}); // Reset the details if no remark is selected
+      setBookingRemarkDetails({}); 
     }
   };
   const handleSubmit = async (event) => {
@@ -175,8 +257,9 @@ const TodayPaymentTemplate = ({ item, onGoBack }) => {
       Remarkamount: bookingRemarkDetails.Remarkamount || 0,
       RemarkName: bookingRemarkDetails.RemarkName || "",
       RemarkDate: formData.NextFollowUpDate, // Use the NextFollowUpDate as RemarkDate
-      AmountTypeID: 1, // Assuming a static value, modify as needed
-      Loan: formData.Loan || 0, // Replace this with the actual Loan field if present
+      AmountTypeID: bookingRemarkDetails.AmountTypeID,
+      Loan: bookingRemarkDetails.Loan || 0,
+      Registraion: bookingRemarkDetails.Registraion || 0, // Replace this with the actual Loan field if present
       Note: formData.Note,
       CreateUID: cookies?.amr?.UserID || 1,
     };
@@ -233,118 +316,171 @@ const TodayPaymentTemplate = ({ item, onGoBack }) => {
 
   return (
     <>
-       <Modal open={open} onClose={handleClose}>
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            bgcolor: "background.paper",
-            boxShadow: 24,
-            p: 4,
-            minWidth: 500,
-            maxWidth: 700,
-            minHeight: 400,
-          }}
+     <Modal open={open} onClose={handleClose}>
+  <Box
+    sx={{
+      position: "absolute",
+      top: "50%",
+      left: "50%",
+      transform: "translate(-50%, -50%)",
+      bgcolor: "background.paper",
+      boxShadow: 24,
+      p: 4,
+      minWidth: 500,
+      maxWidth: 700,
+    
+      borderRadius: 3, // Rounded corners
+      display: 'flex',
+      flexDirection: 'column',
+    }}
+  >
+    {/* Close Button */}
+    <IconButton
+      aria-label="cancel"
+      onClick={handleClose}
+      sx={{
+        position: "absolute",
+        top: 15,
+        right: 15,
+        backgroundColor: "#f0f0f0", 
+        '&:hover': {
+          backgroundColor: "#ffcccc", 
+        },
+      }}
+    >
+      <CancelIcon sx={{ color: "#d32f2f" }} />
+    </IconButton>
+
+    {/* Modal Title */}
+    <Typography
+      id="modal-modal-title"
+      variant="h6" // Bigger title for better visibility
+      component="h3"
+      align="center"
+      sx={{ fontWeight: "bold", color: "#333", mb: 3 }}
+    >
+      Select Next Follow-Up Date and Time
+    </Typography>
+
+    <Box
+      sx={{
+        display: "grid",
+        gridTemplateColumns: "repeat(2, 1fr)", // Two columns for better layout
+        gap: 3,
+        mb: 3,
+      }}
+    >
+      {/* Booking Remark */}
+      <Box item xs={3}>
+        <TextField
+          select
+          label="Select Booking Remark"
+          value={selectedBookingRemark}
+          onChange={handleBookingRemarkChange}
+          fullWidth
+          variant="outlined"
+          sx={{ mb: 2 }}
         >
-          <IconButton
-            aria-label="cancel"
-            onClick={handleClose}
-            sx={{ position: "absolute", top: 6, right: 10 }}
-          >
-            <CancelIcon sx={{ color: "red" }} />
-          </IconButton>
-          <Typography
-            id="modal-modal-title"
-            variant="h7"
-            component="h3"
-            gutterBottom
-            mt={4}
-          >
-            Select Next Follow-Up Date and Time
-          </Typography>
-          <Box container spacing={4}>
-            <Box item xs={3}>
-              <TextField
-                select
-                label="Select Booking Remark"
-                value={selectedBookingRemark}
-                onChange={handleBookingRemarkChange} // Use the correct function
-                fullWidth
-              >
-                {bookingRemarks.map((option) => (
-                  <MenuItem
-                    key={option.BookingremarkID}
-                    value={option.BookingremarkID}
-                  >
-                    {option.RemarkName}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Box>
-            {selectedBookingRemark && (
-              <>
-                <Box item xs={3}>
-                  <TextField
-                    label="Remark Amount"
-                    value={bookingRemarkDetails.Remarkamount || ""}
-                    fullWidth
-                    InputProps={{
-                      readOnly: true,
-                    }}
-                  />
-                </Box>
-                <Box item xs={3}>
-                  <TextField
-                    label="Remark Name"
-                    value={bookingRemarkDetails.RemarkName || ""}
-                    fullWidth
-                    InputProps={{
-                      readOnly: true,
-                    }}
-                  />
-                </Box>
-              </>
-            )}
+          {bookingRemarks.map((option) => (
+            <MenuItem key={option.BookingremarkID} value={option.BookingremarkID}>
+              {option.RemarkName}
+            </MenuItem>
+          ))}
+        </TextField>
+      </Box>
 
-            <Box item xs={3}>
-              <TextField
-                fullWidth
-                type="date"
-                name="NextFollowUpDate"
-                value={formData.NextFollowUpDate}
-                onChange={handleChange}
-                label="Next Follow Up Date"
-                InputLabelProps={{
-                  shrink: true,
-                }}
-              />
-            </Box>
-            <Box item xs={3}>
-              <TextField
-                fullWidth
-                label="Note"
-                type="text"
-                name="Note"
-                value={formData.Note}
-                onChange={handleChange}
-                InputLabelProps={{ sx: { mb: 1 } }}
-              />
-            </Box>
+      {/* Display Remark Details when Selected */}
+      {selectedBookingRemark && (
+        <>
+          <Box item xs={3}>
+            <TextField
+              label="Remark Amount"
+              value={bookingRemarkDetails.Remarkamount || ""}
+              fullWidth
+              InputProps={{
+                readOnly: true,
+              }}
+              variant="outlined"
+              sx={{ mb: 2 }}
+            />
           </Box>
+          <Box item xs={3}>
+            <TextField
+              label="Remark Name"
+              value={bookingRemarkDetails.RemarkName || ""}
+              fullWidth
+              InputProps={{
+                readOnly: true,
+              }}
+              variant="outlined"
+              sx={{ mb: 2 }}
+            />
+          </Box>
+        </>
+      )}
 
-          <Box sx={{ textAlign: "left", mt: 3 }}>
-            <Button
-              variant="contained"
-              sx={{ backgroundColor: "#9155FD", color: "#FFFFFF" }}
-              onClick={handleSubmit}
-            >
-              Submit
-            </Button>
-          </Box>
-        </Box>
-      </Modal>
+      {/* Next Follow Up Date */}
+      <Box item xs={3}>
+        <TextField
+          fullWidth
+          type="date"
+          name="NextFollowUpDate"
+          value={formData.NextFollowUpDate}
+          onChange={handleChange}
+          label="Next Follow Up Date"
+          InputLabelProps={{
+            shrink: true,
+          }}
+          variant="outlined"
+          sx={{ mb: 2 }}
+          error={formData.NextFollowUpDate === ""}
+          helperText={formData.NextFollowUpDate === "" ? "This field is required" : ""}
+        />
+      </Box>
+
+      {/* Note */}
+      <Box item xs={3}>
+        <TextField
+          fullWidth
+          label="Note"
+          type="text"
+          name="Note"
+          value={formData.Note}
+          onChange={handleChange}
+          variant="outlined"
+          sx={{ mb: 2 }}
+          error={formData.Note === ""}
+          helperText={formData.Note === "" ? "This field is required" : ""}
+        />
+      </Box>
+    </Box>
+
+    {/* Submit Button */}
+    <Box sx={{ textAlign: "center", mt: 3 }}>
+      <Button
+        variant="contained"
+        sx={{
+          backgroundColor: "#9155FD",
+          color: "#FFFFFF",
+          padding: "10px 30px", // Increased padding for button size
+          borderRadius: "20px", // Rounded button corners
+          '&:hover': {
+            backgroundColor: "#7a33d7", // Darker on hover
+          },
+          position: "relative",
+        }}
+        onClick={handleSubmit}
+        disabled={loading} // Disable when loading
+      >
+        {loading ? (
+          <CircularProgress size={24} sx={{ position: "absolute" }} />
+        ) : (
+          "Submit"
+        )}
+      </Button>
+    </Box>
+  </Box>
+</Modal>
       <Box sx={{ marginBottom: 100}}>
         <Button
           variant="contained"
@@ -407,8 +543,8 @@ const TodayPaymentTemplate = ({ item, onGoBack }) => {
                 </StyledTableCell>
               </TableRow>
               <TableRow sx={{ padding: 0 }}>
-                <StyledTableCell style={{ textAlign: "center", padding: 0 }}>
-                  <img src="{images}" alt="Logo" width="70" height="100" />
+              <StyledTableCell sx={{width: "150px" , alignItems:"center"}}>
+                  <img src={`https://apiforcornershost.cubisysit.com/projectimage/${data.images || "rosenagar.png"}`} alt="Logo"  width={350}  height={160}/>
                 </StyledTableCell>
                 <StyledTableCell sx={{ padding: 0 }}>
                   <img
@@ -709,7 +845,7 @@ const TodayPaymentTemplate = ({ item, onGoBack }) => {
                   style={{ width: "30%", padding: 0 }}
                   colSpan={4}
                 >
-                  Extra Cost (B)
+                  Extra Cost
                 </StyledTableCell>
                 <StyledTableCell
                   style={{ width: "20%", padding: 0 }}
@@ -735,7 +871,7 @@ const TodayPaymentTemplate = ({ item, onGoBack }) => {
                   style={{ width: "30%", padding: 0 }}
                   colSpan={4}
                 >
-                  Total (A + B)
+                  Total 
                 </StyledTableCell>
                 <StyledTableCell
                   style={{ width: "20%", padding: 0 }}
@@ -749,7 +885,7 @@ const TodayPaymentTemplate = ({ item, onGoBack }) => {
                   style={{ width: "30%", padding: 0 }}
                   colSpan={4}
                 >
-                  Gross Flat Cost (A)
+                  Gross Flat Cost
                 </StyledTableCell>
                 <StyledTableCell
                   style={{ width: "20%", padding: 0 }}
@@ -910,6 +1046,93 @@ const TodayPaymentTemplate = ({ item, onGoBack }) => {
             </TableBody>
           </Table>
         </TableContainer>
+      </InvoiceBox>
+      <InvoiceBox className="printableArea" ref={printRef}>
+        <TableContainer component={Paper}>
+          <Table>
+            <TableBody>
+              {/* Payment Summary Row */}
+
+              {/* Table Headers */}
+              <TableRow>
+                <StyledTableCell
+                  colSpan={5}
+                  style={{ textAlign: "center", borderBottom: "none" }}
+                >
+                  <Typography style={{ fontSize: 20, fontWeight: 700 }}>
+                    PROJECT
+                  </Typography>
+                  <Typography style={{ fontSize: 20, fontWeight: 700 }}>
+                    {data.ProjectName}
+                  </Typography>
+                </StyledTableCell>
+                <StyledTableCell style={{ textAlign: "center" }}>
+                  <Typography variant="body1">WING</Typography>
+                  <Typography variant="body2">{data?.WingName}</Typography>
+                </StyledTableCell>
+
+                <StyledTableCell style={{ textAlign: "center" }}>
+                  <Typography variant="body1">FLOOR</Typography>
+                  <Typography variant="body2">{data?.FloorNo}</Typography>
+                </StyledTableCell>
+                <StyledTableCell style={{ textAlign: "center" }}>
+                  <Typography variant="body1">FLAT NO</Typography>
+                  <Typography variant="body2">{data?.FlatNo}</Typography>
+                </StyledTableCell>
+                <StyledTableCell style={{ textAlign: "center" }}>
+                  <Typography variant="body1">TYPE</Typography>
+                  <Typography variant="body2">{data?.UnittypeName}</Typography>
+                </StyledTableCell>
+              </TableRow>
+
+              <TableRow>
+              <StyledTableCell style={{ textAlign: "center" }}>
+                 Sr No.
+                </StyledTableCell>
+                <StyledTableCell style={{ textAlign: "center" }}>
+                 Date
+                </StyledTableCell>
+         
+                <StyledTableCell colSpan={4} style={{ textAlign: "center" }}>
+                  Amount
+                </StyledTableCell>
+               
+                <StyledTableCell style={{ textAlign: "center" }}>
+                  Balance
+                </StyledTableCell>
+                <StyledTableCell colSpan={2} style={{ textAlign: "center" }}>
+                  Sign.
+                </StyledTableCell>
+              </TableRow>
+
+              {/* Render Rows */}
+              {finalRows?.map((row, index) => (
+                <TableRow key={index}>
+                   <StyledTableCell style={{ textAlign: "center" }}>
+                    {index+1}
+                  </StyledTableCell>
+                  <StyledTableCell style={{ textAlign: "center" }}>
+                    {row.Date}
+                  </StyledTableCell>
+            
+                  <StyledTableCell colSpan={4} style={{ textAlign: "center" }}>
+                    {row.ChequeAmount}
+                  </StyledTableCell>
+                  <StyledTableCell style={{ textAlign: "center" }}>
+                    {row.Balance}
+                  </StyledTableCell>
+                  <StyledTableCell colSpan={2} style={{ textAlign: "center" }}>
+                    {" "}
+                
+                  </StyledTableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        <Typography variant="body2" sx={{ fontWeight: "bold", fontSize: 20 }}>
+          Note: All payments are subject to receipt and realization.
+        </Typography>
       </InvoiceBox>
       </Box>
     </>

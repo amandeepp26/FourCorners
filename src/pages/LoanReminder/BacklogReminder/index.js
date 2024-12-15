@@ -41,6 +41,7 @@ const BacklogReminder = () => {
 
   useEffect(() => {
     fetchData();
+    fetchCounts();
   }, []);
 
   useEffect(() => {
@@ -50,14 +51,13 @@ const BacklogReminder = () => {
   }, [leadData]);
 
   const fetchData = async () => {
-    const userid = cookies.amr?.UserID || 25;
+    const userid = cookies.amr?.UserID || 0;
     try {
       const response = await axios.get(
-        `https://apiforcornershost.cubisysit.com/api/api-fetch-backlogloan.php?UserID=42`
+        `https://apiforcornershost.cubisysit.com/api/api-fetch-backlogloan.php?UserID=${userid}`
       );
       console.log("API Response:", response.data);
       setRows(response.data.data || []);
-      setCounts(response.data.counts || {});
       setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -65,6 +65,22 @@ const BacklogReminder = () => {
       setLoading(false);
     }
   };
+
+      const fetchCounts = async () => {
+        const userid = cookies.amr?.UserID || 25;
+        try {
+          const response = await axios.get(
+            `https://apiforcornershost.cubisysit.com/api/api-graph-loanreminder.php?UserID=${userid}`
+          );
+          console.warn("Loan API Response:", response.data);
+          setCounts(response.data.data || {});
+          setLoading(false);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+          setError(error);
+          setLoading(false);
+        }
+      };
 
   const handleDelete = async (id) => {
     try {
@@ -90,6 +106,7 @@ const BacklogReminder = () => {
     setShowDashboard(false);
 
     fetchData();
+    fetchCounts();
   };
 
   const handleEdit = (row) => {
@@ -142,32 +159,32 @@ const BacklogReminder = () => {
       return null;
     }
 
-    const dynamicSalesData = [
-      {
-        stats: counts?.todayFollowup,
-        title: 'Today Followups',
-        color: 'primary',
-        icon: <TrendingUp sx={{ fontSize: '1.75rem' }} />
-      },
-      {
-        stats: counts?.backlogFollowup,
-        title: 'Backlog Followups',
-        color: 'success',
-        icon: <AccountOutline sx={{ fontSize: '1.75rem' }} />
-      },
-      {
-        stats: counts.transfertooppo,
-        color: 'warning',
-        title: 'Transfer to Opportunity',
-        icon: <CellphoneLink sx={{ fontSize: '1.75rem' }} />
-      },
-      {
-        stats: counts.totalFollowup,
-        color: 'info',
-        title: 'Total Followups',
-        icon: <CurrencyUsd sx={{ fontSize: '1.75rem' }} />
-      }
-    ];
+  const dynamicSalesData = [
+    {
+      stats: counts?.totalBacklogCount,
+      title: "Total Backlog",
+      color: "primary",
+      icon: <TrendingUp sx={{ fontSize: "1.75rem" }} />,
+    },
+    {
+      stats: counts?.totalOpenCount,
+      color: "warning",
+      title: "Total Open",
+      icon: <CellphoneLink sx={{ fontSize: "1.75rem" }} />,
+    },
+    {
+      stats: counts?.totalTodayCount,
+      color: "info",
+      title: "Total Today",
+      icon: <CurrencyUsd sx={{ fontSize: "1.75rem" }} />,
+    },
+    {
+      stats: counts?.totalLoanCount,
+      title: "Total Loan",
+      color: "success",
+      icon: <AccountOutline sx={{ fontSize: "1.75rem" }} />,
+    },
+  ];
 
     return dynamicSalesData.map((item, index) => (
       <Grid item xs={12} sm={3} key={index}>
@@ -200,10 +217,22 @@ const BacklogReminder = () => {
     }
 
     return [
-      { name: 'Today Followups', value: counts.todayFollowup, color: '#8884d8' },
-      { name: 'Backlog Followups', value: counts.backlogFollowup, color: '#82ca9d' },
-      { name: 'Next Followups', value: counts.nextFollowup, color: '#ffc658' },
-      { name: 'Total Followups', value: counts.totalFollowup, color: '#a4de6c' }
+      {
+        name: "Total Backlog",
+        value: counts.totalBacklogCount,
+        color: "#8884d8",
+      },
+      {
+        name: "Total Loan",
+        value: counts.totalLoanCount,
+        color: "#82ca9d",
+      },
+      { name: "Total Open", value: counts.totalOpenCount, color: "#ffc658" },
+      {
+        name: "Total Today",
+        value: counts.totalTodayCount,
+        color: "#a4de6c",
+      },
     ];
   };
 
@@ -214,14 +243,14 @@ const BacklogReminder = () => {
       <>
         <CardHeader
           title='Statistics Card'
-          subheader={
-            <Typography variant='body2'>
-              <Box component='span' sx={{ fontWeight: 600, color: 'text.primary' }}>
-                Total 48.5% growth
-              </Box>{' '}
-              😎 this month
-            </Typography>
-          }
+          // subheader={
+          //   <Typography variant='body2'>
+          //     <Box component='span' sx={{ fontWeight: 600, color: 'text.primary' }}>
+          //       Total 48.5% growth
+          //     </Box>{' '}
+          //     😎 this month
+          //   </Typography>
+          // }
           titleTypographyProps={{
             sx: {
               mb: 2.5,
@@ -274,7 +303,7 @@ const BacklogReminder = () => {
 
   return (
     <Grid container spacing={6}>
-      <Grid item xs={4}>
+      <Grid item xs={12} md={4} style={{background:"white",zIndex:"99",display:"flex", flexWrap:"wrap"}}>
         <BacklogLoanReminderSidebar 
           rows={rows} 
           onItemClick={handleShow} 

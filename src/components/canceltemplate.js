@@ -169,19 +169,55 @@ const TemplatePayment = ({ bookingcancelID, handleCancel }) => {
             </Typography>
           </StyledTableCell>
         </TableRow>
-        <TableRow sx={{ padding: 0 }}>
+        {/* <TableRow sx={{ padding: 0 }}>
           <StyledTableCell style={{ textAlign: 'center', padding: 0 }}>
             <img src="{images}" alt="Logo" width="70" height="100" />
           </StyledTableCell>
-          <StyledTableCell sx={{ padding: 0 }}>
-            <img
-              src="https://i.postimg.cc/PJfmZCRv/Untitled-design-2024-04-12-T161558-455.png"
-              alt="200 * 200"
-              width="30"
-              height="100"
-            />
-          </StyledTableCell>
-        </TableRow>
+          <StyledTableCell style={{ textAlign: "center", padding: 1 }}>
+                  <ListItemAvatar>
+                    <Avatar
+                      alt="Project Image"  // Alt text for accessibility
+                      sx={{
+                        width: '100%',
+                        height: 160,
+                        margin: 2,
+                        borderRadius: 1,
+                      }}
+                      // Dynamically set the image source using the API URL and data.images
+                      src={`https://apiforcornershost.cubisysit.com/projectimage/${data.bookingDetails.images || "rosenagar.png"}`}
+                    />
+                  </ListItemAvatar>
+                </StyledTableCell>
+        </TableRow> */}
+        <TableRow
+                  sx={{ padding: 0, display: "flex", alignItems: "center" }}
+                >
+                  <StyledTableCell style={{ textAlign: "center", padding: 1, width: "355px" ,height:"160px" }}>
+
+                    <img src={`https://apiforcornershost.cubisysit.com/projectimage/${data.bookingDetails.images || "rosenagar.png"}`} alt="Logo" width={350} height={150} />
+
+                  </StyledTableCell>
+               
+                  <Box
+                    sx={{
+                     
+                      flexGrow: 1,
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      border: "1px solid #ddd",
+                    height:"160px",
+                
+                    }}
+                  >
+                     
+                    <Typography variant="h6" align="center">
+                      Photo
+                    </Typography>
+                  
+                  </Box>
+                 
+                </TableRow>
       </TableBody>
     </Table>
   </TableContainer>
@@ -328,6 +364,12 @@ const TemplatePayment = ({ bookingcancelID, handleCancel }) => {
           </StyledTableCell>
         </TableRow>
         <TableRow sx={{ padding: 0 }}>
+        <StyledTableCell style={{ width: '30%', padding: 0 }} colSpan={4}>
+        TTL Amount As Per Builtup
+          </StyledTableCell>
+          <StyledTableCell style={{ width: '20%', padding: 0 }} colSpan={1}>
+            {data.bookingDetails.bookingcancelTtlAmount}
+          </StyledTableCell>
           <StyledTableCell style={{ width: '30%', padding: 0 }} colSpan={4}>
             Advocate
           </StyledTableCell>
@@ -339,7 +381,6 @@ const TemplatePayment = ({ bookingcancelID, handleCancel }) => {
     </Table>
   </TableContainer>
 
-  {/* Additional tables for charges and other details */}
   <TableContainer component={Paper}>
     <Table className="info-border">
       <TableBody>
@@ -435,6 +476,44 @@ const TemplatePayment = ({ bookingcancelID, handleCancel }) => {
     </Table>
   </TableContainer>
 
+  <TableContainer>
+    <Table>
+      <TableBody>
+      <TableRow sx={{ padding: 0 }}>
+          <StyledTableCell style={{ textAlign: 'left', fontSize: 15, fontWeight: 500, padding: 0 }} colSpan={10}>
+          UPDATED  REMARKS:
+          </StyledTableCell>
+        </TableRow>
+
+        {data.updateRemarks?.map((updateremarks, index) => (
+          <TableRow key={updateremarks.BookingRemarkID} sx={{ padding: 0 }}>
+            <StyledTableCell style={{ textAlign: 'left', padding: 0 }} colSpan={10}>
+              {index + 1}. Rs. {updateremarks.bookingcancelremarksAmount} {updateremarks.bookingcancelremarksRemark} {updateremarks.bookingcancelremarksDate}
+            </StyledTableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  </TableContainer>
+  <TableContainer>
+    <Table>
+      <TableBody>
+      <TableRow sx={{ padding: 0 }}>
+          <StyledTableCell style={{ textAlign: 'left', fontSize: 15, fontWeight: 500, padding: 0 }} colSpan={10}>
+          COMPLETE  REMARKS:
+          </StyledTableCell>
+        </TableRow>
+
+        {data.completePaymentRemarks?.map((completeremarks, index) => (
+          <TableRow key={completeremarks.BookingRemarkID} sx={{ padding: 0 }}>
+            <StyledTableCell style={{ textAlign: 'left', padding: 0 }} colSpan={10}>
+              {index + 1}. Rs. {completeremarks.bookingcancelremarksAmount} {completeremarks.bookingcancelremarksRemark} {completeremarks.bookingcancelremarksDate}
+            </StyledTableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  </TableContainer>
   <TableContainer component={Paper}>
     <Table className="info-border">
       <TableBody>

@@ -14,48 +14,54 @@ import {
   IconButton,
   Popover,
   ListItemAvatar,
+  Modal,
+  Button,
+  Chip,
 } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+
 import axios from "axios";
 import PersonIcon from "@mui/icons-material/Person";
+// import  Chip from '@mui/material';
 import SortIcon from "@mui/icons-material/Sort";
 import AddIcon from "@mui/icons-material/Add";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { Chip } from '@mui/material';
-import { useCookies } from "react-cookie";
-
 import GetAppIcon from "@mui/icons-material/GetApp";
+import { useCookies } from "react-cookie";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
-const TodayPayment = ({ onItemClick, onCreate }) => {
+const BacklogPaymentSidebar = ({ onItemClick, onCreate }) => {
+  const initialFormData = {
+    AmountGiven: null,
+  };
+
+  const [formData, setFormData] = useState(initialFormData);
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filteredRows, setFilteredRows] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [totalCost, setTotalCost] = useState(0);
   const [anchorElFilter, setAnchorElFilter] = useState(null);
-  const [anchorElDots, setAnchorElDots] = useState(null);
   const [sortOption, setSortOption] = useState("");
-  const [cookies, setCookie] = useCookies(["amr"]); // Define cookies and setCookie function
-
-  const userName = cookies.amr?.FullName || 'User';
-  const roleName = cookies.amr?.RoleName || 'Admin';
-
-
-
+  const [cookies, setCookie] = useCookies(["amr"]);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [cashPaid, setCashPaid] = useState("");
+  const [chequePaid, setChequePaid] = useState("");
+  const userid = cookies.amr?.UserID || "Role";
 
   useEffect(() => {
-    // console.log(userid , "lead sidebar<<<<<<<<>>>>>>>>>>");
     fetchData();
-
   }, []);
 
   const fetchData = async () => {
-    const userid = cookies.amr?.UserID || 'Role';
     try {
       const response = await axios.get(
-        `https://apiforcornershost.cubisysit.com/api/api-fetch-todayereminder.php?UserID=${userid}`,
-       
+        `https://apiforcornershost.cubisysit.com/api/api-fetch-backlogreminder.php?UserID=${userid}`
+        // https://apiforcornershost.cubisysit.com/api/api-fetch-backlog.php?UserID=${userid}
       );
-      console.log("API Response:", response.data);
+      console.log("BACKLOG PAYEMent DTAA", response.data);
       setRows(response.data.data || []);
       setLoading(false);
     } catch (error) {
@@ -76,8 +82,8 @@ const TodayPayment = ({ onItemClick, onCreate }) => {
     } else {
       const filteredData = rows.filter(
         (item) =>
-          item.Name.toLowerCase().includes(lowerCaseQuery) ||
-          item.Mobile.toLowerCase().includes(lowerCaseQuery) 
+          item?.Name?.toLowerCase().includes(lowerCaseQuery) ||
+          item?.Mobile?.toLowerCase().includes(lowerCaseQuery)
       );
       setFilteredRows(filteredData);
     }
@@ -91,25 +97,17 @@ const TodayPayment = ({ onItemClick, onCreate }) => {
     setSearchQuery("");
     setFilteredRows(rows);
   };
-
-  const handleFilterMenuOpen = (event) => {
-    setAnchorElFilter(event.currentTarget);
-  };
-
-  const handleFilterMenuClose = () => {
-    setAnchorElFilter(null);
-  };
-
-  const handleDotsMenuOpen = (event) => {
-    setAnchorElDots(event.currentTarget);
-  };
   const getDateStatus = (contactCreateDate) => {
     const date = new Date(contactCreateDate);
     const now = new Date();
-    
-    const isCurrentMonth = date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
-    const isPreviousMonth = date.getMonth() === now.getMonth() - 1 && date.getFullYear() === now.getFullYear();
-  
+
+    const isCurrentMonth =
+      date.getMonth() === now.getMonth() &&
+      date.getFullYear() === now.getFullYear();
+    const isPreviousMonth =
+      date.getMonth() === now.getMonth() - 1 &&
+      date.getFullYear() === now.getFullYear();
+
     if (isCurrentMonth) {
       return "New";
     } else if (isPreviousMonth) {
@@ -118,8 +116,15 @@ const TodayPayment = ({ onItemClick, onCreate }) => {
       return null;
     }
   };
-  const handleDotsMenuClose = () => {
-    setAnchorElDots(null);
+  const handleFilterMenuOpen = (event) => {
+    setAnchorElFilter(event.currentTarget);
+  };
+
+  const handleFilterMenuClose = () => {
+    setAnchorElFilter(null);
+  };
+  const calculateBalance = () => {
+    return totalCost - handleAddition();
   };
 
   const handleSortOptionChange = (option) => {
@@ -133,14 +138,12 @@ const TodayPayment = ({ onItemClick, onCreate }) => {
     switch (option) {
       case "asc":
         sortedRows.sort(
-          (a, b) =>
-            new Date(a.RemarkDate) - new Date(b.RemarkDate)
+          (a, b) => new Date(a.RemarkDate) - new Date(b.RemarkDate)
         );
         break;
       case "desc":
         sortedRows.sort(
-          (a, b) =>
-            new Date(b.RemarkDate) - new Date(a.RemarkDate)
+          (a, b) => new Date(b.RemarkDate) - new Date(a.RemarkDate)
         );
         break;
       case "a-z":
@@ -155,30 +158,29 @@ const TodayPayment = ({ onItemClick, onCreate }) => {
     setFilteredRows(sortedRows);
   };
 
-  const jsonToCSV = (json) => {
-    const header = Object.keys(json[0]).join(",");
-    const values = json
-      .map((obj) => Object.values(obj).join(","))
-      .join("\n");
-    return `${header}\n${values}`;
+  const handleModalOpen = (totalCost) => {
+    setTotalCost(totalCost);
+    setModalOpen(true);
   };
 
-  const handleDownload = () => {
-    const csv = jsonToCSV(rows);
-    const blob = new Blob([csv], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "mylead.csv";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+  const handleModalClose = () => {
+    setModalOpen(false);
+  };
+
+  const handleAddition = () => {
+    const cashPaidNumber = parseFloat(cashPaid) || 0;
+    const chequePaidNumber = parseFloat(chequePaid) || 0;
+    return cashPaidNumber + chequePaidNumber;
+  };
+
+  const handleDateChange = (date) => {
+    setFormData({ ...formData, AmountGiven: date });
   };
 
   return (
     <Card
       sx={{
-        width:390,
+        width: 390,
         padding: 5,
         height: 700,
         overflowY: "auto",
@@ -187,10 +189,16 @@ const TodayPayment = ({ onItemClick, onCreate }) => {
       <Grid item xs={12} sx={{ marginBottom: 3 }}>
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Typography variant="body2" sx={{ fontWeight: "bold", fontSize: 20 }}>
-         Today Payment
+            Backlog Payment Reminder
           </Typography>
           <Box display="flex" alignItems="center">
-          
+            {/* <IconButton
+              aria-label="filter"
+              sx={{ color: "grey" }}
+              onClick={onCreate}
+            >
+              <AddIcon />
+            </IconButton> */}
             <IconButton
               aria-label="filter"
               sx={{ color: "grey" }}
@@ -226,7 +234,33 @@ const TodayPayment = ({ onItemClick, onCreate }) => {
               </MenuItem>
             </Popover>
 
-           
+            {/* <IconButton
+              aria-label="more"
+              aria-controls="menu"
+              aria-haspopup="true"
+              onClick={handleDotsMenuOpen}
+              sx={{ color: "grey" }}
+            >
+              <MoreVertIcon />
+            </IconButton>
+            <Popover
+              id="menu"
+              anchorEl={anchorElDots}
+              open={Boolean(anchorElDots)}
+              onClose={handleDotsMenuClose}
+              anchorOrigin={{
+                vertical: "bottom",
+                horizontal: "right",
+              }}
+              transformOrigin={{
+                vertical: "top",
+                horizontal: "right",
+              }}
+            >
+              <MenuItem onClick={handleDownload}>
+                Download All Data
+              </MenuItem>
+            </Popover> */}
           </Box>
         </Box>
       </Grid>
@@ -281,75 +315,43 @@ const TodayPayment = ({ onItemClick, onCreate }) => {
         <List>
           {filteredRows.map((item) => (
             <React.Fragment key={item.BookingID}>
-                  <Card sx={{ marginBottom: 2 }}>
-            <ListItem
-              key={item.BookingID}
-              disablePadding   
-              onClick={() => onItemClick(item)}
-
-            >
-              <ListItemAvatar>
-                <Avatar
-                  alt={item.Name}
-                  sx={{ width: 40, height: 40, margin: 2 }}
-                  src="/images/avatars/1.png"                />
-              </ListItemAvatar>
-              <ListItemText
-                primary={
-                  <Typography
-                  variant="subtitle1"
-                  style={{ fontWeight: "bold" }}
+              <Card sx={{ marginBottom: 2 }}>
+                <ListItem
+                  key={item.BookingID}
+                  disablePadding
+                  onClick={() => onItemClick(item)}
                 >
-                  
-                 {item?.TitleName} {item?.Name}
-                  </Typography>
-                }
-                secondary={ <>
-                  <Typography
-                    variant="body2"
-                    style={{ fontSize: 10,fontWeight:600 }}
-                  >
-                    Remark :  {item.RemarkName}
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    style={{ fontSize: 10,fontWeight:600 }}
-                  >
-                   Remark Date : {item.RemarkDate}
-                  </Typography>
-                  <Typography variant="body2" style={{ fontSize: 10,fontWeight:600 }}>
-                    Remark amount: {item?.Remarkamount}
-                    </Typography>
-                </>}
-              />
-                   <Box
-                        display="flex"
-                        flexDirection="column"
-                        alignItems="flex-end"
-                      >
-                        <IconButton
-                          aria-label="edit"
-                         
-                          sx={{ color: "blue" }}
-                        >      
-                    {getDateStatus(item.ContactCreateDate) && (
-                            <Chip
-                              label={getDateStatus(item.ContactCreateDate)}
-                              size="small"
-                              color={getDateStatus(item.ContactCreateDate) === "New" ? "warning" : "default"}
-                              style={{
-                                fontSize: 8,
-                                marginLeft: 8,
-                                height: 20,
-                              }}
-                            />
-                          )}
-
-                        </IconButton>
-                      </Box>
-            </ListItem>
-            </Card>
-                </React.Fragment>
+                  <ListItemAvatar>
+                    <Avatar
+                      alt={item.Name}
+                      sx={{ width: 40, height: 40, margin: 2 }}
+                      src="/images/avatars/1.png"
+                    />
+                  </ListItemAvatar>
+                  <ListItemText
+                    primary={
+                      <Typography variant="subtitle1" style={{  fontWeight: "bold"}}>
+                       {item?.TitleName} {item.Name}
+                      </Typography>
+                    }
+                    secondary={
+                      <>
+                        <Typography variant="body2" style={{ fontSize: 10,fontWeight:600 }}>
+                          Remark: {item.RemarkName}
+                        </Typography>
+                        <Typography variant="body2" style={{ fontSize: 10,fontWeight:600 }}>
+                          Date: {item.RemarkDate}
+                        </Typography>
+                        <Typography variant="body2" style={{ fontSize: 10,fontWeight:600 }}>
+                        Remark amount: {item.Remarkamount}
+                        </Typography>
+                      </>
+                    }
+                  />
+                
+                </ListItem>
+              </Card>
+            </React.Fragment>
           ))}
         </List>
       )}
@@ -357,4 +359,4 @@ const TodayPayment = ({ onItemClick, onCreate }) => {
   );
 };
 
-export default TodayPayment;
+export default BacklogPaymentSidebar;

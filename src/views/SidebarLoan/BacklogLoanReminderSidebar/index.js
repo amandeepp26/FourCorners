@@ -91,8 +91,9 @@ const BacklogLoanReminderSidebar = ({ onEdit, onItemClick, onCreate, onDashboard
     } else {
       const filteredData = rows.filter(
         (item) =>
-          item?.Name?.toString().includes(lowerCaseQuery) ||
-          item?.Remarkamount?.toString().includes(lowerCaseQuery)
+   
+            item.Name.toLowerCase().includes(lowerCaseQuery) ||
+            item.Mobile.toLowerCase().includes(lowerCaseQuery) 
       );
       setFilteredRows(filteredData);
     }
@@ -211,7 +212,7 @@ const BacklogLoanReminderSidebar = ({ onEdit, onItemClick, onCreate, onDashboard
   return (
     <Card
       sx={{
-        width: 330,
+       
         padding: 5,
         height: 700,
         overflowY: "auto",
@@ -226,9 +227,7 @@ const BacklogLoanReminderSidebar = ({ onEdit, onItemClick, onCreate, onDashboard
             <IconButton aria-label="filter" sx={{ color: "grey" }} onClick={onDashboardClick}>
               <DashboardIcon />
             </IconButton>
-            <IconButton aria-label="filter" sx={{ color: "grey" }} onClick={onCreate}>
-              <AddIcon />
-            </IconButton>
+    
             <IconButton aria-label="filter" sx={{ color: "grey" }} onClick={handleFilterMenuOpen}>
               <SortIcon />
             </IconButton>
@@ -295,34 +294,39 @@ const BacklogLoanReminderSidebar = ({ onEdit, onItemClick, onCreate, onDashboard
           {filteredRows
             
             .map((row) => (
+              <React.Fragment>
+                <Card sx={{ marginBottom: 2 }}>
               <ListItem
                 key={row.BookingremarkID}
-                button
+            
                 onClick={() => handleListItemClick(row)}
               >
                 <ListItemAvatar>
                   <Avatar alt="John Doe"
-                          sx={{ width: 40, height: 40, margin: 2 }}
+                          sx={{ width: 40, height: 40, margin:2 }}
                           src="/images/avatars/1.png"/>
                    
                 </ListItemAvatar>
                 <ListItemText
-                  primary={row.PartyName}
+                   primary={
+                    <Typography
+                    variant="subtitle1"
+                    style={{ fontWeight: "bold" }}
+                  >
+                    
+                   {row?.TitleName} {row?.Name}
+                    </Typography>
+                  }
                   secondary={
                     <Box display="flex" flexDirection="column">
-                        <Typography
-                              variant="subtitle1"
-                              style={{ fontWeight: 600, fontSize: 13 }}
-                            >
-                            {row.Name}
-                            </Typography>
-                      <Typography variant="body2" color="textSecondary">
+                       
+                      <Typography variant="body2" style={{ fontSize: 10,fontWeight:600 }}>
                       Remark amount: {row.Remarkamount}
                       </Typography>
-                      <Typography variant="body2" color="textSecondary">
+                      <Typography variant="body2" style={{ fontSize: 10,fontWeight:600 }}>
                         Mobile: {row.Mobile}
                       </Typography>
-                      <Typography variant="body2" color="textSecondary">
+                      <Typography variant="body2" style={{ fontSize: 10,fontWeight:600 }}>
                       Remark Date: {row.RemarkDate}
                       </Typography>
                     </Box>
@@ -355,67 +359,14 @@ const BacklogLoanReminderSidebar = ({ onEdit, onItemClick, onCreate, onDashboard
                   </Menu>
                 </Box>
               </ListItem>
+              </Card>
+              </React.Fragment>
             ))}
           <Divider />
-          <Box display="flex" justifyContent="space-between" alignItems="center" padding={1}>
-            <Typography variant="body2">
-              Page {page + 1} of {Math.ceil(filteredRows.length / rowsPerPage)}
-            </Typography>
-            <Box display="flex" alignItems="center">
-              <IconButton
-                onClick={(e) => handleChangePage(e, page - 1)}
-                disabled={page === 0}
-              >
-                {"<"}
-              </IconButton>
-              <TextField
-                select
-                value={rowsPerPage}
-                onChange={handleChangeRowsPerPage}
-                variant="outlined"
-                size="small"
-                sx={{ width: 60 }}
-              >
-                <MenuItem value={5}>5</MenuItem>
-                <MenuItem value={10}>10</MenuItem>
-                <MenuItem value={25}>25</MenuItem>
-              </TextField>
-              <IconButton
-                onClick={(e) => handleChangePage(e, page + 1)}
-                disabled={page >= Math.ceil(filteredRows.length / rowsPerPage) - 1}
-              >
-                {">"}
-              </IconButton>
-            </Box>
-          </Box>
+         
         </List>
       )}
-      <Dialog
-        open={confirmDelete}
-        onClose={handleCloseConfirmDelete}
-        aria-labelledby="confirm-delete-dialog-title"
-        aria-describedby="confirm-delete-dialog-description"
-      >
-        <DialogTitle id="confirm-delete-dialog-title">
-          Confirm Delete
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText id="confirm-delete-dialog-description">
-            Are you sure you want to delete this loan reminder?
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseConfirmDelete} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={() => {
-            // Implement delete logic here
-            handleCloseConfirmDelete();
-          }} color="primary" autoFocus>
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
+    
     </Card>
   );
 };

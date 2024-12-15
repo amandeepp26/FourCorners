@@ -945,7 +945,7 @@ const TemplatePayment = ({ bookingID, handleCancel }) => {
                   </StyledTableCell>
                   <StyledTableCell colSpan={2} style={{ textAlign: "center" }}>
                     {" "}
-                    {/* Signature here */}{" "}
+                
                   </StyledTableCell>
                 </TableRow>
               ))}
