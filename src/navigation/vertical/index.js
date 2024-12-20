@@ -70,11 +70,6 @@ const navigation = () => {
       icon: Table,  // Replaced with Table
       children: [
         {
-          title: "Add Booking Details",
-          icon: CubeOutlineIcon,  // Replaced with CubeOutlineIcon
-          path: "/BookingForm",
-        },
-        {
           title: "Add Payment",
           icon: CreditCardOutline,  // Replaced with CreditCardOutline
           path: "/BookingForm/Addpayment",
@@ -91,7 +86,11 @@ const navigation = () => {
         },
       ],
     },
-
+    {
+      icon: PaymentsIcon,  // Replaced with PaymentsIcon
+      title: "Loan Report",
+      path: "/loanreport",
+    },
     {
       sectionTitle: "Companies",
     },

@@ -27,43 +27,70 @@ import TemplateRosenagar from 'src/views/TemplateRosenagar/TemplateRosenagar';
 import Reciept from 'src/views/BookingFormRosenagar/Reciept/Reciept';
 import TemplatePayment from 'src/views/BookingFormRosenagar/TemplatePayment/TemplatePayment';
 import EditBookingform from 'src/views/BookingFormRosenagar/EditBookingform/EditBookingform';
-const salesData = [
-  {
-    stats: '245k',
-    title: 'Sales',
-    color: 'primary',
-    icon: <TrendingUp sx={{ fontSize: '1.75rem' }} />
-  },
-  {
-    stats: '12.5k',
-    title: 'Customers',
-    color: 'success',
-    icon: <AccountOutline sx={{ fontSize: '1.75rem' }} />
-  },
-  {
-    stats: '1.54k',
-    color: 'warning',
-    title: 'Products',
-    icon: <CellphoneLink sx={{ fontSize: '1.75rem' }} />
-  },
-  {
-    stats: '$88k',
-    color: 'info',
-    title: 'Revenue',
-    icon: <CurrencyUsd sx={{ fontSize: '1.75rem' }} />
-  }
-];
 
-const pieData = [
-  { name: 'Sales', value: 2000, color: '#3f51b5' },
-  { name: 'Customers', value: 1200, color: '#4caf50' },
-  { name: 'Products', value: 1540, color: '#ff9800' },
-  { name: 'Revenue', value: 8000, color: '#00acc1' }
-];
+const Addpayment = () => {
+  const router = useRouter();
+  const { lead } = router.query;
+  const leadData = lead ? JSON.parse(lead) : null;
+  const [rows, setRows] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [editData, setEditData] = useState(null);
+  const [rowDataToUpdate, setRowDataToUpdate] = useState(null);
+  const [showReceipt, setShowReceipt] = useState(false);
+
+  const [showAddDetails, setShowAddDetails] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
+  const [firstVisit, setFirstVisit] = useState(true);
+  const [showDashboard, setShowDashboard] = useState(false); // New state for showing dashboard
+  const [showTemplate, setShowTemplate] = useState(false);
+const [bookingID, setBookingID] = useState(null);
+const [bookingIDCheque, setBookingIDCheque] = useState(null);
+const [bookingIDReport, setBookingIDReport] = useState(null);
+const [counts, setCounts] = useState(null);
+const [totalProjects, setTotalProjects] = useState(0);
+
+
+
+
+
+useEffect(() => {
+  fetchDatas();
+}, []);
+
+const fetchDatas = async () => {
+  setLoading(true);
+  setError(null);
+  try {
+    const response = await axios.get('https://apiforcornershost.cubisysit.com/api/api-fetch-projecttotal.php');
+    console.log(response.data); 
+    setRows(response.data.data || []);
+    setTotalProjects(response.data.totalProjects || 0); 
+    setLoading(false);
+  } catch (error) {
+    setError(error);
+  } finally {
+    setLoading(false);
+  }
+};
 
 const renderStats = () => {
-  return salesData.map((item, index) => (
-    <Grid item xs={12} sm={3} key={index}>
+  if (!counts && totalProjects === 0) { 
+    return null;
+  }
+
+  const dynamicSalesData = [
+    {
+      stats: totalProjects, 
+      title: 'Total Projects',
+      color: 'primary',
+      icon: <TrendingUp sx={{ fontSize: '1.75rem' }} />
+    }
+  ];
+  
+
+  return dynamicSalesData.map((item, index) => (
+    <Grid item xs={12} ml={80} key={index}>
       <Box key={index} sx={{ display: 'flex', alignItems: 'center' }}>
         <Avatar
           variant='rounded'
@@ -80,26 +107,32 @@ const renderStats = () => {
         </Avatar>
         <Box sx={{ display: 'flex', flexDirection: 'column' }}>
           <Typography variant='caption'>{item.title}</Typography>
-          <Typography variant='h6'>{item.stats}</Typography>
+          <Typography variant='h6'>{item.stats}</Typography> 
         </Box>
       </Box>
     </Grid>
   ));
 };
 
+const getPieData = () => {
+  if (counts) {
+    return [];
+  }
+
+  return [
+    { name: 'Total Projects', value: totalProjects, color: '#8884d8' },
+  
+  ];
+};
+
+const pieData = getPieData();
+
 const StatisticsCard = () => {
   return (
     <>
       <CardHeader
         title='Statistics Card'
-        subheader={
-          <Typography variant='body2'>
-            <Box component='span' sx={{ fontWeight: 600, color: 'text.primary' }}>
-              Total 48.5% growth
-            </Box>{' '}
-            😎 this month
-          </Typography>
-        }
+       
         titleTypographyProps={{
           sx: {
             mb: 2.5,
@@ -138,6 +171,7 @@ const WelcomeScreen = () => {
         <Typography variant="h5" sx={{ marginTop: 2, fontWeight: "bold" }}>
           Welcome to Project Dashboard
         </Typography>
+
         <Grid variant="body1" sx={{ marginTop: 10, marginLeft: 20 }}>
           <StatisticsCard />
         </Grid>
@@ -145,26 +179,6 @@ const WelcomeScreen = () => {
     </Card>
   );
 };
-
-const Addpayment = () => {
-  const router = useRouter();
-  const { lead } = router.query;
-  const leadData = lead ? JSON.parse(lead) : null;
-  const [rows, setRows] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [editData, setEditData] = useState(null);
-  const [rowDataToUpdate, setRowDataToUpdate] = useState(null);
-  const [showReceipt, setShowReceipt] = useState(false);
-
-  const [showAddDetails, setShowAddDetails] = useState(false);
-  const [showHistory, setShowHistory] = useState(false);
-  const [firstVisit, setFirstVisit] = useState(true);
-  const [showDashboard, setShowDashboard] = useState(false); // New state for showing dashboard
-  const [showTemplate, setShowTemplate] = useState(false);
-const [bookingID, setBookingID] = useState(null);
-const [bookingIDCheque, setBookingIDCheque] = useState(null);
-const [bookingIDReport, setBookingIDReport] = useState(null);
 
 
 
@@ -318,7 +332,7 @@ const [bookingIDReport, setBookingIDReport] = useState(null);
   return (
     <Grid container spacing={6}>
       
-    <Grid item xs={4}>
+      <Grid item xs={12} md={4} style={{background:"white",zIndex:"99",display:"flex", flexWrap:"wrap"}}>
       <SidebarBookingProject
         rows={rows}
         onItemClick={handleShow}

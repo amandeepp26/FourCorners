@@ -2,9 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Grid, CircularProgress, Alert, Typography, Box } from '@mui/material';
 import axios from 'axios';
 import { useRouter } from 'next/router';
-import AddTellecallingDetails from 'src/views/add-tellecallingDetails/AddTellecallingDetails';
-import Sidebar from 'src/views/TellecallingSidebar/Sidebar';
-import ListTellecalling from 'src/views/list-tellecalling/ListTellecalling';
 import HistoryTelecalling from 'src/views/history-telecalling/HistoryTelecalling';
 import PieChartIcon from '@mui/icons-material/PieChart';
 import Card from '@mui/material/Card';
@@ -18,16 +15,13 @@ import CardHeader from '@mui/material/CardHeader';
 import IconButton from '@mui/material/IconButton';
 import Avatar from '@mui/material/Avatar';
 import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer } from 'recharts';
-import SidebarProjectMaster from 'src/views/AvailablityListSidebar/AvailablitySidebar';
-import ProjectManage from 'src/views/addProject/ProjectManage';
-import Listprojectmaster from 'src/views/AvailablityListSidebar/ListAvailibiltyList/ListAvailabiltyList';
+import Sidebarloanreport from 'src/views/loanreport/Sidebarloanreport';
+import Listloanreport from 'src/views/loanreport/Listloanreport';
 
-
-const ProjectMaster = () => {
+const loanreport = () => {
   const router = useRouter();
   const { lead } = router.query;
   const leadData = lead ? JSON.parse(lead) : null;
-  
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -36,94 +30,113 @@ const ProjectMaster = () => {
   const [showAddDetails, setShowAddDetails] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [firstVisit, setFirstVisit] = useState(true);
+  const [counts, setCounts] = useState(null);
   const [totalProjects, setTotalProjects] = useState(0);
 
-  // Fetch project data
-  const fetchData = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await axios.get('https://apiforcornershost.cubisysit.com/api/api-fetch-projecttotal.php');
-      
-      // Ensure the response is in the correct format
-      if (response.data && response.data.data) {
-        setRows(response.data.data || []);
-        setTotalProjects(response.data.totalProjects || 0); // Total projects directly from the response
-      } else {
-        throw new Error('Invalid response data');
-      }
-      setLoading(false);
-    } catch (error) {
-      setError(error);
-      setLoading(false);
+
+ 
+
+  useEffect(() => {
+    if (leadData) {
+      console.log('Converted Lead:', leadData);
     }
-  };
+  }, [leadData]);
+
 
   useEffect(() => {
     fetchData();
   }, []);
-
-
-
-  // Stats rendering function
+  
+  const fetchData = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await axios.get('https://apiforcorners.cubisysit.com/api/api-fetch-projecttotal.php');
+      console.log(response.data); 
+      setRows(response.data.data || []);
+      setTotalProjects(response.data.totalProjects || 0); 
+      setLoading(false);
+    } catch (error) {
+      setError(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
   const renderStats = () => {
-    if (totalProjects === 0) {
+    if (!counts && totalProjects === 0) { 
       return null;
     }
-
-    return (
-      <Grid item xs={12} ml={80}>
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+  
+    const dynamicSalesData = [
+      {
+        stats: totalProjects, 
+        title: 'Total Projects',
+        color: 'primary',
+        icon: <TrendingUp sx={{ fontSize: '1.75rem' }} />
+      }
+    ];
+    
+  
+    return dynamicSalesData.map((item, index) => (
+      <Grid item xs={12} ml={80} key={index}>
+        <Box key={index} sx={{ display: 'flex', alignItems: 'center' }}>
           <Avatar
-            variant="rounded"
+            variant='rounded'
             sx={{
               mr: 3,
               width: 44,
               height: 44,
               boxShadow: 3,
               color: 'common.white',
-              backgroundColor: 'primary.main',
+              backgroundColor: `${item.color}.main`
             }}
           >
-            <TrendingUp sx={{ fontSize: '1.75rem' }} />
+            {item.icon}
           </Avatar>
           <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-            <Typography variant="caption">Total Projects</Typography>
-            <Typography variant="h6">{totalProjects}</Typography>
+            <Typography variant='caption'>{item.title}</Typography>
+            <Typography variant='h6'>{item.stats}</Typography> 
           </Box>
         </Box>
       </Grid>
-    );
+    ));
   };
-
-  // Pie chart data
+  
   const getPieData = () => {
+    if (counts) {
+      return [];
+    }
+
     return [
       { name: 'Total Projects', value: totalProjects, color: '#8884d8' },
+    
     ];
   };
 
+  const pieData = getPieData();
+
   const StatisticsCard = () => {
-    const pieData = getPieData();
     return (
       <>
         <CardHeader
-          title="Statistics Card"
+          title='Statistics Card'
+         
           titleTypographyProps={{
             sx: {
               mb: 2.5,
               lineHeight: '2rem !important',
-              letterSpacing: '0.15px !important',
-            },
+              letterSpacing: '0.15px !important'
+            }
           }}
         />
         <CardContent sx={{ pt: theme => `${theme.spacing(3)} !important` }}>
-          <Grid container spacing={5}>
+          <Grid container spacing={[5, 0]}>
             {renderStats()}
             <Grid item xs={12}>
-              <ResponsiveContainer width="100%" height={400}>
+              <ResponsiveContainer width='100%' height={400}>
                 <PieChart>
-                  <Pie data={pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={120} fill="#8884d8" label>
+                  <Pie data={pieData} dataKey='value' nameKey='name' cx='50%' cy='50%' outerRadius={120} fill='#8884d8' label>
                     {pieData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
@@ -139,24 +152,24 @@ const ProjectMaster = () => {
     );
   };
 
-  const WelcomeScreen = () => (
-    <Card>
-      <Box sx={{ textAlign: 'center', marginTop: '20px' }}>
-        <PieChartIcon sx={{ fontSize: 60, color: '#333' }} />
-        <Typography variant="h5" sx={{ marginTop: 2, fontWeight: 'bold' }}>
-          Welcome to Project Dashboard
-        </Typography>
-        <Grid variant="body1" sx={{ marginTop: 10, marginLeft: 20 }}>
-          <StatisticsCard />
-        </Grid>
-      </Box>
-    </Card>
-  );
-  useEffect(() => {
-    if (leadData) {
-      console.log('Converted Lead:', leadData);
-    }
-  }, [leadData]);
+  const WelcomeScreen = () => {
+    return (
+      <Card>
+        <Box sx={{ textAlign: 'center', marginTop: '20px' }}>
+          <PieChartIcon sx={{ fontSize: 60, color: "#333" }} />
+          <Typography variant="h5" sx={{ marginTop: 2, fontWeight: "bold" }}>
+            Welcome to Project Dashboard
+          </Typography>
+  
+          <Grid variant="body1" sx={{ marginTop: 10, marginLeft: 20 }}>
+            <StatisticsCard />
+          </Grid>
+        </Box>
+      </Card>
+    );
+  };
+  
+
   const handleBack = () => {
     setEditData(null);
     setShowAddDetails(false);
@@ -174,70 +187,52 @@ const ProjectMaster = () => {
   };
 
   const handleShow = (item) => {
-    setRowDataToUpdate(item);
+    setRowDataToUpdate(item); 
     setShowAddDetails(false);
     setShowHistory(false);
     setFirstVisit(false);
   };
+  
 
-  const handleAddTelecaller = () => {
-    setEditData(null);
-    setShowAddDetails(false);
-    setRowDataToUpdate(null);
-    setShowHistory(false);
-    setFirstVisit(false);
-    setTimeout(() => {
-      setShowAddDetails(true);
-    }, 0);
-  };
-
-  const handleShowHistory = () => {
-    setShowHistory(true);
-    setShowAddDetails(false);
-    setFirstVisit(false);
-  };
 
   return (
     <Grid container spacing={6}>
       <Grid item xs={12} md={4} style={{background:"white",zIndex:"99",display:"flex", flexWrap:"wrap"}}>
-        <SidebarProjectMaster rows={rows} onItemClick={handleShow} onEdit={handleEdit} onCreate={handleAddTelecaller} />
+        <Sidebarloanreport rows={rows} onItemClick={handleShow}  />
       </Grid>
-      <Grid item xs={8} sm={8} md={8}>
+      <Grid item xs={8}>
         {loading && <CircularProgress />}
         {error && <Alert severity="error">Error fetching data: {error.message}</Alert>}
 
-        {firstVisit && !loading && !error && !leadData && <WelcomeScreen />}
+        {firstVisit && !loading && !error && !leadData && (
+          <WelcomeScreen />
+        )}
 
         {leadData && (
           <Box>
             <Typography variant="h6" sx={{ mb: 2 }}>
               Converted Lead Details
             </Typography>
+            {/* Render lead data details */}
             <pre>{JSON.stringify(leadData, null, 2)}</pre>
           </Box>
         )}
 
-        {showAddDetails && <ProjectManage show={handleBack} editData={editData} />}
-
-        {!loading && !error && rowDataToUpdate && !showHistory && !showAddDetails && (
-          <Listprojectmaster
-            item={rowDataToUpdate}
-            onHistoryClick={handleShowHistory}
-            onEdit={handleEdit}
-          />
+        {showAddDetails && (
+          <ProjectManage show={handleBack} editData={editData} />
         )}
+{!loading && !error && rowDataToUpdate && !showHistory && !showAddDetails && (
+  <Listloanreport
+    item={rowDataToUpdate}  // Make sure this is getting the updated item data
+  
+  />
+)}
 
-        {!loading && !error && showHistory && (
-          <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" minHeight="100vh">
-            <Typography variant="body2" sx={{ marginTop: 5, fontWeight: 'bold', alignItems: 'center', textAlign: 'center', fontSize: 20 }}>
-              User History
-            </Typography>
-            <HistoryTelecalling item={rowDataToUpdate} onBack={handleBack} />
-          </Box>
-        )}
+
+       
       </Grid>
     </Grid>
   );
 };
 
-export default ProjectMaster;
+export default loanreport;
