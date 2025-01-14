@@ -47,6 +47,7 @@ const EditBookingform = ({ show, bookingID, goBack , handleCloseEditForm}) => {
     Loan: 0,
     Register: 0,
   };
+ 
   const initialFormData = {
     BookingDate: null,
     BookingID: "",
@@ -76,6 +77,9 @@ const EditBookingform = ({ show, bookingID, goBack , handleCloseEditForm}) => {
     TotalCost: "",
     UsableArea: "",
     AgreementCarpet: "",
+    AggrementAmount:"",
+    selfAmount:"",
+    loanAmount:"",
     Area: "",
     ProjectID: "",
     SourceName: "",
@@ -85,6 +89,7 @@ const EditBookingform = ({ show, bookingID, goBack , handleCloseEditForm}) => {
     Status: 1,
     // CreateUID: 1,
   };
+
   const [remarks, setRemarks] = useState([initialRemark]);
   const [formData, setFormData] = useState(initialFormData);
   const [projectMaster, setProjectMaster] = useState([]);
@@ -150,6 +155,7 @@ const EditBookingform = ({ show, bookingID, goBack , handleCloseEditForm}) => {
         FlatNo: res.FlatNo || "",
         UnittypeID: res.UnittypeID || "",
         ParkingAvilability: res.ParkingAvilability || "",
+        ParkingID: res.ParkingID || "",
         Area: res.Area || "",
         Ratesqft: res.Ratesqft || "",
         BookingRef: res.BookingRef || "",
@@ -167,6 +173,9 @@ const EditBookingform = ({ show, bookingID, goBack , handleCloseEditForm}) => {
         FlatCostInWords: res.FlatCostInWords || "",
         BookingDate: res.BookingDate || "",
         BookedByID: res.BookedByID || "",
+        loanAmount: res.loanAmount || 0,  // Ensure this is correctly mapped
+        selfAmount: res.selfAmount || 0,  
+        AggrementAmount:res.AggrementAmount || 0,
         UsableArea: res.UsableArea || "",
         AgreementCarpet: res.AgreementCarpet || "",
       });
@@ -618,7 +627,7 @@ const EditBookingform = ({ show, bookingID, goBack , handleCloseEditForm}) => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-  
+  debugger;
     // URL for the API request
     const url = `https://proxy-forcorners.vercel.app/api/proxy/api-update-projectbooking.php`;
   
@@ -637,14 +646,14 @@ const EditBookingform = ({ show, bookingID, goBack , handleCloseEditForm}) => {
       ModifyUID: cookies?.amr?.UserID || 1,
     }));
   
-    // Structure the data as per the API requirement
+    
     const dataToSend = {
       ...formData, // All other form data like BookingDate, Mobile, etc.
       BookingID: bookingID, // Ensure this is included
       BookingremarkData: formattedRemarks, // Add the formatted remarks with BookingRemarkID
     };
-  
-    console.log(dataToSend, "Data to Send<<<<>>>>>>>>>>>>><<<<<<<<");
+  debugger;
+    console.log(dataToSend, "404 Data to Send<<<<>>>>>>>>>>>>>  <<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<");
   
     try {
       const response = await axios.post(url, dataToSend, {
@@ -652,7 +661,7 @@ const EditBookingform = ({ show, bookingID, goBack , handleCloseEditForm}) => {
           "Content-Type": "application/json",
         },
       });
-  
+  debugger;
       if (response.data.status === "Success") {
         console.log(response.data, "Submission successful<>>>>>>>>>>>>>>>");
   
@@ -675,6 +684,7 @@ const EditBookingform = ({ show, bookingID, goBack , handleCloseEditForm}) => {
           title: "Oops...",
           text: "Something went wrong!",
         });
+        handleCloseEditForm();
       }
     } catch (error) {
       // Handle error case
@@ -684,6 +694,7 @@ const EditBookingform = ({ show, bookingID, goBack , handleCloseEditForm}) => {
         title: "Oops...",
         text: "Something went wrong!",
       });
+      handleCloseEditForm();
     }
   };
   
@@ -746,13 +757,6 @@ const EditBookingform = ({ show, bookingID, goBack , handleCloseEditForm}) => {
 
   return (
     <>
-      {/* <IconButton
-              aria-label="cancel"
-              // onClick={handleClose}
-              sx={{ position: "absolute", top: 6, right: 10 }}
-            >
-              <CancelIcon sx={{ color: "red" }} />
-            </IconButton> */}
       <Card sx={{ height: "auto" }}>
         <CardContent>
           <Grid item xs={12} sx={{ marginTop: 4.8, marginBottom: 3 }}>
@@ -936,24 +940,25 @@ const EditBookingform = ({ show, bookingID, goBack , handleCloseEditForm}) => {
   <FormControl fullWidth>
     <InputLabel>Flat Number</InputLabel>
     <Select
-      value={formData.FlatNo || ''} // Ensure default value if undefined
-      onChange={handleChange}
-      name="FlatNo"
-      label="Flat Number"
-    >
-      {flatNoData.length > 0 ? (
-        flatNoData.map((wing, index) => (
-          <MenuItem
-            key={`${wing.FlatNo}-${index}`}
-            value={wing.FlatNo}
-          >
-            {wing.FlatNo}
-          </MenuItem>
-        ))
-      ) : (
-        <MenuItem disabled>No flats available</MenuItem>
-      )}
-    </Select>
+  value={formData.FlatNo || ''} // Ensure the initial value is set
+  onChange={handleChange}
+  name="FlatNo"
+  label="Flat Number"
+>
+  {flatNoData.length > 0 ? (
+    flatNoData.map((wing, index) => (
+      <MenuItem
+        key={`${wing.FlatNo}-${index}`}
+        value={wing.FlatNo}
+      >
+        {wing.FlatNo}
+      </MenuItem>
+    ))
+  ) : (
+    <MenuItem disabled>No flats available</MenuItem>
+  )}
+</Select>
+
   </FormControl>
 </Grid>
 
@@ -1190,7 +1195,39 @@ const EditBookingform = ({ show, bookingID, goBack , handleCloseEditForm}) => {
                   type="text"
                 />
               </Grid>
-
+              <Grid item xs={8} sm={4}>
+                <TextField
+                  fullWidth
+                  label="Aggrement Amount"
+                  name="AggrementAmount"
+                  placeholder="Aggrement Amount"
+                  value={formData.AggrementAmount}
+                  onChange={handleChange}
+                  type="text"
+                />
+              </Grid>
+              <Grid item xs={8} sm={4}>
+                <TextField
+                  fullWidth
+                  label="Self Amount"
+                  name="selfAmount"
+                  placeholder="Self Amount"
+                  value={formData.selfAmount}
+                  onChange={handleChange}
+                  type="text"
+                />
+              </Grid>
+              <Grid item xs={8} sm={4}>
+                <TextField
+                  fullWidth
+                  label="Loan Amount"
+                  name="loanAmount"
+                  placeholder="Loan Amount"
+                  value={formData.loanAmount}
+                  onChange={handleChange}
+                  type="text"
+                />
+              </Grid>
               <Grid item xs={8} sm={4}>
                 <DatePicker
                   selected={
@@ -1230,25 +1267,6 @@ const EditBookingform = ({ show, bookingID, goBack , handleCloseEditForm}) => {
                 </FormControl>
               </Grid>
 
-              {/* <Grid item xs={12} sm={4}>
-                <input
-                  accept="image/*"
-                  id="contained-button-file"
-                  type="file"
-                  style={{ display: "none" }}
-                  onChange={handleImageChange}
-                />
-                <label htmlFor="contained-button-file">
-                  <Typography variant="body1" component="span">
-                    Choose Image File
-                  </Typography>
-                </label>
-                {formData.imageFile && (
-                  <Typography variant="body1">
-                    {formData.imageFile.name}
-                  </Typography>
-                )}
-              </Grid> */}
 
               {remarks.map((remark, index) => (
                 <Grid container item spacing={2} key={index}>

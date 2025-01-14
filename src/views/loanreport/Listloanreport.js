@@ -50,7 +50,7 @@ const ListLoanReport = ({ item }) => {
     }
    
     
-    const apiUrl = `https://apiforcorners.cubisysit.com/api/api-fetch-loanreport.php?ProjectID=${item.ProjectID}&workpercentage=${workPercentage}&takepercentage=${takePercentage}&fromdate=${fromDate}&todate=${toDate}`;
+    const apiUrl = `https://apiforcornershost.cubisysit.com/api/api-fetch-loanreport.php?ProjectID=${item.ProjectID}&workpercentage=${workPercentage}&takepercentage=${takePercentage}&fromdate=${fromDate}&todate=${toDate}`;
     
     try {
       const response = await axios.get(apiUrl);

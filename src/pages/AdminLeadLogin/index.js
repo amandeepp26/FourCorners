@@ -82,13 +82,6 @@ const AdminLeadLogin = () => {
     <>
       {/* {activeTab === "list" && ( */}
         <>
-  
-
-
-         
-        
- 
-     
 
           <Grid container spacing={6}>
             <Grid item xs={12}>

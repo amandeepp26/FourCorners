@@ -489,7 +489,7 @@ const InvoiceBox = styled(Box)({
                   <img src={`https://apiforcornershost.cubisysit.com/projectimage/${data.images || "rosenagar.png"}`} alt="Logo"  width={350}  height={160}/>
                 </StyledTableCell>
                 <StyledTableCell sx={{ padding: 0 }}>
-                  <img src="https://i.postimg.cc/PJfmZCRv/Untitled-design-2024-04-12-T161558-455.png" alt="200 * 200" width="30" height="100" />
+                  <img src="https://static.thenounproject.com/png/3764342-200.png" alt="200 * 200" width="80px" height="100px" />
                 </StyledTableCell>
               </TableRow>
             </TableBody>

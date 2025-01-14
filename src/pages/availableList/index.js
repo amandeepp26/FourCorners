@@ -63,8 +63,6 @@ const ProjectMaster = () => {
     fetchData();
   }, []);
 
-
-
   // Stats rendering function
   const renderStats = () => {
     if (totalProjects === 0) {

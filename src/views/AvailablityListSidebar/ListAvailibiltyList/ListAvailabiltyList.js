@@ -175,7 +175,7 @@ const ListAvailabiltyList = ({ item }) => {
     if (result.isConfirmed) {
       try {
         const { data } = await axios.post(
-          'https://ideacafe-backend.vercel.app/api/proxy/api-update-projectsku.php',
+          'https://proxy-forcorners.vercel.app/api/proxy/api-update-projectsku.php',
           requestData
         );
         if (data.status === 'Success') {

@@ -20,13 +20,15 @@ import { createGlobalStyle } from "styled-components";
 import styled from "styled-components";
 import { Card } from "mdi-material-ui";
 import { DatePicker } from "@mui/lab";
-import { Call } from "@mui/icons-material";
+import { Call, Grid3x3TwoTone } from "@mui/icons-material";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { format } from 'date-fns';
 const StyledTableCell = styled(TableCell)({
   border: "2px solid black",
   padding: "0px", // Removed padding
   textAlign: "center",
+  padding:0,
+  paddingRight:0,
 });
 
 const InvoiceBox = styled(Box)({
@@ -114,6 +116,10 @@ const Reciept = ({ bookingID }) => {
       [field]: date,
     }));
   };
+  const rowsPerPage = 6; // You can adjust this number to fit the content on A4 size
+  const rowsRemaining = rowsPerPage - data.length; // Calculate the remaining rows to fill
+
+  const emptyRows = Array.from({ length: rowsRemaining }, (_, index) => ({})); // Create empty rows
 
   if (loading) {
     return <Typography>Loading...</Typography>;
@@ -161,125 +167,115 @@ const Reciept = ({ bookingID }) => {
             }
           />
 
-          {/* <Button variant="contained" onClick={handleSearch}>
-            Search
-          </Button> */}
+        </Box>
+        <Box item>
+          <Button variant="contained" onClick={handlePrint}>Print Receipt</Button>
         </Box>
       </Box>
-
-      <InvoiceBox className="printableArea" ref={printRef}>
+      <StyledTableCell>
+      <TableContainer component={Paper} sx={{ border:"25px" }}>
+      <InvoiceBox className="printableArea" ref={printRef}  sx={{border:"5px"}}>
         <TableContainer component={Paper}>
           <Table>
             <TableBody>
-              <TableRow sx={{ height: "10px", padding: 0 }}>
-                <StyledTableCell
-                  colSpan={3}
-                  sx={{ height: "10px", padding: 0 }}
-                >
-                  <Grid
-                    container
-                    alignItems="center"
-                    justifyContent="space-around"
-                    spacing={1}
-                  >
-                    <Grid item>
-                      <img
-                        src="https://i.postimg.cc/PJfmZCRv/Untitled-design-2024-04-12-T161558-455.png"
-                        alt="200 * 200"
-                        width="80"
-                        height="80"
-                      />
-                    </Grid>
-                    <Grid item>
-                      <Typography
-                        style={{
-                          textAlign: "center",
-                          fontSize: 50,
-                          fontWeight: 900,
-                          color: "#ffbf15",
-                        }}
-                      >
-                       {data[0]?.CompanyName || ""}
-                      </Typography>
-                      <Typography
-                        style={{
-                          textAlign: "center",
-                          fontSize: 30,
-                          fontWeight: "bold",
-                        }}
-                      >
-                    Builders & Developer
-                      </Typography>
-                    </Grid>
-                  </Grid>
-                </StyledTableCell>
-              </TableRow>
+            <TableRow sx={{ height: "10px", padding: 0 }}>
+              
+  <StyledTableCell
+    colSpan={3} style={{padding:0}}
+    sx={{ height: "10px", padding: "0px" ,margin:0}}
+  >
+    <Grid
+      container
+      alignItems="center"
+      justifyContent="space-around"
+      spacing={1}
+    >
+      <img
+       src={`https://apiforcornershost.cubisysit.com/companyimage/${data[0]?.companyimageName || 'image.png'}`}
+       alt="Company Logo"
+        style={{  width: "150px",height:"110px",padding:0 }}
+      />
+    </Grid>
+  </StyledTableCell>
+  <StyledTableCell
+    colSpan={7}
+    sx={{ height: "10px", padding: 0 }}
+  >
+    <Grid
+      container
+      alignItems="center"
+      justifyContent="space-around"
+      spacing={1}
+    >
+      <Grid item>
+        <Typography
+          style={{
+            textAlign: "center",
+            fontSize: 35,
+            fontWeight: 900,
+            color: "orange",
+            textTransform:"uppercase",
+          }}
+        >
+          {data[0]?.CompanyName || ""}
+        </Typography>
+        <Typography
+          style={{
+            textAlign: "center",
+            fontSize: 30,
+            fontWeight: "bold",
+          }}
+        >
+          Builders & Developer
+        </Typography>
+      </Grid>
+    </Grid>
+  </StyledTableCell>
+</TableRow>
+
             </TableBody>
           </Table>
         </TableContainer>
         <div>
-          <StyledTableCell colSpan={12}>
-            <Grid container spacing={0} sx={{ width: "100%" }}>
-              <Grid item xs={9}>
-                <StyledTableCell
-                  sx={{ textAlign: "center", padding: 0, border: 0 }}
-                >
-                  <Typography style={{ fontSize: 14, padding: 5 }}>
-                    Corporate Office: {data[0]?.CompanyAddress || "N/A"}.  GST No: {data[0]?.CompanyGst || "N/A"}    <br></br>
-                      Website: {data[0]?.CompanyWebsite || "N/A"} <br></br> Email: {data[0]?.CompanyEmail || "N/A"}  <br></br>  Site Address: {data[0]?.ProjectAddress || "N/A"} MahaRera
-                    No. {data[0]?.reraregistration || "N/A"} <br></br> Mobile No. 9930960449/9004475240
+        <TableContainer component={Paper}>
+          <Table>
+            <TableBody>
+              <TableRow sx={{ height: "10px", padding: 0 }}>
+          <StyledTableCell colSpan={7} >
+          <Typography style={{ fontSize: 14, padding: 5 }}>
+                    Corporate Office: {data[0]?.CompanyAddress || "N/A"}.<br></br>  GST No: {data[0]?.CompanyGst || "N/A"}    <br></br>
+                    Website: {data[0]?.CompanyWebsite || "N/A"} {"  "} Email: {data[0]?.CompanyEmail || "N/A"}  <br></br>  Site Address: {data[0]?.ProjectAddress || "N/A"}  <br></br>
+                     Mobile No. 9930960449/9004475240<br></br> MahaRera 
+                    No. {data[0]?.reraregistration || "N/A"} 
                   </Typography>
-                  
-                </StyledTableCell>
-                
-              </Grid>
-              <Grid item xs={3}>
-                <div style={{ minWidth: "100%", borderWidth: 1 }}>
-                  <div>
-                    <h4 style={{}}>Receipt</h4>
-                    <TableContainer component={Paper}>
-                      <Table style={{ border: "1px solid black" }}>
-                        <TableBody>
-                          <TableRow sx={{ padding: 0 }}>
-                            <StyledTableCell
-                              style={{ width: "20%", padding: 0 }}
-                              colSpan={10}
-                            >
-                              <Typography>R.No.:</Typography>
-                            </StyledTableCell>
-                            <StyledTableCell
-                              style={{ width: "30%", padding: 0 }}
-                              colSpan={10}
-                            >
-                              <Typography>
-                                {data[0]?.paymentID || ""}
-                              </Typography>
-                            </StyledTableCell>
-                          </TableRow>
-                          <TableRow sx={{ padding: 0 }}>
-                            <StyledTableCell
-                              style={{ width: "20%", padding: 0 }}
-                              colSpan={10}
-                            >
-                              <Typography>Date:</Typography>
-                            </StyledTableCell>
-                            <StyledTableCell
-                              style={{ width: "30%", padding: 0 }}
-                              colSpan={10}
-                            >
-                              <Typography>
-                                {data[0]?.BookingDate || ""}
-                              </Typography>
-                            </StyledTableCell>
-                          </TableRow>
-                        </TableBody>
-                      </Table>
-                    </TableContainer>
-                  </div>
-                </div>
-              </Grid>
-            </Grid>
           </StyledTableCell>
+          <StyledTableCell colSpan={3} style={{padding:0 }} >
+          <TableContainer sx={{ paddingRight: 0 , marginBottom:0}}>
+  <Typography>Receipt</Typography>
+  <Table style={{ border: "1px solid black" }}>
+  <TableBody>
+              <TableRow>
+                <StyledTableCell  sx={{ textAlign: 'center' }} style={{padding:0 }}>R No.</StyledTableCell>
+                <StyledTableCell sx={{ textAlign: 'center' }} style={{padding:0 }}>Date</StyledTableCell>
+              
+              </TableRow>
+              </TableBody>
+            <TableBody>
+            
+                <TableRow>
+                  <StyledTableCell style={{padding:0 }}>{data[0]?.paymentID || ""}</StyledTableCell>
+                  <StyledTableCell style={{padding:0 }}>{data[0]?.BookingDate || ""}</StyledTableCell>
+              
+                </TableRow>    
+            </TableBody>
+          </Table>
+</TableContainer>
+</StyledTableCell>
+
+          </TableRow>
+            </TableBody>
+          </Table>
+        </TableContainer>
         </div>
         <div
           style={{
@@ -323,8 +319,7 @@ const Reciept = ({ bookingID }) => {
           >
             <Typography style={{ fontSize: 17 }}>
               Payment Against Flat No. {data[0]?.FlatNo || ""} On{" "}
-              {data[0]?.FloorNo || ""} Floor Of the Building Known as
-              {data[0]?.ProjectName}
+              {data[0]?.FloorNo || ""} Floor Of the Building Known as {" "} {data[0]?.ProjectName}
             </Typography>
           </div>
         </div>
@@ -333,19 +328,30 @@ const Reciept = ({ bookingID }) => {
           <Table style={{ border: "1px solid black" }}>
             <TableHead>
               <TableRow>
-              <TableCell sx={{ textAlign: 'center'}}>Date</TableCell>
-            <TableCell sx={{ textAlign: 'center' }}>Bank Name</TableCell>
-            <TableCell sx={{ textAlign: 'center' }}>Cheque Number</TableCell>
-            <TableCell sx={{ textAlign: 'center' }}>Amount</TableCell>
+                <TableCell sx={{ textAlign: 'center' }}>Date</TableCell>
+                <TableCell sx={{ textAlign: 'center' }}>Bank Name</TableCell>
+                <TableCell sx={{ textAlign: 'center' }}>Cheque Number</TableCell>
+                <TableCell sx={{ textAlign: 'center' }}>Amount</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
+              {/* Render Payment Data */}
               {data?.map((payment) => (
                 <TableRow key={payment.paymentID}>
-                  <StyledTableCell>{format(new Date(payment.Date), 'yyyy-MM-dd')}</StyledTableCell>
+                  <StyledTableCell>{payment.Date}</StyledTableCell>
                   <StyledTableCell>{payment.BankName}</StyledTableCell>
                   <StyledTableCell>{payment.ChequeNumber}</StyledTableCell>
                   <StyledTableCell>{payment.ChequeAmount}</StyledTableCell>
+                </TableRow>
+              ))}
+
+          
+              {data?.length < 6 && [...Array(6 - data.length)].map((_, index) => (
+                <TableRow key={`empty-${index}`}>
+                  <StyledTableCell>&nbsp;</StyledTableCell>
+                  <StyledTableCell>&nbsp;</StyledTableCell>
+                  <StyledTableCell>&nbsp;</StyledTableCell>
+                  <StyledTableCell>&nbsp;</StyledTableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -395,114 +401,102 @@ const Reciept = ({ bookingID }) => {
             </TableBody>
           </Table>
         </TableContainer>
+        <TableContainer component={Paper}>
+  <Table className="info-border">
+    <TableBody>
+     
 
-        <div
+      <TableRow style={{ border: "1px solid black", padding: 0 }}>
+       
+        <StyledTableCell
           style={{
-            width: "100%",
-            display: "flex",
-            alignItems: "center",
+            textAlign: "center",
+            color: "#000",
+            fontSize: 10,
+            fontWeight: 500,
+            padding: 0,
+            marginBottom: 10,
+            paddingTop: 5,
+            paddingBottom: 5,
+         // Adjust width as necessary
           }}
-        >
-          <div
-            style={{
-              paddingTop: 10,
-              width: "50%",
-              display: "flex",
-              flexDirection: "column",
-            }}
-          >
-            <StyledTableCell
-              style={{
-                marginTop: 10,
-                textAlign: "center",
-                color: "#000",
-                fontSize: 25,
-                fontWeight: 500,
-                padding: 0,
-                width: "100%",
-                paddingTop: 5,
-                paddingBottom: 5,
-                marginBottom: 10,
-              }}
-              colSpan={10}
-            >
-              ₹ {totalChequeAmount} /-
-            </StyledTableCell>
-            <StyledTableCell
-              style={{
-                textAlign: "center",
-                color: "#000",
-                fontSize: 16,
-                fontWeight: 500,
-                padding: 0,
-                width: "100%",
-                marginBottom: 10,
-                paddingTop: 5,
-                paddingBottom: 5,
-              }}
-              colSpan={10}
-            >
-              T&C: Subject to Realisation of Cheque*
-            </StyledTableCell>
-          </div>
-          <div
-            style={{
-              marginLeft: 10,
-              minWidth: "25%",
-            }}
-          >
-            <StyledTableCell
-              style={{
-                marginTop: 10,
-                textAlign: "center",
-                color: "#000",
-                fontSize: 25,
-                fontWeight: 500,
-                padding: 0,
-                width: "25%",
-                minWidth: "25%",
-                marginBottom: 10,
-              }}
-              colSpan={10}
-            >
-              <img
-                src="https://i.postimg.cc/PJfmZCRv/Untitled-design-2024-04-12-T161558-455.png"
-                alt="200 * 200"
-                width="80"
-                height="100%"
-              />
-            </StyledTableCell>
-          </div>
-          <div
-            style={{
-              marginLeft: 10,
-              minWidth: "25%",
-            }}
-          >
-            <StyledTableCell
-              style={{
-                marginTop: 10,
-                textAlign: "center",
-                color: "#000",
-                fontSize: 25,
-                fontWeight: 500,
-                padding: 0,
-                width: "25%",
-                minWidth: "50%",
-                marginBottom: 10,
-              }}
-              colSpan={10}
-            >
-              <img
-                src="https://i.postimg.cc/PJfmZCRv/Untitled-design-2024-04-12-T161558-455.png"
-                alt="200 * 200"
-                width="80"
-                height="100%"
-              />
-            </StyledTableCell>
-          </div>
-        </div>
+          colSpan={3}
+        >  <Typography>₹ {totalChequeAmount}</Typography>
+          T&C: Subject to Realisation of Cheque*
+        </StyledTableCell>
 
+        {/* <StyledTableCell
+          style={{
+            textAlign: "center",
+            color: "#000",
+            fontSize: 15,
+            padding: 0,
+    
+            width: 200,
+            paddingTop: 5,
+            paddingBottom: 5,
+          }}
+          colSpan={3}
+        >
+       <img
+       src={`https://apiforcornershost.cubisysit.com/companyimage/${data[0]?.companyimageName || 'image.png'}`}
+       alt="Company Logo"
+        style={{  width: "150px",height:"100px" }}
+      />
+        </StyledTableCell> */}
+
+        <StyledTableCell
+  style={{
+    textAlign: "center",  // Center align the content horizontally
+    color: "#000",
+    fontSize: 15,
+    textTransform: "uppercase", // Make the text uppercase
+    padding: 0,
+    height: "100%",  // Ensure the cell height stretches
+    display: "flex",  // Use flexbox for vertical alignment
+    flexDirection: "column",  // Stack elements vertically
+    justifyContent: "space-between",
+    padding: 0,
+            marginBottom:0,
+            paddingTop: 5,
+            paddingBottom: 5,
+            height:80,
+    // Space out the elements to push one to the top and one to the bottom
+  }}
+  colSpan={4}
+>
+  {/* Company Name at the top */}
+  <Typography
+    style={{
+      textAlign: "center",
+      color: "#000",
+      fontSize: 10,
+      verticalAlign: "top",  // Align content to the top (though flexbox is handling it)
+      padding: 0,
+    }}
+  >
+    {data[0]?.CompanyName || ""}
+  </Typography>
+
+  {/* Authorized Signatory at the bottom */}
+  <Typography
+    style={{
+      textAlign: "center",
+      color: "#000",
+      fontSize: 10,
+      verticalAlign: "bottom",  // Align content to the bottom (flexbox is handling this)
+      padding: 0,
+    }}
+  >
+    Authorized Signatory
+  </Typography>
+</StyledTableCell>
+
+
+      </TableRow>
+    </TableBody>
+  </Table>
+</TableContainer>
         <TableContainer component={Paper}>
           <Table className="info-border">
             <TableBody>
@@ -524,6 +518,8 @@ const Reciept = ({ bookingID }) => {
           </Table>
         </TableContainer>
       </InvoiceBox>
+      </TableContainer>
+      </StyledTableCell>
     </>
   );
 };

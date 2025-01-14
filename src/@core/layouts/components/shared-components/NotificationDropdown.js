@@ -112,7 +112,6 @@ const NotificationDropdown = ({
       } 
       setLoading(false);
     } catch (error) {
-      // console.error("Error fetching booking data:", error);
       setError(error);
       setLoading(false);
     }
@@ -154,45 +153,54 @@ const NotificationDropdown = ({
   
   return (
     <Fragment>
-      <Menu
-        id='notification-menu'
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleDropdownClose}
-      >
-        <PerfectScrollbar>
-          <Box sx={{ padding: 2 }}>
-            <Typography variant='h6'>Notifications</Typography>
+     <Menu
+  id='notification-menu'
+  anchorEl={anchorEl}
+  open={Boolean(anchorEl)}
+  onClose={handleDropdownClose}
+>
+  <PerfectScrollbar>
+    <Box sx={{ padding: 2 }}>
+      <Typography variant='h6'>Notifications</Typography>
+    </Box>
+    {loading ? (
+      <Box sx={{ padding: 2 }}>
+        <Typography>Loading...</Typography>
+      </Box>
+    ) : (
+      notifications.map((notification, index) => (
+        <MenuItem key={index}>
+          <Avatar src='/images/avatars/1.png' alt='Avatar' />
+          <Box sx={{ marginLeft: 2, flex: 1 }}>
+            <MenuItemTitle sx={{ fontSize: 12, wordWrap: 'break-word', whiteSpace: 'normal' }}>
+              Contact: {notification.Details?.CName}
+            </MenuItemTitle>
+            <MenuItemSubtitle sx={{ fontSize: 10 }}>
+              Created By: {notification.Name}
+            </MenuItemSubtitle>
+            <MenuItemSubtitle sx={{ fontSize: 10 }}>
+              Created IN: {notification.TableName}
+            </MenuItemSubtitle>
+            <MenuItemSubtitle sx={{ fontSize: 10 }}>
+              Created Date: {notification.CreatedDate}
+            </MenuItemSubtitle>
           </Box>
-          {loading ? (
-            <Box sx={{ padding: 2 }}>
-              <Typography>Loading...</Typography>
-            </Box>
-          ) : (
-            notifications.map((notification, index) => (
-              <MenuItem key={index}>
-                <Avatar src='/images/avatars/1.png' alt='Avatar' />
-                <Box sx={{ marginLeft: 2, flex: 1 }}>
-                  <MenuItemTitle sx={{ fontSize:16 }} >Contact : {notification.Details?.CName}</MenuItemTitle>
-                  <MenuItemSubtitle sx={{ fontSize:12 }}>Created By : {notification.Name}</MenuItemSubtitle>
-                  <MenuItemSubtitle sx={{ fontSize:12 }}>Created IN :  {notification.TableName}  </MenuItemSubtitle>
-                  <MenuItemSubtitle sx={{ fontSize:12 }}>Created Date : {notification.CreatedDate}</MenuItemSubtitle>
-                </Box>
-              </MenuItem>  
-            ))
-          )}
-          {error && (
-            <Box sx={{ padding: 2 }}>
-              <Typography color='error'>Error fetching notifications</Typography>
-            </Box>
-          )}
-        </PerfectScrollbar>
-        <MenuItem onClick={handleReadAllNotifications}>
-          <Button variant='outlined' fullWidth>
-            View All Notifications
-          </Button>
         </MenuItem>
-      </Menu>
+      ))
+    )}
+    {error && (
+      <Box sx={{ padding: 2 }}>
+        <Typography color='error'>Error fetching notifications</Typography>
+      </Box>
+    )}
+  </PerfectScrollbar>
+  <MenuItem onClick={handleReadAllNotifications}>
+    <Button variant='outlined' fullWidth>
+      View All Notifications
+    </Button>
+  </MenuItem>
+</Menu>
+
 
       <Menu
         id='booking-menu'
