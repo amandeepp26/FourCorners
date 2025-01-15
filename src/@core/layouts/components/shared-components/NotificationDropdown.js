@@ -6,10 +6,12 @@ import {
   Menu as MuiMenu,
   Avatar as MuiAvatar,
   MenuItem as MuiMenuItem,
-  Typography
+  Typography ,
+  IconButton
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import PerfectScrollbarComponent from 'react-perfect-scrollbar';
+import CloseIcon from '@mui/icons-material/Close';
 import { useRouter } from 'next/router';
 import { useCookies } from "react-cookie";
 
@@ -79,10 +81,6 @@ const NotificationDropdown = ({
   const [error, setError] = useState(null);
   const router = useRouter();
 
-  useEffect(() => {
-  
-  }, []);
-
 
 
   useEffect(() => {
@@ -150,57 +148,81 @@ const NotificationDropdown = ({
     router.push('/BookingForm');
     handleDropdownBookingClose();
   };
+  const handleCancelNotification = async (notificationId) => {
+    try {
+      // Send cancellation request to the server
+      await axios.post(
+        `https://proxy-forcorners.vercel.app/api/proxy/api-update-notification.php`,
+        { notificationId }
+      );
+  
+      // Remove the notification from the state optimistically (if you want)
+      setNotifications((prevNotifications) =>
+        prevNotifications.filter((notification) => notification.notificationId !== notificationId)
+      );
+  
+      // Re-fetch notifications to get the updated list
+      await fetchData(); // Call this to get updated notifications from the server
+  
+    } catch (error) {
+      console.error("Error updating notification:", error);
+    }
+  };
   
   return (
     <Fragment>
-     <Menu
-  id='notification-menu'
-  anchorEl={anchorEl}
-  open={Boolean(anchorEl)}
-  onClose={handleDropdownClose}
->
-  <PerfectScrollbar>
-    <Box sx={{ padding: 2 }}>
-      <Typography variant='h6'>Notifications</Typography>
-    </Box>
-    {loading ? (
+    <Menu
+      id='notification-menu'
+      anchorEl={anchorEl}
+      open={Boolean(anchorEl)}
+      onClose={handleDropdownClose}
+    >
       <Box sx={{ padding: 2 }}>
-        <Typography>Loading...</Typography>
+        <Typography variant='h6'>Notifications</Typography>
       </Box>
-    ) : (
-      notifications.map((notification, index) => (
-        <MenuItem key={index}>
-          <Avatar src='/images/avatars/1.png' alt='Avatar' />
-          <Box sx={{ marginLeft: 2, flex: 1 }}>
-            <MenuItemTitle sx={{ fontSize: 12, wordWrap: 'break-word', whiteSpace: 'normal' }}>
-              Contact: {notification.Details?.CName}
-            </MenuItemTitle>
-            <MenuItemSubtitle sx={{ fontSize: 10 }}>
-              Created By: {notification.Name}
-            </MenuItemSubtitle>
-            <MenuItemSubtitle sx={{ fontSize: 10 }}>
-              Created IN: {notification.TableName}
-            </MenuItemSubtitle>
-            <MenuItemSubtitle sx={{ fontSize: 10 }}>
-              Created Date: {notification.CreatedDate}
-            </MenuItemSubtitle>
-          </Box>
-        </MenuItem>
-      ))
-    )}
-    {error && (
-      <Box sx={{ padding: 2 }}>
-        <Typography color='error'>Error fetching notifications</Typography>
-      </Box>
-    )}
-  </PerfectScrollbar>
-  <MenuItem onClick={handleReadAllNotifications}>
-    <Button variant='outlined' fullWidth>
-      View All Notifications
-    </Button>
-  </MenuItem>
-</Menu>
-
+      <PerfectScrollbar>
+      {loading ? (
+        <Box sx={{ padding: 2 }}>
+          <Typography>Loading...</Typography>
+        </Box>
+      ) : (
+        notifications.map((notification, index) => (
+          <MenuItem key={index} sx={{ boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)', borderRadius: 1, marginBottom:2}}>
+            <Avatar src='/images/avatars/1.png' alt='Avatar' />
+            <Box sx={{ marginLeft: 2, flex: 1 }}>
+              <MenuItemTitle sx={{ fontSize: 12, wordWrap: 'break-word', whiteSpace: 'normal' }}>
+                Contact: {notification.Details?.CName}
+              </MenuItemTitle>
+              <MenuItemSubtitle sx={{ fontSize: 10 }}>
+                Created By: {notification.Name}
+              </MenuItemSubtitle>
+              <MenuItemSubtitle sx={{ fontSize: 10 }}>
+                Created IN: {notification.TableName}
+              </MenuItemSubtitle>
+              <MenuItemSubtitle sx={{ fontSize: 10 }}>
+                Created Date: {notification.CreatedDate}
+              </MenuItemSubtitle>
+            </Box>
+            <IconButton onClick={() => handleCancelNotification(notification.notificationId)} size='small'>
+              <CloseIcon fontSize='small' sx={{ color: 'red' }} />
+            </IconButton>
+          </MenuItem>
+        ))
+      )}
+      {error && (
+        <Box sx={{ padding: 2 }}>
+          <Typography color='error'>Error fetching notifications</Typography>
+        </Box>
+      )}
+     
+      </PerfectScrollbar>
+       <MenuItem onClick={handleReadAllNotifications}>
+        <Button variant='outlined' fullWidth>
+          View All Notifications
+        </Button>
+      </MenuItem>
+    </Menu>
+ 
 
       <Menu
         id='booking-menu'
@@ -218,9 +240,9 @@ const NotificationDropdown = ({
             </Box>
           ) : (
             notificationsBooking.map((notification, index) => (
-              <MenuItem key={index}>
+              <MenuItem key={index} sx={{marginBottom:2, boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',borderRadius: 1}}>
                 <Avatar src='/images/avatars/1.png' alt='Avatar' />
-                <Box sx={{ marginLeft: 2, flex: 1 }} onClick={() => handleBookingReadAllNotifications(notification)}>
+                <Box sx={{ marginLeft: 2, flex: 1  }} onClick={() => handleBookingReadAllNotifications(notification)}>
 
                   <MenuItemTitle sx={{ fontSize:16 }} >Booking Name : {notification?.TitleName}{notification?.CName}</MenuItemTitle>
                   <MenuItemSubtitle sx={{ fontSize:12 }}>Transfer By : {notification?.UserName} </MenuItemSubtitle>
@@ -236,11 +258,7 @@ const NotificationDropdown = ({
             </Box>
           )}
         </PerfectScrollbar>
-        <MenuItem onClick={handleBookingReadAllNotifications}>
-          <Button variant='outlined' fullWidth>
-            View All Booking Notifications
-          </Button>
-        </MenuItem>
+       
       </Menu>
     </Fragment>
   );

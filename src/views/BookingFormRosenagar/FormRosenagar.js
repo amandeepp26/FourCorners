@@ -18,6 +18,7 @@ import moment from "moment";
 import {
   Snackbar,
   FormControlLabel,
+  CircularProgress,
   RadioGroup,
   Radio,
   FormLabel,
@@ -49,7 +50,7 @@ const FormRosenagar = ({ onFormSubmitSuccess, show, editData }) => {
 
   const initialFormData = {
     BookingDate: null,
-    TitleID:"",
+    TitleID: "",
     BookedByID: "",
     Mobile: "",
     BookingRef: "",
@@ -72,7 +73,7 @@ const FormRosenagar = ({ onFormSubmitSuccess, show, editData }) => {
     Ratesqft: "",
     UnittypeID: "",
     Advocate: "",
-    AggrementAmount:"",
+    AggrementAmount: "",
     ExtraCost: "",
     TotalCost: "",
     UsableArea: "",
@@ -83,6 +84,8 @@ const FormRosenagar = ({ onFormSubmitSuccess, show, editData }) => {
     WingID: "",
     FlatNo: "",
     FloorNo: "",
+    loanamount: "",
+    selfamount: "",
     Status: 1,
     CreateUID: 1,
   };
@@ -116,11 +119,11 @@ const FormRosenagar = ({ onFormSubmitSuccess, show, editData }) => {
 
     if (storedNotification) {
       const notificationData = JSON.parse(storedNotification);
-      console.log("Fetched Notification Data:", notificationData); 
+      console.log("Fetched Notification Data:", notificationData);
 
       setFormData({
         ...formData,
-        TitleID:notificationData.TitleID || "",
+        TitleID: notificationData.TitleID || "",
         Cid: notificationData.Cid || "",
         Name: notificationData.CName || "",
         SourceName: notificationData.SourceName || "",
@@ -489,12 +492,12 @@ const FormRosenagar = ({ onFormSubmitSuccess, show, editData }) => {
     if (formData.ProjectID) {
       axios
         .get(
-          `https://apiforcornershost.cubisysit.com/api/api-fetch-parking.php?ProjectID=${formData.ProjectID}`
+          `https://apiforcornershost.cubisysit.com/api/api-fetch-parkingnull.php?ProjectID=${formData.ProjectID}`
         )
         .then((response) => {
           if (response.data.status === "Success") {
             console.log(response.data.data, "checkkk it<<<<<<<<");
-            setParking(response.data.data || []); // Ensure data is set as an array
+            setParking(response.data.data || []);
           }
         })
         .catch((error) => {
@@ -507,11 +510,11 @@ const FormRosenagar = ({ onFormSubmitSuccess, show, editData }) => {
     if (formData.WingID && formData.ProjectID && formData.FloorNo) {
       axios
         .get(
-          `https://apiforcornershost.cubisysit.com/api/api-booking-flat.php?WingID=${formData.WingID}&ProjectID=${formData.ProjectID}&FloorNo=${formData.FloorNo}`
+          `https://apiforcornershost.cubisysit.com/api/api-booking-flatnull.php?WingID=${formData.WingID}&ProjectID=${formData.ProjectID}&FloorNo=${formData.FloorNo}`
         )
         .then((response) => {
           if (response.data.status === "Success") {
-            console.log("Flat No Data:", response.data.data); // Log the fetched data
+            console.log("Flat No Data:", response.data.data);
             setFlatNoData(response.data.data);
           }
         })
@@ -543,7 +546,7 @@ const FormRosenagar = ({ onFormSubmitSuccess, show, editData }) => {
               Area,
               UsableArea,
               AgreementCarpet,
-            })); // Update formData with Area, UsableArea, and AgreementCarpet values
+            })); 
           }
         })
         .catch((error) => {
@@ -622,9 +625,9 @@ const FormRosenagar = ({ onFormSubmitSuccess, show, editData }) => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-
+    setLoading(true);
     const url = editData
-      ? "https://proxy-forcorners.vercel.app/api/proxy/api-update-telecalling.php"
+      ? "https://proxy-forcorners.vercel.app/api/proxy/api-update-projectbooking.php"
       : "https://proxy-forcorners.vercel.app/api/proxy/api-insert-projectbooking.php";
 
     const formattedRemarks = remarks.map((remark, index) => ({
@@ -667,9 +670,6 @@ const FormRosenagar = ({ onFormSubmitSuccess, show, editData }) => {
           showConfirmButton: false,
           timer: 1000,
         });
-
-        // Navigate to the desired page with BookingID
-        // window.location.href = `/TemplateRosenagar?BookingID=${BookingID}`;
       } else {
         Swal.fire({
           icon: "error",
@@ -718,7 +718,7 @@ const FormRosenagar = ({ onFormSubmitSuccess, show, editData }) => {
         console.log("data dekh ", response.data.data);
         const data = response.data.data;
 
-        // Assuming you want to set the first item from the array
+
         if (data.length > 0) {
           const fetchedData = data[0];
 
@@ -759,64 +759,26 @@ const FormRosenagar = ({ onFormSubmitSuccess, show, editData }) => {
           </Grid>
           <form style={{ marginTop: "50px" }}>
             <Grid container spacing={7}>
-            {/* <Grid item xs={8} sm={4}>
-                <FormControl fullWidth>
-                  {editData ? (
-                    <>
-                      <InputLabel>
-                        Title <RequiredIndicator />
-                      </InputLabel>
-                      <Select
-                        value={
-                          formData.titleprefixID ||
-                          contactDataTele?.TitleID ||
-                          ""
-                        }
-                        onChange={handleTitleChange}
-                        label="Title"
-                      >
-                        {titles.map((title) => (
-                          <MenuItem key={title.TitleID} value={title.TitleID}>
-                            {title.TitleName}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </>
-                  ) : (
-                    <Box
-                      sx={{
-                        padding: "16px",
-                        border: "1px solid #ced4da",
-                        borderRadius: "4px",
-                        color: "rgba(0, 0, 0, 0.87)",
-                      }}
-                    >
-                      {contactDataTele?.TitleName || "No Code"}
-                    </Box>
-                  )}
-                
-                </FormControl>
-              </Grid> */}
 
-<Grid item xs={8} sm={4}>
-      <FormControl fullWidth>
-        <InputLabel id="title-select-label">Title</InputLabel>
-        <Select
-          labelId="title-select-label"
-          id="title-select"
-          value={formData.TitleID || ""}
-          label="Title"
-          name="TitleID"
-          onChange={handleChange}
-        >
-   {titles.map((title) => (
-                          <MenuItem key={title.TitleID} value={title.TitleID}>
-                            {title.TitleName}
-                          </MenuItem>
-                        ))}
-        </Select>
-      </FormControl>
-    </Grid>
+              <Grid item xs={8} sm={4}>
+                <FormControl fullWidth>
+                  <InputLabel id="title-select-label">Title</InputLabel>
+                  <Select
+                    labelId="title-select-label"
+                    id="title-select"
+                    value={formData.TitleID || ""}
+                    label="Title"
+                    name="TitleID"
+                    onChange={handleChange}
+                  >
+                    {titles.map((title) => (
+                      <MenuItem key={title.TitleID} value={title.TitleID}>
+                        {title.TitleName}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
 
 
 
@@ -901,7 +863,7 @@ const FormRosenagar = ({ onFormSubmitSuccess, show, editData }) => {
                   value={formData.Email || ""}
                   onChange={handleChange}
                 />
-              
+
               </Grid>
 
               {/* Other form fields */}
@@ -966,47 +928,43 @@ const FormRosenagar = ({ onFormSubmitSuccess, show, editData }) => {
               </Grid>
 
               <Grid item xs={12} md={4}>
-                <FormControl fullWidth>
-                  <InputLabel>Floor</InputLabel>
-                  <Select
-                    value={formData.FloorNo}
-                    onChange={handleChange}
-                    name="FloorNo"
-                    label="Floor"
-                  >
-                    {floor.map((wing, index) => (
-                      <MenuItem
-                        key={`${wing.FloorNo}-${index}`}
-                        value={wing.FloorNo}
-                      >
-                        {wing.FloorNo}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
+  <FormControl fullWidth>
+    <InputLabel>Floor</InputLabel>
+    <Select
+      value={formData.FloorNo}
+      onChange={handleChange}
+      name="FloorNo"
+      label="Floor"
+    >
+      {/* Filter the floor data to show unique floor numbers */}
+      {Array.from(new Set(floor.map((wing) => wing.FloorNo))).map((uniqueFloor, index) => (
+        <MenuItem key={`${uniqueFloor}-${index}`} value={uniqueFloor}>
+          {uniqueFloor}
+        </MenuItem>
+      ))}
+    </Select>
+  </FormControl>
+</Grid>
 
-              <Grid item xs={12} md={4}>
-                <FormControl fullWidth>
-                  <InputLabel>Flat Number</InputLabel>
-                  <Select
-                    value={formData.FlatNo}
-                    onChange={handleChange}
-                    name="FlatNo"
-                    label="Flat Number"
-                  >
-                    {flatNoData.map((flat, index) => (
-                      <MenuItem
-                        key={`${flat.FlatNo}-${index}`}
-                        value={flat.FlatNo}
-                      >
-                        {flat.FlatNo}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
+<Grid item xs={12} md={4}>
+  <FormControl fullWidth>
+    <InputLabel>Flat Number</InputLabel>
+    <Select
+      value={formData.FlatNo}
+      onChange={handleChange}
+      name="FlatNo"
+      label="Flat Number"
+    >
+      {flatNoData.map((flat, index) => (
+        <MenuItem key={`${flat.FlatNo}-${index}`} value={flat.FlatNo}>
+          {flat.FlatNo} {flat.skuName} 
+        </MenuItem>
+      ))}
+    </Select>
+  </FormControl>
+</Grid>
 
+           
               <Grid item xs={12} md={4}>
                 <FormControl fullWidth>
                   <InputLabel>Unit Type</InputLabel>
@@ -1242,14 +1200,14 @@ const FormRosenagar = ({ onFormSubmitSuccess, show, editData }) => {
               </Grid>
               <Grid item xs={8} sm={4}>
                 <TextField
-                
+
                   fullWidth
                   label="Aggrement Amount"
                   name="AggrementAmount"
                   placeholder="Aggrement Amount"
                   value={formData.AggrementAmount || ""}
                   onChange={handleChange}
-                 
+
                 />
               </Grid>
 
@@ -1291,6 +1249,28 @@ const FormRosenagar = ({ onFormSubmitSuccess, show, editData }) => {
                   </Select>
                 </FormControl>
               </Grid>
+              <Grid item xs={8} sm={4}>
+                <TextField
+                  fullWidth
+                  label="Self Amount"
+                  name="selfamount"
+                  placeholder="Self Amount"
+                  value={formData.selfamount}
+                  onChange={handleChange}
+                  type="text"
+                />
+              </Grid>
+              <Grid item xs={8} sm={4}>
+                <TextField
+                  fullWidth
+                  label="loan Amount"
+                  name="loanamount"
+                  placeholder="loan Amount"
+                  value={formData.loanamount}
+                  onChange={handleChange}
+                  type="text"
+                />
+              </Grid>
 
               {remarks.map((remark, index) => (
                 <Grid container item spacing={2} key={index}>
@@ -1311,6 +1291,7 @@ const FormRosenagar = ({ onFormSubmitSuccess, show, editData }) => {
                     />
                   </Grid>
 
+                  {/* Amount Type Dropdown */}
                   <Grid item xs={2}>
                     <FormControl fullWidth>
                       <InputLabel>Amount Type</InputLabel>
@@ -1331,7 +1312,7 @@ const FormRosenagar = ({ onFormSubmitSuccess, show, editData }) => {
                     </FormControl>
                   </Grid>
 
-        
+                  {/* Remark Field */}
                   <Grid item xs={4}>
                     <TextField
                       fullWidth
@@ -1341,22 +1322,25 @@ const FormRosenagar = ({ onFormSubmitSuccess, show, editData }) => {
                     />
                   </Grid>
 
-    
+                  {/* Date Field */}
                   <Grid item xs={4}>
-      <DatePicker
-        selected={remark.RemarkDate}
-        onChange={(date) => handleDateRemarks(date, index)}
-        dateFormat="dd-MM-yyyy"
-        customInput={
-          <TextField fullWidth label="Expected Date" />
-        }
-      
-        showMonthDropdown
-        showYearDropdown
-        yearDropdownItemNumber={15}
-        scrollableYearDropdown 
-      />
-    </Grid>
+                    <DatePicker
+                      selected={remark.RemarkDate}
+                      onChange={(date) => handleDateRemarks(date, index)}
+                      dateFormat="dd-MM-yyyy"
+                      customInput={
+                        <TextField fullWidth label="Expected Date" />
+                      }
+                      // Shows both the date picker and allows month/year selection
+                      showMonthDropdown
+                      showYearDropdown
+                      yearDropdownItemNumber={15} // Number of years to show in dropdown
+                      scrollableYearDropdown // Makes year dropdown scrollable
+                    />
+                  </Grid>
+
+
+                  {/* Loan Process Checkbox */}
                   <Grid item xs={2}>
                     <FormControlLabel
                       control={
@@ -1416,17 +1400,23 @@ const FormRosenagar = ({ onFormSubmitSuccess, show, editData }) => {
               ))}
 
               <Grid item xs={12}>
-                <Button
-                  variant="contained"
-                  sx={{
-                    marginRight: 3.5,
-                    marginTop: 5,
-                    backgroundColor: "#9155FD",
-                    color: "#FFFFFF",
-                  }}
-                  onClick={handleSubmit}>
-                  Submit  
-                </Button>
+              <Button
+        variant="contained"
+        sx={{
+          marginRight: 3.5,
+          marginTop: 5,
+          backgroundColor: "#9155FD",
+          color: "#FFFFFF",
+        }}
+        onClick={handleSubmit}
+        disabled={loading} // Disable button when loading
+      >
+        {loading ? (
+          <CircularProgress size={24} sx={{ color: "#fff" }} />
+        ) : (
+          "Submit"
+        )}
+      </Button>
               </Grid>
             </Grid>
           </form>
@@ -1447,8 +1437,8 @@ const FormRosenagar = ({ onFormSubmitSuccess, show, editData }) => {
               {editData
                 ? "Data Updated Successfully"
                 : submitSuccess
-                ? "Data Added Successfully"
-                : ""}
+                  ? "Data Added Successfully"
+                  : ""}
             </MuiAlert>
           </Snackbar>
 

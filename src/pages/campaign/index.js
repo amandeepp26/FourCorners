@@ -101,14 +101,7 @@ const StatisticsCard = () => {
     <Card>
       <CardHeader
         title="Statistics Card"
-        subheader={
-          <Typography variant="body2">
-            <Box component="span" sx={{ fontWeight: 600, color: "text.primary" }}>
-              Total 48.5% growth
-            </Box>{" "}
-            😎 this month
-          </Typography>
-        }
+      
       />
       <CardContent sx={{ pt: (theme) => `${theme.spacing(3)} !important` }}>
         <Grid container spacing={[5, 0]}>

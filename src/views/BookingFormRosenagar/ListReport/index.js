@@ -52,13 +52,13 @@ const [amountsUpcoming, setAmountsUpcoming] = useState([]);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
   const [totalReceived, setTotalReceived] = useState({
-    cash: 0,
+    
     cheque: 0,
     total: 0
   });
 
   const [totalUpcoming, setTotalUpcoming] = useState({
-    cash: 0,
+
     cheque: 0,
     total: 0
   });
@@ -101,7 +101,7 @@ const [amountsUpcoming, setAmountsUpcoming] = useState([]);
         const upcomingRecords = response.data.upcomingpayment || {};
   
         setTotalReceived({
-          cash: receivedRecords.cash || 0,
+         
           cheque: receivedRecords.cheque || 0,
           loan: receivedRecords.loan || 0,
           register: receivedRecords.register || 0,
@@ -109,7 +109,7 @@ const [amountsUpcoming, setAmountsUpcoming] = useState([]);
         });
   
         setTotalUpcoming({
-          cash: upcomingRecords.cash || 0,
+         
           cheque: upcomingRecords.cheque || 0,
           loan: upcomingRecords.loan || 0,
           register: upcomingRecords.register|| 0,
@@ -189,9 +189,7 @@ const [amountsUpcoming, setAmountsUpcoming] = useState([]);
                 <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
                   Received Payments:
                 </Typography>
-                <Typography variant="body2">
-                  Current : {totalReceived.cash?.toLocaleString() || '0'}
-                </Typography>
+               
                 <Typography variant="body2">
                   Post : {totalReceived.cheque?.toLocaleString() || '0'}
                 </Typography>
@@ -225,9 +223,7 @@ const [amountsUpcoming, setAmountsUpcoming] = useState([]);
                 <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
                   Upcoming Payments:
                 </Typography>
-                <Typography variant="body2">
-                  Currrent: {totalUpcoming.cash?.toLocaleString() || '0'}
-                </Typography>
+               
                 <Typography variant="body2">
                   Post: {totalUpcoming.cheque?.toLocaleString() || '0'}
                 </Typography>
@@ -281,6 +277,10 @@ const [amountsUpcoming, setAmountsUpcoming] = useState([]);
               }}
             />
           }
+          showMonthDropdown
+                  showYearDropdown
+                  yearDropdownItemNumber={15} // Number of years to show in dropdown
+                  scrollableYearDropdown
         />
       </Grid>
 
@@ -300,6 +300,10 @@ const [amountsUpcoming, setAmountsUpcoming] = useState([]);
               }}
             />
           }
+          showMonthDropdown
+                  showYearDropdown
+                  yearDropdownItemNumber={15} // Number of years to show in dropdown
+                  scrollableYearDropdown
         />
       </Grid>
 
@@ -360,7 +364,7 @@ const [amountsUpcoming, setAmountsUpcoming] = useState([]);
                 <SortableTableCell label="Wing Name" />
                 <SortableTableCell label="Flat No" />
                 <SortableTableCell label="Post" />
-                <SortableTableCell label="Current" />
+               
               </TableRow>
             </TableHead>
             <TableBody>
@@ -371,7 +375,7 @@ const [amountsUpcoming, setAmountsUpcoming] = useState([]);
                   <TableCell>{row.WingName}</TableCell>
                   <TableCell>{row.FlatNo}</TableCell>
                   <TableCell>{row.ChequeAmount}</TableCell>
-                  <TableCell>{row.Cash}</TableCell>
+               
                 </TableRow>
               ))}
             </TableBody>
