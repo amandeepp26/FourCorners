@@ -1494,6 +1494,10 @@ const downloadCSV = () => {
                       }}
                     />
                   }
+                  showMonthDropdown
+                  showYearDropdown
+                  yearDropdownItemNumber={15} // Number of years to show in dropdown
+                  scrollableYearDropdown
                 />
               </Grid>
 
@@ -1513,6 +1517,10 @@ const downloadCSV = () => {
                       }}
                     />
                   }
+                  showMonthDropdown
+                  showYearDropdown
+                  yearDropdownItemNumber={15} // Number of years to show in dropdown
+                  scrollableYearDropdown
                 />
               </Grid>
 

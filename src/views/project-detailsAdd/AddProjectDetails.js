@@ -26,6 +26,7 @@ const AddProjectDetails = ({ show, setShowUploadExcel, editData }) => {
     ProjectID: "",
     address: "",
     WingName: [],
+    images: null, // Single image field
     Status: 1,
     CreateUID: cookies.amr?.UserID || 1,
   };
@@ -47,9 +48,9 @@ const AddProjectDetails = ({ show, setShowUploadExcel, editData }) => {
     fetchProject();
   }, []);
 
-  const wingsData = Array.from({ length: 26 }, (_, i) => ({
+  const wingsData = Array.from({ length: 15 }, (_, i) => ({
     WingID: i + 1,
-    WingName: `${String.fromCharCode(65 + i)}`,
+    WingName: i + 1,
   }));
 
   const handleFormDataChange = (e) => {
@@ -61,7 +62,7 @@ const AddProjectDetails = ({ show, setShowUploadExcel, editData }) => {
 
   const fetchCompany = () => {
     axios
-      .get("https://apiforcornershost.cubisysit.com/api/api-fetch-companymaster.php")
+      .get("https://apiforcorners.cubisysit.com/api/api-fetch-companymaster.php")
       .then((response) => {
         if (response.data.status === "Success") {
           setCompanyTypeData(response.data.data);
@@ -74,7 +75,7 @@ const AddProjectDetails = ({ show, setShowUploadExcel, editData }) => {
 
   const fetchProject = () => {
     axios
-      .get("https://apiforcornershost.cubisysit.com/api/api-singel-projectdetails.php")
+      .get("https://apiforcorners.cubisysit.com/api/api-fetch-projectmaster.php")
       .then((response) => {
         if (response.data.status === "Success") {
           setProjectTypeData(response.data.data);
@@ -84,47 +85,99 @@ const AddProjectDetails = ({ show, setShowUploadExcel, editData }) => {
         console.error("Error fetching project data:", error);
       });
   };
-
   const handleSubmit = async (event) => {
     event.preventDefault();
+debugger;
+    // FormData to send as a POST request
+    const formDataToSubmit = new FormData();
+
+    // Validate required fields before submitting the form
+    if (
+        !formData.CompanyID ||
+        !formData.ProjectID ||
+        !formData.reraregistration ||
+        !formData.address ||
+        !formData.Status ||
+        !formData.CreateUID ||
+        !formData.WingName.length ||
+        !formData.images
+    ) {
+        setSubmitError(true);
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Please fill in all required fields including uploading an image and selecting wings.',
+        });
+        return;
+    }
+debugger;
+    // Append fields to FormData
+    Object.keys(formData).forEach((key) => {
+        if (key === "images" && formData.images) {
+            // For image field, append the image file
+            formDataToSubmit.append("images", formData.images);
+        } else if (key === "WingName") {
+            // WingName should be a JSON array, so we stringify it before appending
+            formDataToSubmit.append(key, JSON.stringify(formData[key]));
+        } else if (Array.isArray(formData[key])) {
+            // If it's an array (like WingName[]), append each item
+            formData[key].forEach((item) => {
+                formDataToSubmit.append(`${key}[]`, item);
+            });
+        } else {
+            // For other fields, append as key-value pairs
+            formDataToSubmit.append(key, formData[key]);
+        }
+    });
+
     const url = editData
-      ? "https://proxy-forcorners.vercel.app/api/proxy/api-update-telecalling.php"
-      : "https://proxy-forcorners.vercel.app/api/proxy/api-insert-projectinfo.php";
+        ? "https://proxy-forcorners.vercel.app/api/proxy/api-update-projectinfo.php"
+        : "https://apiforcornershost.cubisysit.com/api/api-insert-projectinfo.php";
 
     try {
-      const response = await axios.post(url, formData, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (response.data.status === "Success") {
-        setFormData(initialFormData);
-        
-        Swal.fire({
-          icon: "success",
-          title: editData
-            ? "Data Updated Successfully"
-            : "Data Added Successfully",
-          showConfirmButton: false,
-          timer: 1000,
-        }).then(() => {
-          // Use localStorage to show UploadExcel after reload
-          localStorage.setItem('showUploadExcel', 'true');
-          window.location.reload();
+        const response = await axios.post(url, formDataToSubmit, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
         });
-        setErrors({});
-        setShowUploadExcel(true); // Show UploadExcel on successful submit
-      } else {
+
+        // Log the response data for debugging
+        console.log(response.data);
+        console.log(formDataToSubmit);
+        if (response.data.status === "Success") {
+            setFormData(initialFormData);
+
+            Swal.fire({
+                icon: "success",
+                title: editData ? "Data Updated Successfully" : "Data Added Successfully",
+                showConfirmButton: false,
+                timer: 1000,
+            }).then(() => {
+                localStorage.setItem('showUploadExcel', 'true');
+                window.location.reload();
+            });
+            setErrors({});
+            setShowUploadExcel(true);
+        } else {
+            setSubmitSuccess(false);
+            setSubmitError(true);
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: response.data.message || 'Something went wrong, please try again.',
+            });
+        }
+    } catch (error) {
+        console.error("There was an error!", error);
         setSubmitSuccess(false);
         setSubmitError(true);
-      }
-    } catch (error) {
-      console.error("There was an error!", error);
-      setSubmitSuccess(false);
-      setSubmitError(true);
+        Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: error.response?.data?.message || 'An error occurred while submitting the form. Please try again.',
+        });
     }
-  };
+};
 
   const handleAlertClose = (event, reason) => {
     if (reason === "clickaway") {
@@ -133,7 +186,6 @@ const AddProjectDetails = ({ show, setShowUploadExcel, editData }) => {
     setSubmitSuccess(false);
     setSubmitError(false);
   };
-
   return (
     <>
       <Card sx={{ height: "auto" }}>
@@ -213,6 +265,19 @@ const AddProjectDetails = ({ show, setShowUploadExcel, editData }) => {
                     </Typography>
                   )}
                 </FormControl>
+              </Grid>
+              <Grid item xs={8} sm={4}>
+                <Typography>
+                  Upload Image <RequiredIndicator />
+                </Typography>
+                <input
+                  type="file"
+                  name="images"
+                  accept="image/*"
+                  onChange={(e) => {
+                    setFormData({ ...formData, images: e.target.files[0] }); 
+                  }}
+                />
               </Grid>
 
               <Grid item xs={8} sm={4}>

@@ -1221,14 +1221,21 @@ const FormRosenagar = ({ onFormSubmitSuccess, show, editData }) => {
                   className="form-control"
                   customInput={
                     <TextField
-                      fullWidth
+                      
+                    fullWidth={false} // Make the TextField not full width
+                    style={{ maxWidth: "100%" }}
                       label={<>Booking Date</>}
                       InputProps={{
                         readOnly: true,
-                        sx: { width: "100%" },
+                        className: "custom-input",
+                        sx: { width: "100%",zIndex: 9999 ,overflow: "hidden",  whiteSpace: "nowrap"},
                       }}
                     />
                   }
+                  showMonthDropdown
+                  showYearDropdown
+                  yearDropdownItemNumber={15}
+                  scrollableYearDropdown
                 />
               </Grid>
 
