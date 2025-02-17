@@ -231,12 +231,13 @@ const Sidebar = ({ onEdit, onItemClick, onCreate  , onDashboardClick}) => {
         overflowY: "auto",
       }}
     >
-      <Grid item xs={12} sx={{ marginBottom: 3 }}>
+      <Grid item xs={12} sx={{ marginBottom: 3 }} style={{background:"white",zIndex:"99",display:"flex", flexWrap:"wrap"}}>
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Typography variant="body2" sx={{ fontWeight: "bold", fontSize: 20 }}>
             All Lead
           </Typography>
           <Box display="flex" alignItems="center">
+          
           <IconButton
               aria-label="filter"
               sx={{ color: "grey" }}
@@ -285,6 +286,7 @@ const Sidebar = ({ onEdit, onItemClick, onCreate  , onDashboardClick}) => {
                 Name Z-A
               </MenuItem>
             </Popover>
+
           </Box>
         </Box>
       </Grid>
@@ -458,7 +460,6 @@ const Sidebar = ({ onEdit, onItemClick, onCreate  , onDashboardClick}) => {
   );
 };
 
-// Function to get chip color based on leadstatusName
 const getChipColor = (leadstatusName) => {
   switch (leadstatusName) {
     case "Warm":

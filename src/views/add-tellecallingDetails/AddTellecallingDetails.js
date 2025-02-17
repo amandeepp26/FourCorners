@@ -24,6 +24,7 @@ import {
   FormControlLabel,
   RadioGroup,
   Radio,
+  CircularProgress,
   FormLabel,
   Autocomplete,
 } from "@mui/material";
@@ -36,10 +37,7 @@ const AddTellecallingDetails = ({
   contactDataTele,
   onDashboardClick,
 }) => {
-  console.log(
-    contactDataTele,
-    "contactDataTele data aaya<<<<<<<<<<<<><>>>>>>>>>>>>>>>>>>"
-  );
+
   const initialFormData = {
     titleprefixID: "",
     Cid: "",
@@ -82,7 +80,7 @@ const AddTellecallingDetails = ({
   const [userMaster, setUserMaster] = useState([]);
   const [tellecallingID, setTellecallingID] = useState([]);
   const [bhkOptions, setBhkOptions] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitError, setSubmitError] = useState(false);
   const [cookies, setCookie] = useCookies(["amr"]);
@@ -102,7 +100,7 @@ const AddTellecallingDetails = ({
       setFormData({
         ...contactDataTele,
         NextFollowUpDate: contactDataTele.NextFollowUpDate
-          ? new Date(contactDataTele.NextFollowUpDate)
+          ? new Date(contactDataTele.NextFollowUpDate) 
           : null,
         NextFollowUpTime: contactDataTele.NextFollowUpTime || "",
         TelecallAttendedByID: cookies?.amr?.UserID || 1,
@@ -211,16 +209,6 @@ const AddTellecallingDetails = ({
     }
   };
 
-  // const fetchDataTellecalling = async () => {
-  //   try {
-  //     const response = await axios.get(
-  //       "https://apiforcornershost.cubisysit.com/api/api-fetch-telecalling.php"
-  //     );
-  //     setTellecallingID(response.data.data || []);
-  //   } catch (error) {
-  //     console.error("Error fetching data:", error);
-  //   }
-  // };
 
   const fetchDataTitle = async () => {
     try {
@@ -358,53 +346,66 @@ const AddTellecallingDetails = ({
   const validateForm = () => {
     const newErrors = {};
     const requiredFields = [
-      "titleprefixID",
-      "PartyName",
-      "Mobile",
-      "Countrycode",
+      
+      "CName",
+      "Mobile", 
       "Email",
       "ProjectID",
       "UnittypeID",
+      "EstimatedbudgetID",
       "leadstatusID",
       "Location",
       "SourceID",
-      "TelecallAttendedByID",
+      "NextFollowUpDate",
+      "Comments",
+     
     ];
-
+  
     requiredFields.forEach((field) => {
       if (!formData[field]) {
         newErrors[field] = "This field is required";
       }
     });
-
+  
+    // Validate email format
+    if (formData.Email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.Email)) {
+      newErrors.Email = "Invalid email address.";
+    }
+  
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0; // Return true if no errors
+    return Object.keys(newErrors).length === 0;
   };
+  
   const handleSubmit = async (event) => {
     event.preventDefault();
-
+    setLoading(true);
+    const isValid = validateForm();
+    if (!isValid) {
+      setLoading(false);
+      return;
+    }
+  debugger;
     const url = editData
       ? "https://proxy-forcorners.vercel.app/api/proxy/api-update-telecalling.php"
       : "https://proxy-forcorners.vercel.app/api/proxy/api-insert-telecalling.php";
-
+      debugger;
     const dataToSend = {
       ...formData,
 
       ModifyUID: cookies.amr?.UserID || 1,
       TelecallAttendedByID: cookies?.amr?.UserID || 1,
       titleprefixID: editData ? editData?.TitleID : contactDataTele?.TitleID,
-      // titleprefixID: editData ? editData?.TitleID : contactDataTele?.TitleID,
     };
 
     console.log("Data to Send:", dataToSend);
-
+debugger;
     try {
       const response = await axios.post(url, dataToSend, {
         headers: {
           "Content-Type": "application/json",
         },
       });
-
+      setLoading(false);
       if (response.data.status === "Success") {
         setFormData(initialFormData);
         setSubmitError(false);
@@ -428,15 +429,18 @@ const AddTellecallingDetails = ({
           title: "Oopsii...",
           text: "Something went wrong!",
         });
+        setLoading(false);
       }
     } catch (error) {
-      console.error("There was an error!", error);
+     
       setSubmitError(true);
+      setLoading(false);
       Swal.fire({
         icon: "error",
         title: "Oops...",
-        text: "An error occurred!",
+        text: "Already In Telcalling OR Check The Fields  ",
       });
+    
     }
   };
 
@@ -447,18 +451,13 @@ const AddTellecallingDetails = ({
     setSubmitSuccess(false);
     setSubmitError(false);
   };
-
-  const handleDateChange = (date) => {
-    if (date) {
-      // Convert date to UTC
-      const adjustedDate = new Date(
-        Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())
-      );
-      setFormData({ ...formData, NextFollowUpDate: adjustedDate });
-    } else {
-      setFormData({ ...formData, NextFollowUpDate: date });
-    }
+  const handleDateChange = (event) => {
+    const date = event.target.value; // Get the value as a string (yyyy-mm-dd)
+    console.log("date checking",date);
+    setFormData({ ...formData, NextFollowUpDate: date });
   };
+  
+  
 
   return (
     <>
@@ -613,35 +612,15 @@ const AddTellecallingDetails = ({
                   onChange={handleChange}
                   inputProps={{
                     pattern: "[0-9]*",
-                    maxLength: 10,
+                 
                   }}
+                  error={!!errors.Mobile}
+    helperText={errors.Mobile || ""}
                 />
                 {/* Add error handling for Mobile if needed */}
               </Grid>
 
-              {/* <Grid item xs={8} sm={4}>
-                <TextField
-                  fullWidth
-                  label={
-                    <>
-                      Mobile <RequiredIndicator />
-                    </>
-                  }
-                  type="tel"
-                  name="Mobile"
-                  value={formData.Mobile}
-                  onChange={handleChange}
-                  inputProps={{
-                    pattern: "[0-9]*",
-                    maxLength: 10,
-                  }}
-                />
-                {errors.Mobile && (
-                  <Typography variant="caption" color="error">
-                    {errors.Mobile}
-                  </Typography>
-                )}
-              </Grid> */}
+           
 
               <Grid item xs={8} sm={4}>
                 <FormControl fullWidth>
@@ -682,21 +661,6 @@ const AddTellecallingDetails = ({
                 </FormControl>
               </Grid>
 
-              {/* <Grid item xs={8} sm={4}>
-                <TextField
-                  fullWidth
-                  type="tel"
-                  name="AlternateMobileNo"
-                  label="Alternate Mobile Number"
-                  placeholder="Alternate Mobile Number"
-                  value={formData.AlternateMobileNo}
-                  onChange={handleChange}
-                  inputProps={{
-                    pattern: "[0-9]*",
-                    maxLength: 10,
-                  }}
-                />
-              </Grid> */}
 
               <Grid item xs={8} sm={4}>
                 <TextField
@@ -705,29 +669,13 @@ const AddTellecallingDetails = ({
                   name="Email"
                   value={formData.Email || ""}
                   onChange={handleChange}
+                  error={!!errors.Email}
+    helperText={errors.Email || ""}
                 />
                 {/* Add error handling for Email if needed */}
               </Grid>
 
-              {/* <Grid item xs={8} sm={4}>
-                <TextField
-                  fullWidth
-                  label={
-                    <>
-                      Email <RequiredIndicator />
-                    </>
-                  }
-                  name="Email"
-                  placeholder="E-Mail"
-                  value={formData.Email}
-                  onChange={handleChange}
-                />
-                {errors.Email && (
-                  <Typography variant="caption" color="error">
-                    {errors.Email}
-                  </Typography>
-                )}
-              </Grid> */}
+            
 
               <Grid item xs={8} sm={4}>
                 <FormControl fullWidth>
@@ -738,6 +686,8 @@ const AddTellecallingDetails = ({
                     value={formData.ProjectID}
                     name="ProjectID"
                     onChange={handleChange}
+                    error={!!errors.ProjectID}
+    helperText={errors.ProjectID || ""}
                     label={<>Project Name</>}
                   >
                     <MenuItem value="">
@@ -768,6 +718,8 @@ const AddTellecallingDetails = ({
                   <Select
                     value={formData.UnittypeID}
                     onChange={handleBhkChange}
+                    error={!!errors.UnittypeID}
+    helperText={errors.UnittypeID || ""}
                     label={
                       <>
                         Unit Type <RequiredIndicator />
@@ -794,6 +746,8 @@ const AddTellecallingDetails = ({
                   <Select
                     value={formData.EstimatedbudgetID}
                     onChange={handleEstimatedBudget}
+                    error={!!errors.EstimatedbudgetID}
+    helperText={errors.EstimatedbudgetID || ""}
                     label={
                       <>
                         Estimated Budget <RequiredIndicator />
@@ -825,6 +779,8 @@ const AddTellecallingDetails = ({
                   <Select
                     value={formData.leadstatusID}
                     onChange={handleLeadStatus}
+                    error={!!errors.leadstatusID}
+    helperText={errors.leadstatusID || ""}
                     label={
                       <>
                         Lead Status <RequiredIndicator />
@@ -863,6 +819,8 @@ const AddTellecallingDetails = ({
                     (contactDataTele ? contactDataTele.Location : "")
                   }
                   onChange={handleChange}
+                  error={!!errors.Location}
+                  helperText={errors.Location || ""}
                 />
               </Grid>
               <Grid item xs={8} sm={4}>
@@ -873,7 +831,10 @@ const AddTellecallingDetails = ({
                   <Select
                     value={formData.SourceID}
                     onChange={handleSource}
+                    
                     label="Source"
+                    error={!!errors.SourceID}
+                    helperText={errors.SourceID || ""}
                   >
                     {source.map((bhk) => (
                       <MenuItem key={bhk.SourceID} value={bhk.SourceID}>
@@ -889,78 +850,34 @@ const AddTellecallingDetails = ({
                 </FormControl>
               </Grid>
 
-              {/* <Grid item xs={8} sm={4}>
-                <TextField
-                  fullWidth
-                  label={
-                    <>
-                      Source Name <RequiredIndicator />
-                    </>
-                  }
-                  name="SourceName"
-                  placeholder="Source Name"
-                  value={formData.SourceName}
-                  onChange={handleChange}
-                />
-              </Grid> */}
-
-              {/* <Grid item xs={8} sm={4}>
-              <TextField
-                fullWidth
-                label="Source Description"
-                placeholder="Source Description"
-                name="SourceDescription"
-                value={formData.SourceDescription}
-                onChange={handleChange}
-            
-            </Grid>
-
-            <Grid item xs={8} sm={4}>
-                <FormControl fullWidth>
-                  <InputLabel>
-                    Telecall Attended By
-                    <RequiredIndicator />
-                  </InputLabel>
-                  <Select
-                    value={formData.TelecallAttendedByID}
-                    onChange={handleTelecaller}
-                    label="Telecall Attended By"
-                  >
-                    {userMaster.map((bhk) => (
-                      <MenuItem key={bhk.UserID} value={bhk.UserID}>
-                        {bhk.Name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                  {errors.TelecallAttendedByID && (
-                    <Typography variant="caption" color="error">
-                      {errors.TelecallAttendedByID}
-                    </Typography>
-                  )}
-                </FormControl>
-              </Grid> */}
+         
 
               <Grid item xs={8} sm={4}>
-                <DatePicker
-                  selected={formData.NextFollowUpDate}
-                  onChange={handleDateChange}
-                  dateFormat="dd-MM-yyyy"
-                  className="form-control"
-                  customInput={
-                    <TextField
-                      fullWidth
-                      label={
-                        <>
-                          Next follow up-date <RequiredIndicator />
-                        </>
-                      }
-                      InputProps={{
-                        readOnly: true,
-                        sx: { width: "100%" },
-                      }}
-                    />
-                  }
-                />
+             
+                  
+                
+              <TextField
+  fullWidth
+  onChange={handleDateChange}
+  type="date"
+  className="form-control"
+  value={formData.NextFollowUpDate}
+  error={!!errors.NextFollowUpDate}
+  helperText={errors.NextFollowUpDate || ""}
+  label={
+    <>
+      Next follow up-date <RequiredIndicator />
+    </>
+  }
+  variant="outlined"
+  InputLabelProps={{ shrink: true }}
+  showMonthDropdown
+  showYearDropdown
+  yearDropdownItemNumber={15} // Number of years to show in dropdown
+  scrollableYearDropdown
+/>
+
+              
               </Grid>
               <Grid item xs={8} sm={4}>
                 <TextField
@@ -990,6 +907,8 @@ const AddTellecallingDetails = ({
                   name="Comments"
                   value={formData.Comments || ""}
                   onChange={handleChange}
+                  error={!!errors.Comments}
+                  helperText={errors.Comments || ""}
                 />
               </Grid>
 
@@ -1026,18 +945,23 @@ const AddTellecallingDetails = ({
               </Grid>
 
               <Grid item xs={12}>
-                <Button
-                  variant="contained"
-                  sx={{
-                    marginRight: 3.5,
-                    marginTop: 5,
-                    backgroundColor: "#9155FD",
-                    color: "#FFFFFF",
-                  }}
-                  onClick={handleSubmit}
-                >
-                  Submit
-                </Button>
+              <Button
+        variant="contained"
+        sx={{
+          marginRight: 3.5,
+          marginTop: 5,
+          backgroundColor: "#9155FD",
+          color: "#FFFFFF",
+        }}
+        onClick={handleSubmit}
+        disabled={loading} 
+      >
+        {loading ? (
+          <CircularProgress size={24} sx={{ color: "#fff" }} />
+        ) : (
+          "Submit"
+        )}
+      </Button>
               </Grid>
             </Grid>
           </form>

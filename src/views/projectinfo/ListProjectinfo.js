@@ -203,7 +203,7 @@ const Listprojectinfo = ({ item, onDelete, onEdit, onHistoryClick }) => {
               <Grid item xs={4}>
                 <Card variant="outlined" sx={{ borderRadius: 1, padding: "10px" }}>
                   <Typography variant="body2" sx={{ fontWeight: 600, fontSize: "0.8rem" }}>
-                    Remarks
+                    Unit Type 
                   </Typography>
                   <Typography variant="body2" sx={{ fontSize: "0.7rem" }}>
                     {projectDetails.Remark}
@@ -267,7 +267,7 @@ const Listprojectinfo = ({ item, onDelete, onEdit, onHistoryClick }) => {
               <Grid item xs={4}>
                 <Card variant="outlined" sx={{ borderRadius: 1, padding: "10px" }}>
                   <Typography variant="body2" sx={{ fontWeight: 600, fontSize: "0.8rem" }}>
-                    Latitude
+                    Project Location 
                   </Typography>
                   <Typography variant="body2" sx={{ fontSize: "0.7rem" }}>
                     {projectDetails.Latitude}
@@ -279,7 +279,7 @@ const Listprojectinfo = ({ item, onDelete, onEdit, onHistoryClick }) => {
               <Grid item xs={12}>
                 <Card variant="outlined" sx={{ borderRadius: 1, padding: "10px" }}>
                   <Typography variant="body2" sx={{ fontWeight: 600, fontSize: "0.8rem" }}>
-                    Description
+                 Email Paragraph
                   </Typography>
                   <Typography variant="body2" sx={{ fontSize: "0.7rem" }}>
                     {projectDetails.Para}
@@ -289,19 +289,22 @@ const Listprojectinfo = ({ item, onDelete, onEdit, onHistoryClick }) => {
 
               {/* Amenities */}
               <Grid item xs={12}>
-                <Card variant="outlined" sx={{ borderRadius: 1, padding: "10px" }}>
-                  <Typography variant="body2" sx={{ fontWeight: 600, fontSize: "0.8rem" }}>
-                    Amenities
-                  </Typography>
-                  <List sx={{ paddingLeft: 2 }}>
-                    {projectDetails.AmenitiesNames.map((amenity, index) => (
-                      <ListItem key={index} sx={{ paddingLeft: 0 }}> {/* Remove left padding for better alignment */}
-                        <ListItemText primary={`${index + 1}. ${amenity}`} />
-                      </ListItem>
-                    ))}
-                  </List>
-                </Card>
-              </Grid>
+  <Card variant="outlined" sx={{ borderRadius: 1, padding: "10px" }}>
+    <Typography variant="body2" sx={{ fontWeight: 600, fontSize: "0.8rem" }}>
+      Amenities
+    </Typography>
+    <Grid container spacing={2} sx={{ paddingLeft: 2, flexWrap: "wrap" }}>
+      {projectDetails.AmenitiesNames.map((amenity, index) => (
+        <Grid item key={index}>
+          <Typography variant="body2" sx={{ fontSize: "0.8rem" }}>
+            {`${index + 1}. ${amenity}`}
+          </Typography>
+        </Grid>
+      ))}
+    </Grid>
+  </Card>
+</Grid>
+
 
             </Grid>
           </Box>

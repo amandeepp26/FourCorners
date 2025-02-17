@@ -26,7 +26,7 @@ const AddProjectDetails = ({ show, setShowUploadExcel, editData }) => {
     ProjectID: "",
     address: "",
     WingName: [],
-    images: null, // Single image field
+    images: null, 
     Status: 1,
     CreateUID: cookies.amr?.UserID || 1,
   };
@@ -62,7 +62,7 @@ const AddProjectDetails = ({ show, setShowUploadExcel, editData }) => {
 
   const fetchCompany = () => {
     axios
-      .get("https://apiforcorners.cubisysit.com/api/api-fetch-companymaster.php")
+      .get("https://apiforcornershost.cubisysit.com/api/api-fetch-companymaster.php")
       .then((response) => {
         if (response.data.status === "Success") {
           setCompanyTypeData(response.data.data);
@@ -75,7 +75,7 @@ const AddProjectDetails = ({ show, setShowUploadExcel, editData }) => {
 
   const fetchProject = () => {
     axios
-      .get("https://apiforcorners.cubisysit.com/api/api-fetch-projectmaster.php")
+      .get("https://apiforcornershost.cubisysit.com/api/api-fetch-projectmaster.php")
       .then((response) => {
         if (response.data.status === "Success") {
           setProjectTypeData(response.data.data);
@@ -132,7 +132,7 @@ debugger;
 
     const url = editData
         ? "https://proxy-forcorners.vercel.app/api/proxy/api-update-projectinfo.php"
-        : "https://apiforcornershost.cubisysit.com/api/api-insert-projectinfo.php";
+        : "https://proxy-forcorners.vercel.app/api/proxy/api-insert-projectinfo.php";
 
     try {
         const response = await axios.post(url, formDataToSubmit, {
@@ -140,7 +140,7 @@ debugger;
                 "Content-Type": "multipart/form-data",
             },
         });
-
+debugger;
         // Log the response data for debugging
         console.log(response.data);
         console.log(formDataToSubmit);
@@ -214,6 +214,7 @@ debugger;
                     name="CompanyID"
                     onChange={handleFormDataChange}
                     label={<>Select Company</>}
+                    required
                   >
                     <MenuItem value="">
                       <em>None</em>
@@ -246,6 +247,7 @@ debugger;
                     name="ProjectID"
                     onChange={handleFormDataChange}
                     label={<>Select Project</>}
+                    required
                   >
                     <MenuItem value="">
                       <em>None</em>
@@ -277,6 +279,7 @@ debugger;
                   onChange={(e) => {
                     setFormData({ ...formData, images: e.target.files[0] }); 
                   }}
+                  required
                 />
               </Grid>
 
@@ -284,10 +287,12 @@ debugger;
                 <TextField
                   fullWidth
                   label={<>RERA Registration</>}
+                  
                   type="text"
                   name="reraregistration"
                   value={formData.reraregistration}
                   onChange={handleFormDataChange}
+                  required
                 />
                 {errors.reraregistration && (
                   <Typography variant="caption" color="error">
@@ -304,12 +309,13 @@ debugger;
                   name="address"
                   value={formData.address}
                   onChange={handleFormDataChange}
+                  required
                 />
                 {errors.address && (
                   <Typography variant="caption" color="error">
                     {errors.address}
                   </Typography>
-                )}
+                )}  
               </Grid>
 
               <Grid item xs={8} sm={4}>
@@ -321,9 +327,11 @@ debugger;
                   <Select
                     multiple
                     value={formData.WingName}
+                    label={<>Select Wings</>}
                     name="WingName"
                     onChange={handleFormDataChange}
                     renderValue={(selected) => selected.join(", ")}
+                    required
                   >
                     {wingsData.map((wing) => (
                       <MenuItem key={wing.WingID} value={wing.WingName}>
@@ -351,6 +359,7 @@ debugger;
                   {editData ? "Update" : "Submit"}
                 </Button>
               </Grid>
+
             </Grid>
           </form>
         </CardContent>

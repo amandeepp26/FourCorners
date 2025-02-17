@@ -117,6 +117,25 @@ export default function HistoryBooking({ item }) {
       ...formData,
       Tid: item.Tid
     };
+    if (
+      !formData.CurrentUpdateID ||
+      !formData.NextFollowUpDate ||
+      !formData.NextFollowUpTime ||
+      !formData.Interest
+    ) {
+      Swal.fire({
+        icon: "error",
+        title: "Missing Fields",
+        text: "Please fill in all required fields.",
+        didOpen: () => {
+          const swalContainer = document.querySelector('.swal2-container');
+          if (swalContainer) {
+            swalContainer.style.zIndex = '9999'; // Explicitly set a higher z-index
+          }
+        },
+      });
+      return;
+    }
     const url = "https://proxy-forcorners.vercel.app/api/proxy/api-insert-nextfollowup.php";
     try {
       const response = await axios.post(url, formDataWithTid, {
@@ -207,128 +226,170 @@ export default function HistoryBooking({ item }) {
           Add New Follow Up
         </Button>
         <Modal
-          open={open}
-          onClose={handleClose}
-          aria-labelledby="modal-modal-title"
-          aria-describedby="modal-modal-description"
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 4,
+            minWidth: 500,
+            maxWidth: 700, // Adjust the maxWidth to accommodate two text fields in a row
+            mt: 5,
+            mx: 2,
+            minHeight: 400, // Adjust the minHeight to increase the height of the modal
+            height: "auto",
+          }}
         >
-          <Box
-            sx={{
-              position: "absolute",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              bgcolor: "background.paper",
-              boxShadow: 24,
-              p: 4,
-              minWidth: 500,
-              maxWidth: 700,
-              mt: 5,
-              mx: 2,
-              minHeight: 400,
-              height: 'auto', 
-            }}
+          <IconButton
+            aria-label="cancel"
+            onClick={handleClose}
+            sx={{ position: "absolute", top: 6, right: 10 }}
           >
-            <IconButton
-              aria-label="cancel"
-              onClick={handleClose}
-              sx={{ position: "absolute", top: 6, right: 10 }}
-            >
-              <CancelIcon sx={{ color: "red" }} />
-            </IconButton>
-            <Typography
-              id="modal-modal-title"
-              variant="h7"
-              component="h3"
-              gutterBottom
-            >
-              Select Next Follow-Up Date and Time
-            </Typography>
-            <Grid container spacing={2} mt={8}>
-              <Grid item xs={6}>
-                <FormControl fullWidth>
-                  <InputLabel>Current Update</InputLabel>
-                  <Select
-                    value={formData.CurrentUpdateID}
-                    onChange={handleCurrentUpdate}
-                    label="Current Update"
-                    MenuProps={{
-                      PaperProps: {
-                        style: {
-                          maxHeight: 180,
-                        },
+            <CancelIcon sx={{ color: "red" }} />
+          </IconButton>
+          <Typography
+            id="modal-modal-title"
+            variant="h7"
+            component="h3"
+            gutterBottom
+          >
+           Next Follow-Up 
+          </Typography>
+
+          <Grid container spacing={2} mt={8}>
+            <Grid item xs={6}>
+              <FormControl fullWidth>
+                <InputLabel>
+                  Current Update <span style={{ color: "red" }}>*</span>
+                </InputLabel>
+                <Select
+                  value={formData.CurrentUpdateID}
+                  onChange={handleCurrentUpdate}
+                  label="Current Update"
+                  error={!formData.CurrentUpdateID} // Highlight field in case of error
+                  MenuProps={{
+                    PaperProps: {
+                      style: {
+                        maxHeight: 180, // Adjust as needed
                       },
-                    }}
-                  >
-                    {currentUpdate.map((bhk) => (
-                      <MenuItem  key={bhk.CurrentUpdateID} value={bhk.CurrentUpdateID}>
-                        {bhk.CurrentUpdateName}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={6}>
-                <TextField
-                  fullWidth
-                  type="date"
-                  name="NextFollowUpDate"
-                  value={formData.NextFollowUpDate}
-                  onChange={handleChange}
-                  InputLabelProps={{ sx: { mb: 1 } }}
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <TextField
-                  fullWidth
-                  type="time"
-                  name="NextFollowUpTime"
-                  value={formData.NextFollowUpTime}
-                  onChange={handleChange}
-                  InputLabelProps={{ sx: { mb: 1 } }}
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <TextField
-                  fullWidth
-                  label="Interest In"
-                  type="text"
-                  name="Interest"
-                  value={formData.Interest}
-                  onChange={handleChange}
-                  InputLabelProps={{ sx: { mb: 1 } }}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Note"
-                  type="text"
-                  name="Note"
-                  value={formData.Note}
-                  onChange={handleChange}
-                  InputLabelProps={{ sx: { mb: 1 } }}
-                />
-              </Grid>
-            </Grid>
-            <Box sx={{ textAlign: "left" }}>
-              <Grid item xs={12}>
-                <Button
-                  variant="contained"
-                  sx={{
-                    marginRight: 3.5,
-                    marginTop: 15,
-                    backgroundColor: "#9155FD",
-                    color: "#FFFFFF",
+                    },
                   }}
-                  onClick={handleSubmit}
                 >
-                  Submit
-                </Button>
-              </Grid>
-            </Box>
+                  {currentUpdate.map((bhk) => (
+                    <MenuItem
+                      key={bhk.CurrentUpdateID}
+                      value={bhk.CurrentUpdateID}
+                    >
+                      {bhk.CurrentUpdateName}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+
+            <Grid item xs={6}>
+              <TextField
+                fullWidth
+                type="date"
+                name="NextFollowUpDate"
+                value={formData.NextFollowUpDate}
+                onChange={handleChange}
+                label={
+                  <span>
+                    Next Follow-Up Date <span style={{ color: "red" }}>*</span>
+                  </span>
+                }
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                inputProps={{
+                  min: new Date().toISOString().split("T")[0], // Only allow today or future dates
+                }}
+                error={!formData.NextFollowUpDate} // Highlight field in case of error
+              />
+            </Grid>
+
+            <Grid item xs={6}>
+              <TextField
+                fullWidth
+                type="time"
+                name="NextFollowUpTime"
+                value={formData.NextFollowUpTime}
+                onChange={handleChange}
+                label={
+                  <span>
+                    Next Follow-Up Time <span style={{ color: "red" }}>*</span>
+                  </span>
+                }
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                error={!formData.NextFollowUpTime} // Highlight field in case of error
+              />
+            </Grid>
+
+            <Grid item xs={6}>
+              <TextField
+                fullWidth
+                type="text"
+                name="Interest"
+                value={formData.Interest}
+                onChange={handleChange}
+                label={
+                  <span>
+                    Interest In <span style={{ color: "red" }}>*</span>
+                  </span>
+                }
+                InputLabelProps={{ sx: { mb: 1 } }}
+                error={!formData.Interest} // Highlight field in case of error
+              />
+            </Grid>
+
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                type="text"
+                name="Note"
+                value={formData.Note}
+                onChange={handleChange}
+                label={
+                  <span>
+                    Note <span style={{ color: "red" }}>*</span>
+                  </span>
+                }
+                InputLabelProps={{ sx: { mb: 1 } }}
+              
+              />
+            </Grid>
+
+          </Grid>
+
+          <Box sx={{ textAlign: "left" }}>
+            <Grid item xs={12}>
+              <Button
+                variant="contained"
+                sx={{
+                  marginRight: 3.5,
+                  marginTop: 15,
+                  backgroundColor: "#9155FD",
+                  color: "#FFFFFF",
+                }}
+                onClick={handleSubmit}
+              >
+                Submit
+              </Button>
+            </Grid>
           </Box>
-        </Modal>
+        </Box>
+      </Modal>
       </Box>
     </Box>
   );

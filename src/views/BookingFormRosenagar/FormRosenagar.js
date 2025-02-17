@@ -39,13 +39,13 @@ const FormRosenagar = ({ onFormSubmitSuccess, show, editData }) => {
 
   console.log(editData, "Edit data aaya");
   const initialRemark = {
-    Proccess: "",
+    Proccess: null,
     RemarkName: "",
     RemarkDate: null, // or new Date() if you want a default date
     AmountTypeID: "",
     Remarkamount: "",
-    Loan: "",
-    Registraion: "",
+    Loan: null,
+    Registraion: null,
   };
 
   const initialFormData = {
@@ -507,11 +507,12 @@ const FormRosenagar = ({ onFormSubmitSuccess, show, editData }) => {
   }, [formData.ProjectID]);
 
   useEffect(() => {
-    if (formData.WingID && formData.ProjectID && formData.FloorNo) {
+    if (formData.WingID && formData.ProjectID && formData.FloorNo !== undefined) {
+      const url = `https://apiforcornershost.cubisysit.com/api/api-booking-flatnull.php?WingID=${formData.WingID}&ProjectID=${formData.ProjectID}&FloorNo=${formData.FloorNo}`;
+      console.log("Request URL:", url);
+
       axios
-        .get(
-          `https://apiforcornershost.cubisysit.com/api/api-booking-flatnull.php?WingID=${formData.WingID}&ProjectID=${formData.ProjectID}&FloorNo=${formData.FloorNo}`
-        )
+        .get(url)
         .then((response) => {
           if (response.data.status === "Success") {
             console.log("Flat No Data:", response.data.data);
@@ -546,7 +547,7 @@ const FormRosenagar = ({ onFormSubmitSuccess, show, editData }) => {
               Area,
               UsableArea,
               AgreementCarpet,
-            })); 
+            }));
           }
         })
         .catch((error) => {
@@ -632,16 +633,14 @@ const FormRosenagar = ({ onFormSubmitSuccess, show, editData }) => {
 
     const formattedRemarks = remarks.map((remark, index) => ({
       ...remark,
-      RemarkDate: remark.RemarkDate
-        ? format(new Date(remark.RemarkDate), "yyyy-MM-dd")
-        : null,
+      RemarkDate: remark.RemarkDate ? remark.RemarkDate.toISOString().split('T')[0] : null,
       RemarkUpdateID: index + 1,
       Status: 1,
-
       CreateUID: 1,
     }));
-    console.log(formattedRemarks, "Formatted Remarks");
 
+    console.log(formattedRemarks, "Formatted Remarks");
+    debugger;
     const dataToSend = {
       ...formData,
 
@@ -656,9 +655,9 @@ const FormRosenagar = ({ onFormSubmitSuccess, show, editData }) => {
           "Content-Type": "application/json",
         },
       });
-
+      debugger;
       if (response.data.status === "Success") {
-        console.log(response.data.data, "Submission successful");
+
         const { BookingID } = response.data;
         onFormSubmitSuccess(BookingID);
         setFormData(initialFormData);
@@ -676,6 +675,7 @@ const FormRosenagar = ({ onFormSubmitSuccess, show, editData }) => {
           title: "Oops...",
           text: "Something went wrong!",
         });
+        setLoading(false);
       }
     } catch (error) {
       console.error("There was an error!", error);
@@ -684,6 +684,7 @@ const FormRosenagar = ({ onFormSubmitSuccess, show, editData }) => {
         title: "Oops...",
         text: "Something went wrong!",
       });
+      setLoading(false);
     }
   };
 
@@ -695,14 +696,18 @@ const FormRosenagar = ({ onFormSubmitSuccess, show, editData }) => {
     setSubmitError(false);
   };
 
-  const handleDateChange = (date) => {
-    const formattedDate = format(date, "yyyy-MM-dd");
+  const handleDateChange = (event) => {
+    // Get the date value from the input field (format: YYYY-MM-DD)
+    const formattedDate = event.target.value;
+  
+    // Update formData with the new date (keep it in the correct format)
     setFormData({ ...formData, BookingDate: formattedDate });
   };
 
-  const handleDateRemarks = (date, index) => {
+
+  const handleDateRemarks = (event, index) => {
     const updatedRemarks = [...remarks];
-    updatedRemarks[index] = { ...updatedRemarks[index], RemarkDate: date };
+    updatedRemarks[index] = { ...updatedRemarks[index], RemarkDate: new Date(event.target.value) };
     setRemarks(updatedRemarks);
   };
 
@@ -928,43 +933,43 @@ const FormRosenagar = ({ onFormSubmitSuccess, show, editData }) => {
               </Grid>
 
               <Grid item xs={12} md={4}>
-  <FormControl fullWidth>
-    <InputLabel>Floor</InputLabel>
-    <Select
-      value={formData.FloorNo}
-      onChange={handleChange}
-      name="FloorNo"
-      label="Floor"
-    >
-      {/* Filter the floor data to show unique floor numbers */}
-      {Array.from(new Set(floor.map((wing) => wing.FloorNo))).map((uniqueFloor, index) => (
-        <MenuItem key={`${uniqueFloor}-${index}`} value={uniqueFloor}>
-          {uniqueFloor}
-        </MenuItem>
-      ))}
-    </Select>
-  </FormControl>
-</Grid>
+                <FormControl fullWidth>
+                  <InputLabel>Floor</InputLabel>
+                  <Select
+                    value={formData.FloorNo}
+                    onChange={handleChange}
+                    name="FloorNo"
+                    label="Floor"
+                  >
+                    {/* Filter the floor data to show unique floor numbers */}
+                    {Array.from(new Set(floor.map((wing) => wing.FloorNo))).map((uniqueFloor, index) => (
+                      <MenuItem key={`${uniqueFloor}-${index}`} value={uniqueFloor}>
+                        {uniqueFloor}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
 
-<Grid item xs={12} md={4}>
-  <FormControl fullWidth>
-    <InputLabel>Flat Number</InputLabel>
-    <Select
-      value={formData.FlatNo}
-      onChange={handleChange}
-      name="FlatNo"
-      label="Flat Number"
-    >
-      {flatNoData.map((flat, index) => (
-        <MenuItem key={`${flat.FlatNo}-${index}`} value={flat.FlatNo}>
-          {flat.FlatNo} {flat.skuName} 
-        </MenuItem>
-      ))}
-    </Select>
-  </FormControl>
-</Grid>
+              <Grid item xs={12} md={4}>
+                <FormControl fullWidth>
+                  <InputLabel>Flat Number</InputLabel>
+                  <Select
+                    value={formData.FlatNo}
+                    onChange={handleChange}
+                    name="FlatNo"
+                    label="Flat Number"
+                  >
+                    {flatNoData.map((flat, index) => (
+                      <MenuItem key={`${flat.FlatNo}-${index}`} value={flat.FlatNo}>
+                        {flat.FlatNo} {flat.skuName}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
 
-           
+
               <Grid item xs={12} md={4}>
                 <FormControl fullWidth>
                   <InputLabel>Unit Type</InputLabel>
@@ -1210,35 +1215,22 @@ const FormRosenagar = ({ onFormSubmitSuccess, show, editData }) => {
 
                 />
               </Grid>
+                <Grid item xs={8} sm={4}>
+                  <TextField
+                    fullWidth
+                    type="date"
+                    label="Booking Date"
+                    value={formData.BookingDate || ''}
+                     onChange={handleDateChange}
+                    className="form-control"
+                    InputProps={{
+                      sx: { width: "100%", zIndex: 99 },
+                    }}
+                    variant="outlined"
+                    InputLabelProps={{ shrink: true }}
+                  />
 
-              <Grid item xs={8} sm={4}>
-                <DatePicker
-                  selected={
-                    formData.BookingDate ? new Date(formData.BookingDate) : null
-                  }
-                  onChange={handleDateChange}
-                  dateFormat="dd-MM-yyyy"
-                  className="form-control"
-                  customInput={
-                    <TextField
-                      
-                    fullWidth={false} // Make the TextField not full width
-                    style={{ maxWidth: "100%" }}
-                      label={<>Booking Date</>}
-                      InputProps={{
-                        readOnly: true,
-                        className: "custom-input",
-                        sx: { width: "100%",zIndex: 9999 ,overflow: "hidden",  whiteSpace: "nowrap"},
-                      }}
-                    />
-                  }
-                  showMonthDropdown
-                  showYearDropdown
-                  yearDropdownItemNumber={15}
-                  scrollableYearDropdown
-                />
-              </Grid>
-
+                </Grid>
               <Grid item xs={8} sm={4}>
                 <FormControl fullWidth>
                   <InputLabel>Booked By</InputLabel>
@@ -1330,19 +1322,16 @@ const FormRosenagar = ({ onFormSubmitSuccess, show, editData }) => {
                   </Grid>
 
                   {/* Date Field */}
-                  <Grid item xs={4}>
-                    <DatePicker
-                      selected={remark.RemarkDate}
-                      onChange={(date) => handleDateRemarks(date, index)}
-                      dateFormat="dd-MM-yyyy"
-                      customInput={
-                        <TextField fullWidth label="Expected Date" />
-                      }
-                      // Shows both the date picker and allows month/year selection
-                      showMonthDropdown
-                      showYearDropdown
-                      yearDropdownItemNumber={15} // Number of years to show in dropdown
-                      scrollableYearDropdown // Makes year dropdown scrollable
+                  <Grid item xs={8} sm={4}>
+                    <TextField
+                      fullWidth
+                      type="date"
+                      label="Expected Date"
+                      className="form-control"
+                      value={remark.RemarkDate ? remark.RemarkDate.toISOString().split('T')[0] : ''}
+                      onChange={(event) => handleDateRemarks(event, index)}
+                      variant="outlined"
+                      InputLabelProps={{ shrink: true }}
                     />
                   </Grid>
 
@@ -1407,23 +1396,23 @@ const FormRosenagar = ({ onFormSubmitSuccess, show, editData }) => {
               ))}
 
               <Grid item xs={12}>
-              <Button
-        variant="contained"
-        sx={{
-          marginRight: 3.5,
-          marginTop: 5,
-          backgroundColor: "#9155FD",
-          color: "#FFFFFF",
-        }}
-        onClick={handleSubmit}
-        disabled={loading} // Disable button when loading
-      >
-        {loading ? (
-          <CircularProgress size={24} sx={{ color: "#fff" }} />
-        ) : (
-          "Submit"
-        )}
-      </Button>
+                <Button
+                  variant="contained"
+                  sx={{
+                    marginRight: 3.5,
+                    marginTop: 5,
+                    backgroundColor: "#9155FD",
+                    color: "#FFFFFF",
+                  }}
+                  onClick={handleSubmit}
+                  disabled={loading} // Disable button when loading
+                >
+                  {loading ? (
+                    <CircularProgress size={24} sx={{ color: "#fff" }} />
+                  ) : (
+                    "Submit"
+                  )}
+                </Button>
               </Grid>
             </Grid>
           </form>

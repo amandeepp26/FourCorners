@@ -102,7 +102,7 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
   const [selectedBookingRemark, setSelectedBookingRemark] = useState("");
   const [bookingRemarkDetails, setBookingRemarkDetails] = useState({});
   const [modalOpen, setModalOpen] = useState(false);
-  
+
 
   const [showAmountType, setShowAmountType] = useState(false);
 
@@ -113,7 +113,7 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
   const [chequePayments, setChequePayments] = useState([
     {
       chequePaid: "",
-      Date:"",
+      Date: "",
       bankName: "",
       cheqNo: "",
       chequeDate: null,
@@ -201,7 +201,7 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
       const apiUrl = `https://apiforcornershost.cubisysit.com/api/api-fetch-wing.php?WingID=${wing.WingID}&ProjectID=${item.ProjectID}`;
       const response = await axios.get(apiUrl);
       if (response.data.status === "Success") {
-        
+
         setWingDetails(response.data.data);
         setSelectedWing(wing);
         setDataAvailable(response.data.data.length > 0);
@@ -215,7 +215,7 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
       setDataAvailable(false);
     }
   };
-  
+
 
   const handleAddChequePayment = () => {
     setChequePayments([
@@ -236,8 +236,8 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
     updatedChequePayments[index][field] = value;
     setChequePayments(updatedChequePayments);
   };
-  
-  
+
+
 
   useEffect(() => {
     // Update booking remark details based on the selected remark
@@ -258,7 +258,7 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
         `https://apiforcornershost.cubisysit.com/api/api-dropdown-bookingremark.php?BookingID=${bookingID}`
       );
       if (response.data.status === "Success") {
-      
+
         const bookingRemarksData = response.data.data;
         setBookingRemarks(bookingRemarksData);
 
@@ -296,7 +296,7 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
     setAnchorEl(event.currentTarget);
     setCurrentRow(row);
   };
-  
+
   const handleMenuClose = () => {
     setAnchorEl(null);
     setCurrentRow(null); // Clear the current row
@@ -310,30 +310,30 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
   };
 
   const handleTemplateClick = (row) => {
-    setBookingID(row.BookingID); 
-    setOpenTemplate(true); 
+    setBookingID(row.BookingID);
+    setOpenTemplate(true);
     handleMenuClose();
 
   };
 
   const onCheque = (row) => {
-    setBookingID(row.BookingID); 
-    setOpenCheque(true); 
-    handleMenuClose(); 
+    setBookingID(row.BookingID);
+    setOpenCheque(true);
+    handleMenuClose();
   };
 
   const onCancel = (row) => {
-    setBookingID(row.BookingID); 
-    setopencancel(true); 
-    handleMenuClose(); 
+    setBookingID(row.BookingID);
+    setopencancel(true);
+    handleMenuClose();
   };
 
   const onEdit = (row) => {
-    console.log(row, "Selected row data EDit"); 
+    console.log(row, "Selected row data EDit");
 
-    setBookingID(row.BookingID); 
+    setBookingID(row.BookingID);
     setOpenEdit(true);
-    handleMenuClose(); 
+    handleMenuClose();
   };
 
   const SortableTableCell = ({ label, onClick }) => (
@@ -363,7 +363,7 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
         wingDetails.filter((row) => {
           const flatNo = row.FlatNo ? row.FlatNo.toString().toLowerCase() : '';
           const partyName = row?.Partyname?.toLowerCase() || '';
-  
+
           return flatNo.includes(searchQuery.toLowerCase()) || partyName.includes(searchQuery.toLowerCase());
         })
       );
@@ -371,7 +371,7 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
       setFilteredRows(wingDetails);
     }
   }, [searchQuery, wingDetails]);
-  
+
 
   useEffect(() => {
     if (!open) {
@@ -397,6 +397,14 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
   const handleModalClose = () => {
     setModalOpen(false);
     setSelectedRow(null);
+    setSelectedBookingRemark("");
+    setBookingRemarkDetails({});
+    setSelectedPaymentType("");
+    setAmountType("");
+    setCashPaid("");
+    setChequePayments([]);
+    setRemarks([]);
+    setCashdate(null);
   };
 
   const handleRemoveChequePayment = (index) => {
@@ -409,14 +417,14 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
     const adjustedDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
     setCashdate({ CashDate: adjustedDate });
   };
-  
+
 
   const handleDateChange = (date, index, fieldName) => {
     const adjustedDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
     handleChequePaymentChange(index, fieldName, adjustedDate);
   };
-  
-  
+
+
   const handleDateChangePayment = (date, field) => {
     setFormData((prevFormData) => ({
       ...prevFormData,
@@ -430,110 +438,110 @@ const Listprojectbookng = ({ onChequeReceiptClick, item }) => {
       { Remarkamount: "", RemarkName: "", RemarkDate: new Date(), Loan: 0 },
     ]);
   };
-// 
+  // 
 
-const downloadCSV = () => {
-  // Extra booking data
-           
-  const bookingHeaders = [
-    "BookingData", "Mobile", "Name", "Address", "Aadhar", "Pancard", "Email", 
-    "FloorNo", "FlatNo", "Area", "Ratesqft", "TtlAmount", "Charges", 
-    "ParkingFacility", "FlatCost", "FlatCostInWords", "Gst", "StampDuty", 
-    "Registration", "Advocate", "ExtraCost", "TotalCost", "UsableArea", "AgreementCarpet"
-  ];
-  let csvContent = "data:text/csv;charset=utf-8,";
-  // Add the header row for Booking Data
-  csvContent += bookingHeaders.join(",") + "\n";
-  Booking.forEach(item => {
-    const bookingValues = [
-      item.BookingDate, item.Mobile, item.Name, item.Address, item.Aadhar, 
-      item.Pancard, item.Email, item.FloorNo, item.FlatNo, item.Area, 
-      item.Ratesqft, item.TtlAmount, item.Charges, item.ParkingFacility, 
-      item.FlatCost, item.FlatCostInWords, item.Gst, item.StampDuty, 
-      item.Registration, item.Advocate, item.ExtraCost, item.TotalCost, 
-      item.UsableArea, item.AgreementCarpet
+  const downloadCSV = () => {
+    // Extra booking data
+
+    const bookingHeaders = [
+      "BookingData", "Mobile", "Name", "Address", "Aadhar", "Pancard", "Email",
+      "FloorNo", "FlatNo", "Area", "Ratesqft", "TtlAmount", "Charges",
+      "ParkingFacility", "FlatCost", "FlatCostInWords", "Gst", "StampDuty",
+      "Registration", "Advocate", "ExtraCost", "TotalCost", "UsableArea", "AgreementCarpet"
     ];
-  
-  
-    // Append the values for each booking as a row in the CSV
-    csvContent += bookingValues.join(",") + "\n";
-  });
-  // Prepare the CSV content
- 
-  // Headers for payment records
-  const headers = ['Remark', 'Amount', 'Payment Type', 'Date'];
+    let csvContent = "data:text/csv;charset=utf-8,";
+    // Add the header row for Booking Data
+    csvContent += bookingHeaders.join(",") + "\n";
+    Booking.forEach(item => {
+      const bookingValues = [
+        item.BookingDate, item.Mobile, item.Name, item.Address, item.Aadhar,
+        item.Pancard, item.Email, item.FloorNo, item.FlatNo, item.Area,
+        item.Ratesqft, item.TtlAmount, item.Charges, item.ParkingFacility,
+        item.FlatCost, item.FlatCostInWords, item.Gst, item.StampDuty,
+        item.Registration, item.Advocate, item.ExtraCost, item.TotalCost,
+        item.UsableArea, item.AgreementCarpet
+      ];
 
-  // Upcoming Payments Section
-  csvContent += "Upcoming Payment Records\n";
-  csvContent += headers.join(",") + "\n"; // Header row for Upcoming Payments
-  upcomingPayments.forEach((item) => {
-    csvContent += [
-      item.RemarkName, 
-      item.Remarkamount, 
-      item.AmountTypeID === 1 ? "Current" : "Post", 
-      new Date(item.RemarkDate).toLocaleDateString("en-GB").replace(/\//g, "-")
-    ].join(",") + "\n";
-  });
-  if (upcomingPayments.length === 0) {
-    csvContent += "No Upcoming Payments\n";
-  }
 
-  // Received Payments Section
-  csvContent += "\nReceived Payment Records\n";
-  csvContent += "Remark,Amount,Payment Type,Date\n"; // Header row for Received Payments
-  receivedPayments.forEach((item) => {
-    csvContent += [
-      item.RemarkName,
-      item.Cash,
-      item.ChequeAmount,
-      new Date(item.Date).toLocaleDateString("en-GB").replace(/\//g, "-")
-    ].join(",") + "\n";
-  });
-  if (receivedPayments.length === 0) {
-    csvContent += "No Received Payments\n";
-  }
+      // Append the values for each booking as a row in the CSV
+      csvContent += bookingValues.join(",") + "\n";
+    });
+    // Prepare the CSV content
 
-  // Upcoming Loan Payments Section
-  csvContent += "\nUpcoming Loan Records\n";
-  csvContent += headers.join(",") + "\n"; // Header row for Upcoming Loan Payments
-  UpcomingPaymentsloan.forEach((item) => {
-    csvContent += [
-      item.RemarkName, 
-      item.Remarkamount, 
-      item.AmountTypeID === 1 ? "Current" : "Post", 
-      new Date(item.RemarkDate).toLocaleDateString("en-GB").replace(/\//g, "-")
-    ].join(",") + "\n";
-  });
-  if (UpcomingPaymentsloan.length === 0) {
-    csvContent += "No Upcoming Loan Payments\n";
-  }
+    // Headers for payment records
+    const headers = ['Remark', 'Amount', 'Payment Type', 'Date'];
 
-  // Received Loan Payments Section
-  csvContent += "\nReceived Loan Records\n";
-  csvContent += "Remark,Amount,Payment Type,Date\n"; // Header row for Received Loan Payments
-  ReceivedPaymentsloan.forEach((item) => {
-    csvContent += [
-      item.RemarkName,
-      item.Cash,
-      item.ChequeAmount,
-      new Date(item.Date).toLocaleDateString("en-GB").replace(/\//g, "-")
-    ].join(",") + "\n";
-  });
-  if (ReceivedPaymentsloan.length === 0) {
-    csvContent += "No Received Loan Payments\n";
-  }
+    // Upcoming Payments Section
+    csvContent += "Upcoming Payment Records\n";
+    csvContent += headers.join(",") + "\n"; // Header row for Upcoming Payments
+    upcomingPayments.forEach((item) => {
+      csvContent += [
+        item.RemarkName,
+        item.Remarkamount,
+       item.AmountTypeID == 2 ? "Post" : "",
+        new Date(item.RemarkDate).toLocaleDateString("en-GB").replace(/\//g, "-")
+      ].join(",") + "\n";
+    });
+    if (upcomingPayments.length === 0) {
+      csvContent += "No Upcoming Payments\n";
+    }
 
-  // Create a download link and trigger the download
-  const encodedUri = encodeURI(csvContent);
-  const link = document.createElement("a");
-  link.setAttribute("href", encodedUri);
-  link.setAttribute("download", "payment_details.csv");
-  document.body.appendChild(link); // Append link to the DOM
-  link.click(); // Trigger the download
-  document.body.removeChild(link); // Remove the link after download
-};
+    // Received Payments Section
+    csvContent += "\nReceived Payment Records\n";
+    csvContent += "Remark,Amount,Payment Type,Date\n"; // Header row for Received Payments
+    receivedPayments.forEach((item) => {
+      csvContent += [
+        item.RemarkName,
+        item.Cash,
+        item.ChequeAmount,
+        new Date(item.Date).toLocaleDateString("en-GB").replace(/\//g, "-")
+      ].join(",") + "\n";
+    });
+    if (receivedPayments.length === 0) {
+      csvContent += "No Received Payments\n";
+    }
 
-// 
+    // Upcoming Loan Payments Section
+    csvContent += "\nUpcoming Loan Records\n";
+    csvContent += headers.join(",") + "\n"; // Header row for Upcoming Loan Payments
+    UpcomingPaymentsloan.forEach((item) => {
+      csvContent += [
+        item.RemarkName,
+        item.Remarkamount,
+     item.AmountTypeID == 2 ? "Post" : "",
+        new Date(item.RemarkDate).toLocaleDateString("en-GB").replace(/\//g, "-")
+      ].join(",") + "\n";
+    });
+    if (UpcomingPaymentsloan.length === 0) {
+      csvContent += "No Upcoming Loan Payments\n";
+    }
+
+    // Received Loan Payments Section
+    csvContent += "\nReceived Loan Records\n";
+    csvContent += "Remark,Amount,Payment Type,Date\n"; // Header row for Received Loan Payments
+    ReceivedPaymentsloan.forEach((item) => {
+      csvContent += [
+        item.RemarkName,
+        item.Cash,
+        item.ChequeAmount,
+        new Date(item.Date).toLocaleDateString("en-GB").replace(/\//g, "-")
+      ].join(",") + "\n";
+    });
+    if (ReceivedPaymentsloan.length === 0) {
+      csvContent += "No Received Loan Payments\n";
+    }
+
+    // Create a download link and trigger the download
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "payment_details.csv");
+    document.body.appendChild(link); // Append link to the DOM
+    link.click(); // Trigger the download
+    document.body.removeChild(link); // Remove the link after download
+  };
+
+  // 
   const handleRemoveRemark = (index) => {
     const newRemarks = remarks.filter((_, i) => i !== index);
     setRemarks(newRemarks);
@@ -544,7 +552,7 @@ const downloadCSV = () => {
     newRemarks[index][field] = e.target.value;
     setRemarks(newRemarks);
   };
-  
+
   const handleDateRemarks = (date, index) => {
     const newRemarks = [...remarks];
     newRemarks[index].RemarkDate = date;
@@ -578,12 +586,12 @@ const downloadCSV = () => {
     setBookingID(null); // Reset the booking ID (optional)
   };
   const handleCloseRecipt = () => {
-    setOpenCheque(false); 
-    setBookingID(null); 
+    setOpenCheque(false);
+    setBookingID(null);
   };
   const handleCancel = () => {
-    setopencancel(false); 
-    setBookingID(null); 
+    setopencancel(false);
+    setBookingID(null);
   };
   const handleCloseReport = () => setOpen(false);
 
@@ -608,11 +616,11 @@ const downloadCSV = () => {
         const bookingRemarks = response.data.data.bookingremark;
         const payments = response.data.data.payment;
         const booking = response.data.data.booking;
-        console.log(payments , 'agaaya dataa<<<<<>>>>>>>>');
+        console.log(payments, 'agaaya dataa<<<<<>>>>>>>>');
         const upcomingLoanPayments = [
           ...bookingRemarks.loan, // Loan-related upcoming payments
         ];
-  
+
         const receivedLoanPayments = [
           ...payments.loan, // Loan-related received payments
         ];
@@ -638,9 +646,9 @@ const downloadCSV = () => {
   };
 
   const handleSubmit = async () => {
-    setLoading(true); // Set loading to true when submission starts
-  
-    // Construct the payload
+    setLoading(true);
+    // Check for required fields
+    debugger;
     const payload = {
       BookingID: selectedRow,
       Proccess: 1,
@@ -652,7 +660,7 @@ const downloadCSV = () => {
           (acc, remark) => acc + parseFloat(remark.Remarkamount || 0),
           0
         ),
-        PRegistraion: bookingRemarkDetails.Registraion || "",
+        PRegistraion: bookingRemarkDetails.Registraion || 0,
         Cash: amountType === "1" ? parseFloat(cashPaid) || 0 : 0,
         ChequeAmount: amountType === "2" ? parseFloat(payment.chequePaid) || 0 : 0,
         BankName: payment.bankName || "",
@@ -662,9 +670,9 @@ const downloadCSV = () => {
           ? payment.chequeDate.toISOString().split("T")[0]
           : cashDate?.CashDate?.toISOString().split("T")[0] || null,
         Date: amountType === "1"
-          ? cashDate?.CashDate?.toISOString().split("T")[0] || null
-          : payment.Date?.toISOString().split("T")[0] || null,
-          PLoan: remarks.some(remark => parseInt(remark.Loan) > 0) ? 1 : 0,
+          ? cashDate?.CashDate?.toISOString().split("T")[0]
+          : payment.Date.toISOString().split("T")[0] || null,
+        PLoan: remarks.some(remark => parseInt(remark.Loan) > 0) ? 1 : 0,
         paymenttypeID: parseInt(selectedPaymentType) || "",
         CreateUID: 1,
       })),
@@ -680,15 +688,15 @@ const downloadCSV = () => {
       })),
     };
 
-    console.log('Payload:', JSON.stringify(payload, null, 2));
-
+    debugger;
+    console.log('API Response:', payload);
     try {
       const response = await axios.post(
         "https://proxy-forcorners.vercel.app/api/proxy/api-insert-payment.php",
         payload
       );
       console.log('API Response:', response.data);
-  
+
       if (response.data.status === "Success") {
         Swal.fire({
           icon: "success",
@@ -696,7 +704,7 @@ const downloadCSV = () => {
           showConfirmButton: true,
           timer: 1000,
         });
-        // Reset the form fields
+        debugger;
         setCashPaid("");
         setChequePayments([]);
         setRemarks([]);
@@ -712,27 +720,34 @@ const downloadCSV = () => {
           title: "Failed to Submit",
           text: response.data.message || "Something went wrong!",
         });
+        debugger;
+        setLoading(false);
+        setModalOpen(false);
       }
     } catch (error) {
       console.error("Error submitting payment:", error);
+      debugger;
       Swal.fire({
         icon: "error",
         title: "Failed to Submit",
         text: "An error occurred while submitting the payment.",
       });
+      setLoading(false);
+      setModalOpen(false);
     } finally {
       setLoading(false); 
+      setModalOpen(false);
     }
   };
-  
-  
+
+
   const formatDateForAPI = (date) => {
     const offset = date.getTimezoneOffset();
     const adjustedDate = new Date(date.getTime() - offset * 60000);
     return adjustedDate.toISOString().split("T")[0];
   };
-  
-  
+
+
   useEffect(() => {
     if (!paymentData) return;
 
@@ -804,7 +819,7 @@ const downloadCSV = () => {
                 },
               }}
             >
-             Wing {wing.WingName}
+              Wing {wing.WingName}
             </Button>
           </Grid>
         ))}
@@ -847,9 +862,9 @@ const downloadCSV = () => {
           <CardContent>
             {loading ? (
               <CircularProgress />
-              
+
             ) : dataAvailable ? (
-         
+
               <>
                 <TableContainer component={Paper}>
                   <Table sx={{ minWidth: 800 }} aria-label="wing details table">
@@ -865,10 +880,10 @@ const downloadCSV = () => {
                         >
                           Actions
                         </TableCell>
-                       
+
                       </TableRow>
                     </TableHead>
-                    <TableBody  sx={{ alignItems:"center"}}>
+                    <TableBody sx={{ alignItems: "center" }}>
                       {(searchQuery ? filteredRows : wingDetails).map((row) => (
                         <TableRow key={row.RoomID}>
                           <TableCell>{row.Partyname}</TableCell>
@@ -881,7 +896,7 @@ const downloadCSV = () => {
                               variant="outlined"
                               color="primary"
                             >
-                              <PaymentIcon /> 
+                              <PaymentIcon />
                             </IconButton>
                           </TableCell>
                           <TableCell>
@@ -901,11 +916,11 @@ const downloadCSV = () => {
                               <MenuItem
                                 onClick={() => handleTemplateClick(currentRow)}
                               >
-                                Template 
+                                Template
                               </MenuItem>
 
                               <MenuItem onClick={() => onCheque(currentRow)}>
-                                Cheque Receipt 
+                                Cheque Receipt
                               </MenuItem>
                               <MenuItem onClick={() => onEdit(currentRow)}>
                                 Edit details
@@ -915,7 +930,7 @@ const downloadCSV = () => {
                               </MenuItem>
                             </Menu>
                           </TableCell>
-                         
+
                         </TableRow>
                       ))}
                     </TableBody>
@@ -938,7 +953,6 @@ const downloadCSV = () => {
             position: "absolute",
             top: "50%",
             left: "50%",
-
             transform: "translate(-50%, -50%)",
             bgcolor: "background.paper",
             boxShadow: 24,
@@ -946,7 +960,7 @@ const downloadCSV = () => {
             width: 1300,
             mt: 5,
             mx: 2,
-            maxHeight: "80vh", 
+            maxHeight: "80vh",
             overflow: "auto",
           }}
         >
@@ -993,7 +1007,7 @@ const downloadCSV = () => {
                       key={option.BookingremarkID}
                       value={option.BookingremarkID}
                     >
-                      {option.RemarkName}   ({option.RemarkDate},{option.AmountTypeName})
+                      {option.Remarkamount} ||  {option.RemarkName} /  ({option.RemarkDate},{option.AmountTypeName})
                     </MenuItem>
                   ))}
                 </TextField>
@@ -1026,208 +1040,213 @@ const downloadCSV = () => {
               )}
             </Grid>
             <>
-             
+
               <Grid item xs={4}>
-  <TextField
-    select
-    label="Select Payment Type"
-    value={selectedPaymentType}
-    onChange={handleChangePayment}
-    fullWidth
-    margin="normal"
-    required // Make it required
-    error={!selectedPaymentType} // Show error if not selected
-    helperText={selectedPaymentType ? "" : "Payment Type is required"}
-  >
-    {paymentTypes.map((option) => (
-      <MenuItem
-        key={option.paymenttypeID}
-        value={option.paymenttypeID} // Changed from paymenttypeName to paymenttypeID
-      >
-        {option.paymenttypeName}
-      </MenuItem>
-    ))}
-  </TextField>
-</Grid>
-
-
-<Grid item xs={4} mt={3}>
-      <FormControl fullWidth>
-        <InputLabel>Amount will be given by</InputLabel>
-        <Select
-          value={amountType}
-          onChange={(e) => setAmountType(e.target.value)}
-          label="Amount will be given by"
-        >
-          {amountTypes.map((type) => (
-            <MenuItem key={type.AmountTypeID} value={type.AmountTypeID}>
-              {type.AmountTypeName}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-    </Grid>
-
-    {/* Handle amountType === 1 */}
-    {amountType === "1" && (
-      <>
-        <Grid item xs={4} mt={3}>
-          <FormControl fullWidth>
-            <InputLabel>Amount Type</InputLabel>
-            <Select
-              value={amountType}
-              onChange={(e) => setAmountType(e.target.value)}
-              label="Amount Type"
-            >
-              {amountTypes.map((type) => (
-                <MenuItem key={type.AmountTypeID} value={type.AmountTypeID}>
-                  {type.AmountTypeName}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Grid>
-        <Grid item xs={4}>
-          <TextField
-            label="Current Paid"
-            type="number"
-            value={cashPaid}
-            onChange={(e) => setCashPaid(e.target.value)}
-            fullWidth
-            margin="normal"
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">₹</InputAdornment>
-              ),
-            }}
-          />
-        </Grid>
-        <Grid item xs={3} mt={3.5}>
-          <DatePicker
-            selected={cashDate?.CashDate}
-            onChange={handleDateChangeCash}
-            dateFormat="yyyy-MM-dd"
-            customInput={<TextField label="Current date" fullWidth />}
-             showMonthDropdown
-                                showYearDropdown
-                                yearDropdownItemNumber={15} // Number of years to show in dropdown
-                                scrollableYearDropdown
-          />
-        </Grid>
-      </>
-    )}
-
-    {/* Handle amountType === 2 */}
-    {amountType === "2" && (
-      <>
-        {chequePayments.map((payment, index) => (
-          <React.Fragment key={index}>
-            <Grid item xs={12} mt={3}>
-              <Typography variant="h6">Payment {index + 1}</Typography>
-            </Grid>
-
-            {/* Common Amount Type Dropdown */}
-            <Grid item xs={4} mt={3}>
-              <FormControl fullWidth>
-                <InputLabel>Amount Type</InputLabel>
-                <Select
-                  value={payment.AmountTypeID || ""}
-                  onChange={(e) =>
-                    handleChequePaymentChange(index, "AmountTypeID", e.target.value)
-                  }
-                  label="Amount Type"
+                <TextField
+                  select
+                  label="Select Payment Type"
+                  value={selectedPaymentType}
+                  onChange={handleChangePayment}
+                  fullWidth
+                  margin="normal"
+                  required // Make it required
+                  error={!selectedPaymentType} // Show error if not selected
+                  helperText={selectedPaymentType ? "" : "Payment Type is required"}
                 >
-                  {amountTypes.map((type) => (
-                    <MenuItem key={type.AmountTypeID} value={type.AmountTypeID}>
-                      {type.AmountTypeName}
+                  {paymentTypes.map((option) => (
+                    <MenuItem
+                      key={option.paymenttypeID}
+                      value={option.paymenttypeID} // Changed from paymenttypeName to paymenttypeID
+                    >
+                      {option.paymenttypeName}
                     </MenuItem>
                   ))}
-                </Select>
-              </FormControl>
-            </Grid>
+                </TextField>
+              </Grid>
 
-            <Grid item xs={4}>
-              <TextField
-                label="Cheque Paid"
-                type="number"
-                value={payment.chequePaid}
-                onChange={(e) =>
-                  handleChequePaymentChange(index, "chequePaid", e.target.value)
-                }
-                fullWidth
-                margin="normal"
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">₹</InputAdornment>
-                  ),
-                }}
-              />
-            </Grid>
-            <Grid item xs={4}>
-              <TextField
-                label="Bank Name"
-                type="text"
-                value={payment.bankName}
-                onChange={(e) =>
-                  handleChequePaymentChange(index, "bankName", e.target.value)
-                }
-                fullWidth
-                margin="normal"
-              />
-            </Grid>
-            <Grid item xs={4}>
-              <TextField
-                label="Cheque Number"
-                type="text"
-                value={payment.cheqNo}
-                onChange={(e) =>
-                  handleChequePaymentChange(index, "cheqNo", e.target.value)
-                }
-                fullWidth
-                margin="normal"
-              />
-            </Grid>
-            <Grid item xs={4} mt={3}>
-              <DatePicker
-                selected={payment.chequeDate}
-                onChange={(date) =>
-                  handleDateChange(date, index, "chequeDate")
-                }
-                dateFormat="yyyy-MM-dd"
-                customInput={<TextField label="Cheque Date" fullWidth />}
-                 showMonthDropdown
-                                    showYearDropdown
-                                    yearDropdownItemNumber={15} // Number of years to show in dropdown
-                                    scrollableYearDropdown
-              />
-            </Grid>
-            <Grid item xs={4} mt={3}>
-              <DatePicker
-                selected={payment.Date}
-                onChange={(date) => handleDateChange(date, index, "Date")}
-                dateFormat="yyyy-MM-dd"
-                customInput={<TextField label="Date" fullWidth />}
-                 showMonthDropdown
-                                    showYearDropdown
-                                    yearDropdownItemNumber={15} // Number of years to show in dropdown
-                                    scrollableYearDropdown
-              />
-            </Grid>
-            <Grid item xs={1}>
-              <IconButton onClick={handleAddChequePayment} color="primary">
-                <AddIcon />
-              </IconButton>
-              <IconButton
-                color="secondary"
-                onClick={() => handleRemoveChequePayment(index)}
-              >
-                <DeleteIcon sx={{ color: "red" }} />
-              </IconButton>
-            </Grid>
-          </React.Fragment>
-        ))}
-      </>
-    )}
+
+              <Grid item xs={4} mt={3}>
+                <FormControl fullWidth>
+                  <InputLabel>Amount will be given by</InputLabel>
+                  <Select
+                    value={amountType}
+                    onChange={(e) => setAmountType(e.target.value)}
+                    label="Amount will be given by"
+                  >
+                    {amountTypes.map((type) => (
+                      <MenuItem key={type.AmountTypeID} value={type.AmountTypeID}>
+                        {type.AmountTypeName}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+
+              {/* Handle amountType === 1 */}
+              {amountType === "1" && (
+                <>
+                  <React.Fragment>
+                    <Grid item xs={12} mt={3}>
+                      <Typography variant="h6">Payment </Typography>
+                    </Grid>
+                    <Grid item xs={4} mt={3}>
+                      <FormControl fullWidth>
+                        <InputLabel>Amount Type</InputLabel>
+                        <Select
+                          value={amountType}
+                          onChange={(e) => setAmountType(e.target.value)}
+                          label="Amount Type"
+                        >
+                          {amountTypes.map((type) => (
+                            <MenuItem key={type.AmountTypeID} value={type.AmountTypeID}>
+                              {type.AmountTypeName}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={4}>
+                      <TextField
+                        label="Current Paid"
+                        type="number"
+                        value={cashPaid}
+                        onChange={(e) => setCashPaid(e.target.value)}
+                        fullWidth
+                        margin="normal"
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">₹</InputAdornment>
+                          ),
+                        }}
+                      />
+                    </Grid>
+                    <Grid item xs={3} mt={3.5}>
+                      <DatePicker
+                        selected={cashDate?.CashDate}
+                        onChange={handleDateChangeCash}
+                         dateFormat="dd-MM-yyyy"
+                        customInput={<TextField label="Current date" fullWidth />}
+                        showMonthDropdown
+                        showYearDropdown
+                        yearDropdownItemNumber={15} // Number of years to show in dropdown
+                        scrollableYearDropdown
+                      />
+                    </Grid>
+                  </React.Fragment>
+                </>
+              )}
+
+              {/* Handle amountType === 2 */}
+              {amountType === "2" && (
+                <>
+                  {chequePayments.map((payment, index) => (
+                    <React.Fragment key={index}>
+                      <Grid item xs={12} mt={3}>
+                        <Typography variant="h6">Payment {index + 1}</Typography>
+                      </Grid>
+
+                      {/* Common Amount Type Dropdown */}
+                      <Grid item xs={4} mt={3}>
+                        <FormControl fullWidth>
+                          <InputLabel>Amount Type</InputLabel>
+                          <Select
+                            value={payment.AmountTypeID || ""}
+                            onChange={(e) =>
+                              handleChequePaymentChange(index, "AmountTypeID", e.target.value)
+                            }
+                            label="Amount Type"
+                          >
+                            {amountTypes.map((type) => (
+                              <MenuItem key={type.AmountTypeID} value={type.AmountTypeID}>
+                                {type.AmountTypeName}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                      </Grid>
+
+                      <Grid item xs={4}>
+                        <TextField
+                          label="Cheque Paid"
+                          type="number"
+                          value={payment.chequePaid}
+                          onChange={(e) =>
+                            handleChequePaymentChange(index, "chequePaid", e.target.value)
+                          }
+                          fullWidth
+                          margin="normal"
+                          InputProps={{
+                            startAdornment: (
+                              <InputAdornment position="start">₹</InputAdornment>
+                            ),
+                          }}
+                        />
+                      </Grid>
+                      <Grid item xs={4}>
+                        <TextField
+                          label="Bank Name"
+                          type="text"
+                          value={payment.bankName}
+                          onChange={(e) =>
+                            handleChequePaymentChange(index, "bankName", e.target.value)
+                          }
+                          fullWidth
+                          margin="normal"
+                        />
+                      </Grid>
+                      <Grid item xs={4}>
+                        <TextField
+                          label="Cheque Number"
+                          type="text"
+                          value={payment.cheqNo}
+                          onChange={(e) =>
+                            handleChequePaymentChange(index, "cheqNo", e.target.value)
+                          }
+                          fullWidth
+                          margin="normal"
+                        />
+                      </Grid>
+                      <Grid item xs={4} mt={3}>
+                        <DatePicker
+                          selected={payment.chequeDate}
+                          onChange={(date) =>
+                            handleDateChange(date, index, "chequeDate")
+                          }
+                            dateFormat="dd-MM-yyyy"
+                          customInput={<TextField label="Cheque Date" fullWidth />}
+                          showMonthDropdown
+                          showYearDropdown
+                          yearDropdownItemNumber={15} // Number of years to show in dropdown
+                          scrollableYearDropdown
+                        />
+                      </Grid>
+                      <Grid item xs={4} mt={3}>
+                        <DatePicker
+                          selected={payment.Date}
+                          onChange={(date) => handleDateChange(date, index, "Date")}
+                           dateFormat="dd-MM-yyyy"
+                          customInput={<TextField label="Date" fullWidth />}
+                          showMonthDropdown
+                          showYearDropdown
+                          yearDropdownItemNumber={15} // Number of years to show in dropdown
+                          scrollableYearDropdown
+                        />
+                      </Grid>
+                      <Grid item xs={1}>
+                        <IconButton onClick={handleAddChequePayment} color="primary">
+                          <AddIcon />
+                        </IconButton>
+                        <IconButton
+                          color="secondary"
+                          onClick={() => handleRemoveChequePayment(index)}
+                        >
+                          <DeleteIcon sx={{ color: "red" }} />
+                        </IconButton>
+                      </Grid>
+                    </React.Fragment>
+                  ))}
+                </>
+              )}
             </>
 
             {selectedPaymentType === 2 && (
@@ -1295,10 +1314,10 @@ const downloadCSV = () => {
                         onChange={(date) => handleDateRemarks(date, index)}
                         dateFormat="yyyy-MM-dd"
                         customInput={<TextField label="Date" fullWidth />}
-                         showMonthDropdown
-                                            showYearDropdown
-                                            yearDropdownItemNumber={15} // Number of years to show in dropdown
-                                            scrollableYearDropdown
+                        showMonthDropdown
+                        showYearDropdown
+                        yearDropdownItemNumber={15} // Number of years to show in dropdown
+                        scrollableYearDropdown
                       />
                     </Grid>
                     <Grid item xs={12} md={6}>
@@ -1335,23 +1354,23 @@ const downloadCSV = () => {
             )}
 
             <Grid item xs={12}>
-            <Button
-  variant="contained"
-  sx={{
-    marginRight: 3.5,
-    marginTop: 5,
-    backgroundColor: "#9155FD",
-    color: "#FFFFFF",
-  }}
-  onClick={handleSubmit}
-  disabled={loading} 
->
-  {loading ? (
-    <CircularProgress size={24} sx={{ color: "white" }} />
-  ) : (
-    "Submit"
-  )}
-</Button>
+              <Button
+                variant="contained"
+                sx={{
+                  marginRight: 3.5,
+                  marginTop: 5,
+                  backgroundColor: "#9155FD",
+                  color: "#FFFFFF",
+                }}
+                onClick={handleSubmit}
+                disabled={loading}
+              >
+                {loading ? (
+                  <CircularProgress size={24} sx={{ color: "white" }} />
+                ) : (
+                  "Submit"
+                )}
+              </Button>
 
             </Grid>
           </Grid>
@@ -1366,50 +1385,50 @@ const downloadCSV = () => {
             marginTop: "50px",
             height: "90vh", // Set height relative to the viewport
             padding: "20px",
-            overflowY: "auto", 
+            overflowY: "auto",
             position: "relative",
             // Enable vertical scrolling if content overflows
           }}
         >
-          
+
           <IconButton
-      aria-label="cancel"
-      onClick={handleCloseEditForm}
-      sx={{ position: "absolute", top: 6, right: 10 }}
-    >
-      <CancelIcon sx={{ color: "red" }} />
-    </IconButton>
+            aria-label="cancel"
+            onClick={handleCloseEditForm}
+            sx={{ position: "absolute", top: 6, right: 10 }}
+          >
+            <CancelIcon sx={{ color: "red" }} />
+          </IconButton>
           <EditBookingform
             bookingID={bookingID}
             handleCloseEditForm={handleCloseEditForm}
-            // handleCancel={handleCloseTemplate}
+          // handleCancel={handleCloseTemplate}
           />
         </Card>
       </Modal>
       <Modal open={opencancel} onClose={handleCancel}>
-  <Card
-    style={{
-      maxWidth: "800px",
-      margin: "auto",
-      marginTop: "50px",
-      height: "90vh",
-      padding: "20px",
-      overflowY: "auto",
-      position: "relative",
+        <Card
+          style={{
+            maxWidth: "800px",
+            margin: "auto",
+            marginTop: "50px",
+            height: "90vh",
+            padding: "20px",
+            overflowY: "auto",
+            position: "relative",
 
-    }}
-  >
-    <IconButton
-      aria-label="cancel"
-      onClick={handleCancel}
-      sx={{ position: "absolute", top: 6, right: 10 }}
-    >
-      <CancelIcon sx={{ color: "red" }} />
-    </IconButton>
+          }}
+        >
+          <IconButton
+            aria-label="cancel"
+            onClick={handleCancel}
+            sx={{ position: "absolute", top: 6, right: 10 }}
+          >
+            <CancelIcon sx={{ color: "red" }} />
+          </IconButton>
 
-    <Cancelform bookingID={bookingID} />
-  </Card>
-</Modal>
+          <Cancelform bookingID={bookingID} />
+        </Card>
+      </Modal>
 
       <Modal open={openTemplate} onClose={handleCloseTemplate}>
         <Card
@@ -1450,7 +1469,7 @@ const downloadCSV = () => {
           </IconButton>
 
           <Reciept bookingID={bookingID}
-           handleCancel = {handleCloseRecipt}
+            handleCancel={handleCloseRecipt}
           />
         </Card>
       </Modal>
@@ -1469,7 +1488,7 @@ const downloadCSV = () => {
             <IconButton
               aria-label="cancel"
               onClick={handleCloseReport}
-              // sx={{ position: "absolute", top: 6, right: 10 }}
+            // sx={{ position: "absolute", top: 6, right: 10 }}
             >
               <CancelIcon sx={{ color: "red" }} />
             </IconButton>
@@ -1539,17 +1558,17 @@ const downloadCSV = () => {
                 </Button>
               </Grid>
               <Grid item xs={12} sm={6} md={3}>
-            <Button
-            variant="contained"
-            color="primary"
-            onClick={downloadCSV}
-           
-          >
-            Download CSV
-          </Button>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={downloadCSV}
+
+                >
+                  Download CSV
+                </Button>
               </Grid>
             </Grid>
-          
+
 
             <Grid container spacing={3}>
               {/* Upcoming Payments */}
@@ -1576,8 +1595,8 @@ const downloadCSV = () => {
                               {item.AmountTypeID === 1 ? "Current" : "Post"}
                             </TableCell>
                             <TableCell>
-  {new Date(item.RemarkDate).toLocaleDateString("en-GB").replace(/\//g, "-")}
-</TableCell>
+                              {new Date(item.RemarkDate).toLocaleDateString("en-GB").replace(/\//g, "-")}
+                            </TableCell>
 
                           </TableRow>
                         ))
@@ -1600,7 +1619,7 @@ const downloadCSV = () => {
                   <Table>
                     <TableHead>
                       <TableRow>
-                      <TableCell>RemarkName</TableCell>
+                        <TableCell>RemarkName</TableCell>
 
                         <TableCell>Current </TableCell>
                         <TableCell>Post</TableCell>
@@ -1616,7 +1635,7 @@ const downloadCSV = () => {
                             <TableCell>{item.Cash}</TableCell>
                             <TableCell>{item.ChequeAmount}</TableCell>
                             <TableCell>  {new Date(item.Date).toLocaleDateString("en-GB").replace(/\//g, "-")}
-</TableCell>
+                            </TableCell>
                           </TableRow>
                         ))
                       ) : (
@@ -1631,82 +1650,82 @@ const downloadCSV = () => {
                 </TableContainer>
               </Grid>
             </Grid>
-            <Grid container spacing={3} sx={{marginTop:10}}>
-  {/* Upcoming Payments Loan */}
-  <Grid item xs={12}>
-    <Typography variant="h6">Upcoming Payments Loan</Typography>
-    <TableContainer component={Paper} style={{ maxHeight: 400 }}>
-      <Table>
-        <TableHead> 
-          <TableRow>
-            <TableCell>Remark</TableCell>
-            <TableCell>Amount</TableCell>
-            <TableCell>Payment Type</TableCell>
-            <TableCell>Date</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {UpcomingPaymentsloan.length > 0 ? (
-            UpcomingPaymentsloan.map((item, index) => (
-              <TableRow key={index}>
-                <TableCell>{item.RemarkName}</TableCell>
-                <TableCell>{item.Remarkamount}</TableCell>
-                <TableCell>
-                  {item.AmountTypeID === 1 ? "Current" : "Post"}
-                </TableCell>
-                <TableCell>
-                  {new Date(item.RemarkDate).toLocaleDateString("en-GB").replace(/\//g, "-")}
-                </TableCell>
-              </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={4} align="center">
-                No Upcoming Payments Loan
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-    </TableContainer>
-  </Grid>
+            <Grid container spacing={3} sx={{ marginTop: 10 }}>
+              {/* Upcoming Payments Loan */}
+              <Grid item xs={12}>
+                <Typography variant="h6">Upcoming Payments Loan</Typography>
+                <TableContainer component={Paper} style={{ maxHeight: 400 }}>
+                  <Table>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Remark</TableCell>
+                        <TableCell>Amount</TableCell>
+                        <TableCell>Payment Type</TableCell>
+                        <TableCell>Date</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {UpcomingPaymentsloan.length > 0 ? (
+                        UpcomingPaymentsloan.map((item, index) => (
+                          <TableRow key={index}>
+                            <TableCell>{item.RemarkName}</TableCell>
+                            <TableCell>{item.Remarkamount}</TableCell>
+                            <TableCell>
+                              {item.AmountTypeID === 1 ? "Current" : "Post"}
+                            </TableCell>
+                            <TableCell>
+                              {new Date(item.RemarkDate).toLocaleDateString("en-GB").replace(/\//g, "-")}
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      ) : (
+                        <TableRow>
+                          <TableCell colSpan={4} align="center">
+                            No Upcoming Payments Loan
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </Grid>
 
-  <Grid item xs={12}>
-    <Typography variant="h6">Received Payments Loan</Typography>
-    <TableContainer component={Paper} style={{ maxHeight: 400 }}>
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell>RemarkName</TableCell>
-            <TableCell>Current</TableCell>
-            <TableCell>Post</TableCell>
-            <TableCell>Date</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {ReceivedPaymentsloan.length > 0 ? (
-            ReceivedPaymentsloan.map((item, index) => (
-              <TableRow key={index}>
-                <TableCell>{item.RemarkName}</TableCell>
-                <TableCell>{item.Cash}</TableCell>
-                <TableCell>{item.ChequeAmount}</TableCell>
-                <TableCell>
-                  {new Date(item.Date).toLocaleDateString("en-GB").replace(/\//g, "-")}
-                </TableCell>
-              </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={4} align="center">
-                No Received Payments Loan
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-    </TableContainer>
-  </Grid>
-</Grid>
+              <Grid item xs={12}>
+                <Typography variant="h6">Received Payments Loan</Typography>
+                <TableContainer component={Paper} style={{ maxHeight: 400 }}>
+                  <Table>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>RemarkName</TableCell>
+                        <TableCell>Current</TableCell>
+                        <TableCell>Post</TableCell>
+                        <TableCell>Date</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {ReceivedPaymentsloan.length > 0 ? (
+                        ReceivedPaymentsloan.map((item, index) => (
+                          <TableRow key={index}>
+                            <TableCell>{item.RemarkName}</TableCell>
+                            <TableCell>{item.Cash}</TableCell>
+                            <TableCell>{item.ChequeAmount}</TableCell>
+                            <TableCell>
+                              {new Date(item.Date).toLocaleDateString("en-GB").replace(/\//g, "-")}
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      ) : (
+                        <TableRow>
+                          <TableCell colSpan={4} align="center">
+                            No Received Payments Loan
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </Grid>
+            </Grid>
 
           </CardContent>
         </Card>

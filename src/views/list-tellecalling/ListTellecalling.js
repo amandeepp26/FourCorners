@@ -35,7 +35,7 @@ import EmailIcon from "@mui/icons-material/Email";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 // import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 const ListTellecalling = ({ item, onDelete, onEdit, onHistoryClick }) => {
-  console.log(item, 'CIDD MIL JAYEGAA<<<>>>>>>');
+
   const [cookies, setCookie, removeCookie] = useCookies(["amr"]);
   const intialName = {
     Tid: "",
@@ -239,87 +239,174 @@ const ListTellecalling = ({ item, onDelete, onEdit, onHistoryClick }) => {
 
   const handleSubmitProject = async () => {
     if (!selectedProject) {
-    console.error('Project not selected.');
-    return;
+      console.error('Project not selected.');
+      return;
     }
-    
+  
     try {
-    const projectResponse = await axios.get(`https://apiforcornershost.cubisysit.com/api/api-fetch-projectdetails.php?ProjectID=${selectedProject.ProjectID}`);
-    const projectData = projectResponse.data.data[0];
-    
-    // Prepare email data with project details and amenities
-    const emailData = {
-    projectID: projectData.ProjectID,
-    projectCode: projectData.ProjectCode,
-    projectManager: projectData.ProjectManager,
-    areaSqft: projectData.Areasqft,
-    videoLink: projectData.VideoLink,
-    virtualLink: projectData.VirtualLink,
-    launchDate: projectData.LaunchDate,
-    completionDate: projectData.CompletionDate,
-    possessionDate: projectData.PossessionDate,
-    remark: projectData.Remark,
-    cc: projectData.Cc,
-    oc: projectData.Oc,
-    facebookLink: projectData.FacebookLink,
-    instagramLink: projectData.InstagramLink,
-    latitude: projectData.Latitude,
-    para: projectData.Para,
-    projectName: projectData.ProjectName,
-    amenities: projectData.AmenitiesNames.join(', '),
-    amenitieIcons: projectData.AmenitiesIcon.join(', '),
-    name: item.CName,
-    email: item.Email,
-    };
-    
-    // Send email request
-    const emailResponse = await axios.post("https://proxy-forcorners.vercel.app/api/proxy/api-email.php", emailData, {
-    headers: {
-      "Content-Type": "application/json",
-    },
-    });
-    
-    if (emailResponse.data.status !== "Success") {
-    throw new Error('Failed to send email');
-    }
-    
-    // Now, send SMS
-    const smsData = {
-    projectID: projectData.ProjectID,
-    projectName: projectData.ProjectName,
-    projectCode: projectData.ProjectCode,
-    name: item.CName,
-    phone: item.Mobile,
-    };
-    
-    const smsResponse = await axios.post("https://proxy-forcorners.vercel.app/api/proxy/api-sms.php", smsData, {
-    headers: {
-      "Content-Type": "application/json",
-    },
-    });
-    
-    if (smsResponse.data.status !== "Success") {
-    throw new Error('Failed to send SMS');
-    }
-    
-    Swal.fire({
-    icon: 'success',
-    title: 'Email & SMS Sent!',
-    text: 'The email and SMS have been sent successfully.',
-    });
-    
-    // Close the modal after successful submission
-    setModalVisible(false);
+      // Fetch project details using the provided ProjectID
+      const projectResponse = await axios.get(`https://apiforcornershost.cubisysit.com/api/api-fetch-projectdetails.php?ProjectID=${selectedProject.ProjectID}`);
+      const projectData = projectResponse.data.data[0];
+  
+      // Validate all necessary fields
+      const requiredFields = [
+        'ProjectID', 'ProjectCode', 'ProjectManager', 'Areasqft', 'VideoLink', 'VirtualLink', 
+        'LaunchDate', 'CompletionDate', 'PossessionDate', 'Remark', 'Cc', 'Oc', 'FacebookLink',
+        'InstagramLink', 'Latitude', 'Para', 'ProjectName', 'AmenitiesNames', 'AmenitiesIcon', 'CName', 'Email', 'Mobile'
+      ];
+  
+      const missingFields = requiredFields.filter(field => !projectData[field] && !item[field]);
+  
+      if (missingFields.length > 0) {
+        console.error(`Missing required fields: ${missingFields.join(', ')}`);
+        Swal.fire({
+          icon: 'error',
+          title: 'Missing Fields',
+          text: `The following fields are missing: ${missingFields.join(', ')}`,
+        });
+        return; // Stop the process if any fields are missing
+      }
+  
+      // Prepare email data with project details and amenities
+      const emailData = {
+        projectID: projectData.ProjectID,
+        projectCode: projectData.ProjectCode,
+        projectManager: projectData.ProjectManager,
+        areaSqft: projectData.Areasqft,
+        videoLink: projectData.VideoLink,
+        virtualLink: projectData.VirtualLink,
+        launchDate: projectData.LaunchDate,
+        completionDate: projectData.CompletionDate,
+        possessionDate: projectData.PossessionDate,
+        remark: projectData.Remark,
+        Cc: projectData.Cc,
+images:projectData.images,
+        oc: projectData.Oc,
+        facebookLink: projectData.FacebookLink,
+        instagramLink: projectData.InstagramLink,
+        latitude: projectData.Latitude,
+        para: projectData.Para,
+        projectName: projectData.ProjectName,
+        amenities: projectData.AmenitiesNames.join(', '),
+        amenitieIcons: projectData.AmenitiesIcon.join(', '),
+        name: item.CName,
+        email: item.Email,
+      };
+  
+      // Send email request with individual try-catch block
+      let emailError = null;
+      try {
+        const emailResponse = await axios.post("https://proxy-forcorners.vercel.app/api/proxy/api-email.php", emailData, {
+          headers: { "Content-Type": "application/json" },
+        });
+  
+        if (emailResponse.data.status !== "Success") {
+          throw new Error('Failed to send email');
+        }
+      } catch (error) {
+        emailError = error;
+        console.error("Error sending email:", error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Email Failed',
+          text: 'There was an issue sending the email. The email was not sent.',
+        });
+      }
+  
+      // Prepare SMS data
+      const smsData = {
+        projectID: projectData.ProjectID,
+        projectName: projectData.ProjectName,
+        projectCode: projectData.ProjectCode,
+        name: item.CName,
+        phone: item.Mobile,
+      };
+  
+      // Send SMS request with individual try-catch block
+      let smsError = null;
+      try {
+        const smsResponse = await axios.post("https://proxy-forcorners.vercel.app/api/proxy/api-sms.php", smsData, {
+          headers: { "Content-Type": "application/json" },
+        });
+  
+        if (smsResponse.data.status !== "Success") {
+          throw new Error('Failed to send SMS');
+        }
+      } catch (error) {
+        smsError = error;
+        console.error("Error sending SMS:", error);
+        Swal.fire({
+          icon: 'error',
+          title: 'SMS Failed',
+          text: 'There was an issue sending the SMS. The SMS was not sent.',
+        });
+      }
+  
+      // Prepare WhatsApp data
+      const whatsappData = {
+        Areasqft: projectData.Areasqft,
+        VideoLink: projectData.VideoLink,
+        VirtualLink: projectData.VirtualLink,
+        LaunchDate: projectData.LaunchDate,
+        CompletionDate: projectData.CompletionDate,
+        PossessionDate: projectData.PossessionDate,
+        Remark: projectData.Remark,
+        Cc: projectData.Cc,
+images:projectData.images,
+        Oc: projectData.Oc,
+        ProjectName: projectData.ProjectName,
+        CompanyName: projectData.CompanyName,
+        projectAddress: projectData.address,
+        Partyname: item.CName,
+        phone: item.Mobile,
+        Name: projectData.Name,
+        reraregistration: projectData.reraregistration,
+        amenities: projectData.AmenitiesNames.join(', '),
+        amenitieIcons: projectData.AmenitiesIcon.join(', ')
+      };
+       console.log("whatsapp json data ",whatsappData);
+     
+      let whatsappError = null;
+      try {
+        const whatsappResponse = await axios.post("https://proxy-forcorners.vercel.app/api/proxy/api-whatsapp.php", whatsappData, {
+          headers: { "Content-Type": "application/json" },
+        });
+  
+        if (whatsappResponse.data.status !== "Success") {
+          throw new Error('Failed to send WhatsApp message');
+        }
+      } catch (error) {
+        whatsappError = error;
+        console.error("Error sending WhatsApp:", error);
+        Swal.fire({
+          icon: 'error',
+          title: 'WhatsApp Failed',
+          text: 'There was an issue sending the WhatsApp message. The message was not sent.',
+        });
+      }
+  
+      // Show success message only if all actions succeed
+      if (!emailError && !smsError && !whatsappError) {
+        Swal.fire({
+          icon: 'success',
+          title: 'Success!',
+          text: 'The email, SMS, and WhatsApp messages have been sent successfully.',
+        });
+      }
+  
+      // Close the modal after the entire process
+      setModalVisible(false);
+  
     } catch (error) {
-    console.error("Error sending email and SMS:", error);
-    Swal.fire({
-    icon: 'error',
-    title: 'Error',
-    text: 'An error occurred while processing your request. Please try again later.',
-    });
+      console.error("Error processing request:", error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'An error occurred while processing your request. Please try again later.',
+      });
     }
-    };
-    
+  };
+  
 
 
   const handleClick = (event) => {
@@ -520,25 +607,7 @@ const ListTellecalling = ({ item, onDelete, onEdit, onHistoryClick }) => {
             Edit Details
           </Button>
         </Grid>
-        <Grid item>
-          <Button
-            variant="contained"
-            onClick={downloadCSV}
-            startIcon={<GetAppIcon />}
-            sx={{
-              color: "#333333",
-              fontSize: "0.6rem",
-              backgroundColor: "#f0f0f0",
-              minWidth: "auto",
-              minHeight: 20,
-              "&:hover": {
-                backgroundColor: "#dcdcdc",
-              },
-            }}
-          >
-            Download
-          </Button>
-        </Grid>
+        
         <Grid item>
           <Button
             variant="contained"
@@ -606,19 +675,20 @@ const ListTellecalling = ({ item, onDelete, onEdit, onHistoryClick }) => {
             anchorEl={anchorEl}
             open={Boolean(anchorEl)}
             onClose={handleDropdownClose}
+          
           >
-            <MenuItem onClick={handleAddFollowUpClick}>
+            {/* <MenuItem onClick={handleAddFollowUpClick}>
               <AddIcon sx={{ mr: 1 }} />
               Add Follow Up
-            </MenuItem>
-            <MenuItem onClick={handleHistoryClick}>
-              <HistoryIcon sx={{ mr: 1 }} />
+            </MenuItem> */}
+            <MenuItem onClick={handleHistoryClick} >
+              <HistoryIcon   />
               History
             </MenuItem>
           </Menu>
         </Grid>
       </Grid>
-      <Modal
+      {/* <Modal
         open={open}
         onClose={handleClose}
         aria-labelledby="modal-modal-title"
@@ -753,7 +823,7 @@ const ListTellecalling = ({ item, onDelete, onEdit, onHistoryClick }) => {
             </Grid>
           </Box>
         </Box>
-      </Modal>
+      </Modal> */}
       <Card sx={{}}>
         <Paper sx={{ padding: 5 }}>
           <Box
@@ -782,7 +852,7 @@ const ListTellecalling = ({ item, onDelete, onEdit, onHistoryClick }) => {
             </Box>
           </Box>
 
-          <Box sx={{ width: "100%", ml: 20 }}>
+          <Box sx={{  ml: 20 }}>
             <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
               <Typography
                 variant="body2"
@@ -841,8 +911,8 @@ const ListTellecalling = ({ item, onDelete, onEdit, onHistoryClick }) => {
                 Attended By: {item?.TelecallAttendedByName}
               </Typography>
             </Box>
-          </Box>
-          <Box sx={{ display: "flex", mt: 10,justifyContent:"center" }}>
+
+            <Box sx={{ display: "flex", mt: 10, ml: 20 }}>
               <a href={`tel:${item?.Mobile}`} style={{ marginRight: 40 }}>
                 <IconButton
                   aria-label="phone"
@@ -861,7 +931,7 @@ const ListTellecalling = ({ item, onDelete, onEdit, onHistoryClick }) => {
                 </IconButton>
               </a>
         
-    <a onClick={() => setModalVisible(true)} style={{ marginRight: 40 }}>
+    <a onClick={() => setModalVisible(true)} style={{ marginRight: 35 }}>
       <IconButton
         aria-label="email"
         size="small"
@@ -879,7 +949,7 @@ const ListTellecalling = ({ item, onDelete, onEdit, onHistoryClick }) => {
       </IconButton>
     </a>
 
-              <a style={{ marginRight:40 }}>
+              <a style={{ marginRight:10 }}>
                 <IconButton
                   aria-label="share"
                   size="small"
@@ -888,6 +958,7 @@ const ListTellecalling = ({ item, onDelete, onEdit, onHistoryClick }) => {
                     backgroundColor: "#e3f2fd",
                     borderRadius: "50%",
                     padding: "10px",
+                    marginRight: 10,
                     "&:hover": {
                       backgroundColor: "#bbdefb",
                     },
@@ -897,7 +968,7 @@ const ListTellecalling = ({ item, onDelete, onEdit, onHistoryClick }) => {
                   <HistoryIcon />
                 </IconButton>
               </a>
-              <a href={`mailto:${item?.Email}`} style={{ marginRight: 40 }}>
+              <a href={`mailto:${item?.Email}`} style={{ marginRight: 15 }}>
                 <IconButton
                   aria-label="email"
                   size="small"
@@ -937,6 +1008,8 @@ const ListTellecalling = ({ item, onDelete, onEdit, onHistoryClick }) => {
                 </IconButton>
               </a>
             </Box>
+          </Box>
+
           <Box
             sx={{
               width: "auto",

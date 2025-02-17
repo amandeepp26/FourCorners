@@ -15,17 +15,17 @@ import DotsVertical from 'mdi-material-ui/DotsVertical'
 import CellphoneLink from 'mdi-material-ui/CellphoneLink'
 import AccountOutline from 'mdi-material-ui/AccountOutline'
 import CardContent from '@mui/material/CardContent'
-
+import Listmyopportunity from 'src/views/list-opportunity/MyOpportunity/Listmyopportunity';
 import AddIcon from "@mui/icons-material/Add";
 import CardHeader from '@mui/material/CardHeader'
 import Avatar from '@mui/material/Avatar'
-import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer } from 'recharts'
+import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer } from 'recharts';
+import AddOpportunityDetails from 'src/views/add-opportunitydetails/AddOpportunityDetails';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import ScheduleIcon from '@mui/icons-material/Schedule';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import CancelIcon from '@mui/icons-material/Cancel';
 import MyOpportunitySidebar from 'src/views/opportunitysidebar/MyOpportunity/MyOpportunitySidebar';
-import Listmyopportunity from 'src/views/list-opportunity/MyOpportunity/Listmyopportunity';
 import HistoryOpportunitylead from 'src/views/history-apportunity/HistoryOppoerunityLead/HistoryOpportunitylead';
 import { useCookies } from "react-cookie";
 import HistoryOpportunitybacklog from 'src/views/history-apportunity/HistoryOpportunityBacklog/HistoryOpportunitybacklog';
@@ -66,8 +66,6 @@ const MyOpportunity = () => {
   };
 
   const renderStats = () => {
-    console.log(counts, 'dekh>>>>>>>>>>>>>>>>>>');
-    
     if (!counts) {
       return null;
     }
@@ -145,7 +143,7 @@ const MyOpportunity = () => {
       <>
         <CardHeader
           title='Statistics Card'
-          
+         
           titleTypographyProps={{
             sx: {
               mb: 2.5,
@@ -252,7 +250,7 @@ const WelcomeScreen = () => {
 
   return (
     <Grid container spacing={6}>
-      <Grid item xs={4}>
+      <Grid item xs={12} md={4} style={{background:"white",zIndex:"99",display:"flex", flexWrap:"wrap"}}>
         <BacklogSidebar rows={rows} onItemClick={handleShow} onEdit={handleEdit} onCreate={handleAddTelecaller} />
       </Grid>
       <Grid item xs={8}>
@@ -264,12 +262,12 @@ const WelcomeScreen = () => {
 
         )}
 
-        {/* {showAddDetails && (
-          <AddTellecallingDetails show={handleBack} editData={editData} />
-        )} */}
+        {showAddDetails && (
+          <AddOpportunityDetails show={handleBack} editData={editData} />
+        )}
 
         {!loading && !error && rowDataToUpdate && !showHistory && !showAddDetails && (
-          <ListOpportunitybacklog
+          <Listmyopportunity
             item={rowDataToUpdate}
             onDelete={handleDelete}
             onHistoryClick={handleShowHistory}

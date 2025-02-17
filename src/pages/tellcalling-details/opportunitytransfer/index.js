@@ -37,7 +37,7 @@ const TransferOpportunityData  = () => {
 
 
   const fetchData = async () => {
-    const userid = cookies.amr?.UserID || 25;
+    const userid = cookies.amr?.UserID || 0;
     try {
       const response = await axios.get(
         `https://apiforcornershost.cubisysit.com/api/api-graph-lead.php?UserID=${userid}`
@@ -61,30 +61,14 @@ const TransferOpportunityData  = () => {
     }
 
     const dynamicSalesData = [
-      // {
-      //   stats: counts?.todayFollowup,
-      //   title: 'Today Followups',
-      //   color: 'primary',
-      //   icon: <TrendingUp sx={{ fontSize: '1.75rem' }} />
-      // },
-      // {
-      //   stats: counts?.backlogFollowup,
-      //   title: 'Backlog Followups',
-      //   color: 'success',
-      //   icon: <AccountOutline sx={{ fontSize: '1.75rem' }} />
-      // },
+     
       {
         stats: counts.transfertooppo,
         color: 'warning',
         title: 'Transfer to Opportunity',
         icon: <CellphoneLink sx={{ fontSize: '1.75rem' }} />
       },
-      // {
-      //   stats: counts.totalFollowup,
-      //   color: 'info',
-      //   title: 'Total Followups',
-      //   icon: <CurrencyUsd sx={{ fontSize: '1.75rem' }} />
-      // }
+   
     ];
 
     return dynamicSalesData.map((item, index) => (
@@ -119,9 +103,6 @@ const TransferOpportunityData  = () => {
 
     return [
       { name: 'Tranfer to Opportunity', value: counts.transfertooppo, color: '#8884d8' },
-      // { name: 'Backlog Followups', value: counts.backlogFollowup, color: '#82ca9d' },
-      // { name: 'Next Followups', value: counts.nextFollowup, color: '#ffc658' },
-      // { name: 'Total Followups', value: counts.totalFollowup, color: '#a4de6c' }
     ];
   };
 
@@ -132,7 +113,7 @@ const TransferOpportunityData  = () => {
       <>
         <CardHeader
           title='Statistics Card'
-         
+        
           titleTypographyProps={{
             sx: {
               mb: 2.5,
@@ -267,7 +248,7 @@ const TransferOpportunityData  = () => {
 
   return (
     <Grid container spacing={6}>
-      <Grid item xs={4}>
+      <Grid item xs={12} md={4} style={{background:"white",zIndex:"99",display:"flex", flexWrap:"wrap"}}>
         <TransferOpportunitySIdebar
           onDashboardClick={handleNavigation} 
         
@@ -280,13 +261,7 @@ const TransferOpportunityData  = () => {
 
         {firstVisit && !loading && !error && (
           <WelcomeScreen />
-
         )}
-
-        {/* {showAddDetails && (
-          <AddTellecallingDetails show={handleBack} editData={editData} />
-        )} */}
-
         {!loading && !error && rowDataToUpdate && !showHistory && !showAddDetails && !showDashboard && (
           <ListTransferOpportunity
             item={rowDataToUpdate}

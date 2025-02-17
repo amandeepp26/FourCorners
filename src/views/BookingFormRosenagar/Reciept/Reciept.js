@@ -20,6 +20,7 @@ import { createGlobalStyle } from "styled-components";
 import styled from "styled-components";
 import { Card } from "mdi-material-ui";
 import { DatePicker } from "@mui/lab";
+import ErrorIcon from '@mui/icons-material/Error';
 import { Call, Grid3x3TwoTone } from "@mui/icons-material";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { format } from 'date-fns';
@@ -41,7 +42,7 @@ const InvoiceBox = styled(Box)({
   fontFamily: "Helvetica Neue, Helvetica, Arial, sans-serif",
 });
 
-const Reciept = ({ bookingID }) => {
+const Reciept = ({ bookingID  }) => {
   console.log(bookingID, "id bookinggg<<>>>> ayaa UJJAWALLLLLL");
   const printRef = useRef();
   const [data, setData] = useState([]);
@@ -126,7 +127,10 @@ const Reciept = ({ bookingID }) => {
   }
 
   if (error) {
-    return <Typography>Error loading data</Typography>;
+    return  <Typography variant="body1" color="textSecondary" display="flex" alignItems="center">
+        <ErrorIcon style={{ marginRight: 8 }} />
+        No Record found
+      </Typography>;
   }
 
   return (

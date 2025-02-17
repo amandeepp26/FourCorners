@@ -1032,6 +1032,10 @@ const handleSubmit = async () => {
                 }}
               />
             }
+            showMonthDropdown
+            showYearDropdown
+            yearDropdownItemNumber={15} // Number of years to show in dropdown
+            scrollableYearDropdown
           />
         </Grid>
 
@@ -1051,6 +1055,10 @@ const handleSubmit = async () => {
                 }}
               />
             }
+            showMonthDropdown
+            showYearDropdown
+            yearDropdownItemNumber={15} // Number of years to show in dropdown
+            scrollableYearDropdown
           />
         </Grid>
 

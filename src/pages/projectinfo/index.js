@@ -123,7 +123,7 @@ const ProjectMaster = () => {
       <>
         <CardHeader
           title='Statistics Card'
-        
+          
           titleTypographyProps={{
             sx: {
               mb: 2.5,
@@ -214,7 +214,7 @@ const ProjectMaster = () => {
 
   return (
     <Grid container spacing={6}>
-      <Grid item xs={4}>
+ <Grid item xs={12} md={4} style={{background:"white",zIndex:"99",display:"flex", flexWrap:"wrap"}}>
         <Sidebarprojectinfo rows={rows} onItemClick={handleShow} onEdit={handleEdit} onCreate={handleAddTelecaller} />
       </Grid>
       <Grid item xs={8}>

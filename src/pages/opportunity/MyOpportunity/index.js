@@ -13,7 +13,7 @@ import DotsVertical from 'mdi-material-ui/DotsVertical'
 import CellphoneLink from 'mdi-material-ui/CellphoneLink'
 import AccountOutline from 'mdi-material-ui/AccountOutline'
 import CardContent from '@mui/material/CardContent'
-
+import AddOpportunityDetails from 'src/views/add-opportunitydetails/AddOpportunityDetails';
 import AddIcon from "@mui/icons-material/Add";
 import CardHeader from '@mui/material/CardHeader'
 import Avatar from '@mui/material/Avatar'
@@ -29,7 +29,7 @@ import { useCookies } from "react-cookie";
 
 const MyOpportunity = () => {
   const [rows, setRows] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true); 
   const [error, setError] = useState(null);
   const [editData, setEditData] = useState(null);
   const [rowDataToUpdate, setRowDataToUpdate] = useState(null);
@@ -140,7 +140,7 @@ const MyOpportunity = () => {
       <>
         <CardHeader
           title='Statistics Card'
-       
+         
           titleTypographyProps={{
             sx: {
               mb: 2.5,
@@ -247,7 +247,7 @@ const WelcomeScreen = () => {
 
   return (
     <Grid container spacing={6}>
-      <Grid item xs={4}>
+     <Grid item xs={12} md={4} style={{background:"white",zIndex:"99",display:"flex", flexWrap:"wrap"}}>
         <MyOpportunitySidebar rows={rows} onItemClick={handleShow} onEdit={handleEdit} onCreate={handleAddTelecaller} />
       </Grid>
       <Grid item xs={8}>
@@ -260,7 +260,7 @@ const WelcomeScreen = () => {
         )}
 
         {showAddDetails && (
-          <AddTellecallingDetails show={handleBack} editData={editData} />
+          <AddOpportunityDetails show={handleBack} editData={editData} />
         )}
 
         {!loading && !error && rowDataToUpdate && !showHistory && !showAddDetails && (

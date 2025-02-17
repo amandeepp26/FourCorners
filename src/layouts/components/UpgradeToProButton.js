@@ -54,7 +54,7 @@ const BuyNowButton = () => {
       className='upgrade-to-pro-button mui-fixed'
       sx={{ right: theme => theme.spacing(20), bottom: theme => theme.spacing(10), zIndex: 11, position: 'fixed' }}
     >
-      <SpeedDial
+      {/* <SpeedDial
         ariaLabel="SpeedDial basic example"
         sx={{ position: 'absolute', bottom: 16, right: 16 }}
         icon={<SpeedDialIcon />}
@@ -70,7 +70,7 @@ const BuyNowButton = () => {
             onClick={action.onClick}
           />
         ))}
-      </SpeedDial>
+      </SpeedDial> */}
     </Box>
   );
 };

@@ -488,7 +488,7 @@ const EditBookingform = ({ show, bookingID, goBack , handleCloseEditForm}) => {
         });
     }
   }, [formData.ProjectID]);
-
+ 
   useEffect(() => {
     if (formData.ProjectID) {
       axios
@@ -640,28 +640,28 @@ const EditBookingform = ({ show, bookingID, goBack , handleCloseEditForm}) => {
         ? format(new Date(remark.RemarkDate), "yyyy-MM-dd")
         : null,
       AmountTypeID: remark.AmountTypeID || "",
+      Actionby: 1,
       Loan: remark.Loan || 0,
+      Registraion: remark.Registraion || 0,
       Proccess: remark.Proccess || "",
       Status: 1,
       ModifyUID: cookies?.amr?.UserID || 1,
     }));
   
-    
+    debugger;
     const dataToSend = {
       ...formData, // All other form data like BookingDate, Mobile, etc.
       BookingID: bookingID, // Ensure this is included
       BookingremarkData: formattedRemarks, // Add the formatted remarks with BookingRemarkID
     };
-  debugger;
-    console.log(dataToSend, "404 Data to Send<<<<>>>>>>>>>>>>>  <<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>><<<<<<<<");
-  
+debugger;
     try {
       const response = await axios.post(url, dataToSend, {
         headers: {
           "Content-Type": "application/json",
         },
       });
-  debugger;
+  
       if (response.data.status === "Success") {
         console.log(response.data, "Submission successful<>>>>>>>>>>>>>>>");
   
@@ -1267,119 +1267,118 @@ const EditBookingform = ({ show, bookingID, goBack , handleCloseEditForm}) => {
                 </FormControl>
               </Grid>
 
-
               {remarks.map((remark, index) => (
-                <Grid container item spacing={2} key={index}>
-                  {/* Amount Field */}
-                  <Grid item xs={4}>
-                    <TextField
-                      fullWidth
-                      label={`Amount ${index + 1}`}
-                      value={remark.Remarkamount}
-                      onChange={(e) => handleChange(e, index, "Remarkamount")}
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">₹</InputAdornment>
-                        ),
-                        inputProps: { style: { textAlign: "left" } },
-                      }}
-                      type="text"
-                    />
-                  </Grid>
+  <Grid container item spacing={2} key={index}>
+    {/* Amount Field */}
+    <Grid item xs={4}>
+      <TextField
+        fullWidth
+        label={`Amount ${index + 1}`}
+        value={remark.Remarkamount}
+        onChange={(e) => handleChange(e, index, "Remarkamount")}
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">₹</InputAdornment>
+          ),
+          inputProps: { style: { textAlign: "left" } },
+        }}
+        type="text"
+      />
+    </Grid>
 
-                  {/* Amount Type Dropdown */}
-                  <Grid item xs={4}>
-                    <FormControl fullWidth>
-                      <InputLabel>Amount Type</InputLabel>
-                      <Select
-                        value={remark.AmountTypeID || ""}
-                        onChange={(e) => handleChange(e, index, "AmountTypeID")}
-                        label="Amount Type"
-                      >
-                        {amountTypes.map((type) => (
-                          <MenuItem
-                            key={type.AmountTypeID}
-                            value={type.AmountTypeID}
-                          >
-                            {type.AmountTypeName}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Grid>
+    {/* Amount Type Dropdown */}
+    <Grid item xs={4}>
+      <FormControl fullWidth>
+        <InputLabel>Amount Type</InputLabel>
+        <Select
+          value={remark.AmountTypeID || ""}
+          onChange={(e) => handleChange(e, index, "AmountTypeID")}
+          label="Amount Type"
+          required
+        >
+          {amountTypes.map((type) => (
+            <MenuItem key={type.AmountTypeID} value={type.AmountTypeID}>
+              {type.AmountTypeName}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+    </Grid>
 
-                  {/* Remark Field */}
-                  <Grid item xs={4}>
-                    <TextField
-                      fullWidth
-                      label={`Remark ${index + 1}`}
-                      value={remark.RemarkName}
-                      onChange={(e) => handleChange(e, index, "RemarkName")}
-                    />
-                  </Grid>
+    {/* Remark Field */}
+    <Grid item xs={4}>
+      <TextField
+        fullWidth
+        label={`Remark ${index + 1}`}
+        value={remark.RemarkName}
+        onChange={(e) => handleChange(e, index, "RemarkName")}
+        required
+      />
+    </Grid>
 
-                  {/* Date Field */}
-                  <Grid item xs={12} sm={6}>
-                    <DatePicker
-                      selected={
-                        remark.RemarkDate && remark.RemarkDate !== "0000-00-00"
-                          ? new Date(remark.RemarkDate)
-                          : null
-                      }
-                      onChange={(date) => handleDateRemarks(date, index)}
-                      dateFormat="yyyy-MM-dd"
-                      customInput={<TextField label="Remark Date" fullWidth />}
-                    />
-                  </Grid>
+    {/* Date Field */}
+    <Grid item xs={12} sm={6}>
+      <DatePicker
+        selected={
+          remark.RemarkDate && remark.RemarkDate !== "0000-00-00"
+            ? new Date(remark.RemarkDate)
+            : null
+        }
+        onChange={(date) => handleDateRemarks(date, index)}
+          dateFormat="dd-MM-yyyy"
+        customInput={<TextField label="Remark Date" fullWidth  required/>}
 
-                  {/* Loan Process Checkbox */}
-                  <Grid item xs={2}>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={remark.Loan === 1}
-                          onChange={(e) => handleChange(e, index, "Loan")}
-                        />
-                      }
-                      label="Loan Process"
-                    />
-                  </Grid>
-                  <Grid item xs={2}>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={remark.Registraion === 1} // Note the typo here, make sure it's consistent
-                          onChange={(e) =>
-                            handleChange(e, index, "Registraion")
-                          } // Use "Registraion" to match the API response
-                        />
-                      }
-                      label="Register" // This is the label text; it can be "Register" or anything you want
-                    />
-                  </Grid>
+        showMonthDropdown
+        showYearDropdown
+        yearDropdownItemNumber={15}
+        scrollableYearDropdown
+      />
+    </Grid>
 
-                  {/* Add and Delete Buttons */}
-                  {index === remarks.length - 1 && (
-                    <Grid item xs={2}>
-                      <IconButton
-                        color="primary"
-                        sx={{ color: "#1976d2" }}
-                        onClick={handleAddRemark}
-                      >
-                        <AddIcon />
-                      </IconButton>
-                      <IconButton
-                        color="primary"
-                        sx={{ color: "#f44336", ml: 1 }}
-                        onClick={() => handleRemoveRemark(index)}
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </Grid>
-                  )}
-                </Grid>
-              ))}
+    <Grid item xs={2}>
+      <FormControlLabel
+        control={
+          <Checkbox
+            checked={remark.Registraion === 1}
+            onChange={(e) => handleChange(e, index, "Registraion")}
+          />
+        }
+        label="Registraion Process"
+      />
+    </Grid>
+    <Grid item xs={2}>
+      <FormControlLabel
+        control={
+          <Checkbox
+            checked={remark.Loan === 1}
+            onChange={(e) => handleChange(e, index, "Loan")}
+          />
+        }
+        label="Loan Process"
+      />
+    </Grid>
 
+    {/* Add and Delete Buttons */}
+    {index === remarks.length - 1 && (
+      <Grid item xs={2}>
+        <IconButton
+          color="primary"
+          sx={{ color: "#1976d2" }}
+          onClick={handleAddRemark}
+        >
+          <AddIcon />
+        </IconButton>
+        <IconButton
+          color="primary"
+          sx={{ color: "#f44336", ml: 1 }}
+          onClick={() => handleRemoveRemark(index)}
+        >
+          <DeleteIcon />
+        </IconButton>
+      </Grid>
+    )}
+  </Grid>
+))}
               <Grid item xs={12}>
                 <Button
                   variant="contained"

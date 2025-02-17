@@ -115,7 +115,7 @@ const navigation = () => {
     },
     {
       title: "Project Details",
-      icon: PhoneIcon,  
+      icon: PhoneIcon,  // Replaced with PhoneIcon
       children: [
         {
           title: "Add Project Details",
@@ -124,7 +124,7 @@ const navigation = () => {
         },
         {
           title: "List Project Details",
-          icon: Table, 
+          icon: Table,  // Replaced with Table
           path: "/project-details/ListProjectDetails",
         },
       ],
@@ -139,33 +139,33 @@ const navigation = () => {
       sectionTitle: "Cancel Booking",
     },
     {
-      icon: PaymentsIcon, 
+      icon: PaymentsIcon,  
       title: "Cancel Bookings",
       path: "/bookingcancel",
     },
     {
       title: "Followup Booking Cancel",
-      icon: TrendingUpIcon,
+      icon: TrendingUpIcon, 
       path: "/cancelfollowup",
       children: [
         {
           title: "All Followup",
-          icon: CubeOutlineIcon, 
+          icon: CubeOutlineIcon,  
           path: "/cancelfollowup",
         },
         {
           title: "Today's Followup",
-          icon: CubeOutlineIcon, 
+          icon: CubeOutlineIcon,
           path: "/cancelfollowup/Todaycancelfollowup",
         },
         {
           title: "Next Followup",
-          icon: CubeOutlineIcon, 
+          icon: CubeOutlineIcon,  // Replaced with CubeOutlineIcon
           path: "/cancelfollowup/Nextcancelfollowup",
         },
         {
           title: "Backlog Followup",
-          icon: CubeOutlineIcon, 
+          icon: CubeOutlineIcon,  // Replaced with CubeOutlineIcon
           path: "/cancelfollowup/Backlogcancelfollowup",
         },
       ],
@@ -175,7 +175,7 @@ const navigation = () => {
       sectionTitle: "Template",
     },
     {
-      icon: CubeOutlineIcon, 
+      icon: CubeOutlineIcon,  // Replaced with CubeOutlineIcon
       title: "Template",
       path: "/template",
     },
@@ -185,7 +185,7 @@ const navigation = () => {
     },
     {
       title: "Campaign Manager",
-      icon: LanguageIcon, 
+      icon: LanguageIcon,  // Replaced with LanguageIcon
       path: "/campaign",
     },
   ];

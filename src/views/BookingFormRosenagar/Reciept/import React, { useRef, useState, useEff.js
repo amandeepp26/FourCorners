@@ -121,10 +121,10 @@ const Reciept = ({ bookingID }) => {
                   >
                     <Grid item>
                       <img
-                        src="https://i.postimg.cc/PJfmZCRv/Untitled-design-2024-04-12-T161558-455.png"
+                        src="https://static.thenounproject.com/png/3764342-200.png"
                         alt="200 * 200"
-                        width="80"
-                        height="80"
+                        width="80px"
+                        height="100px"
                       />
                     </Grid>
                     <Grid item>

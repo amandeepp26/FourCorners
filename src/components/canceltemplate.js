@@ -25,15 +25,14 @@ const GlobalStyle = createGlobalStyle`
       margin: 0;
       padding: 0;
       color: #000;
-      font-size: 12px; /* Adjust font size for print */
+      font-size: 12px;
     }
 
     @page {
-      size: auto; /* auto is the initial value */
-      margin: 10mm; /* Add margin for print */
+      size: auto;
+      margin: 10mm;
     }
 
-    /* Hide unwanted elements */
     * {
       visibility: hidden;
     }
@@ -47,27 +46,23 @@ const GlobalStyle = createGlobalStyle`
       left: 0;
       top: 0;
       width: 100%;
-      page-break-inside: avoid; /* Prevent page breaks inside this area */
+      page-break-inside: avoid;
     }
 
-    /* Prevent breaking inside tables */
     table {
       page-break-inside: avoid;
-      border-collapse: collapse; /* For better control over breaks */
+      border-collapse: collapse;
     }
   }
 `;
+
 const formatAmount = (amount) => {
   if (!amount) return "0";
 
   const numAmount = parseFloat(amount);
-  
-  // Format for Crores
-  if (numAmount >= 10000000) return `${(numAmount / 10000000).toFixed(2)} CR`; 
-  // Format for Lakhs
-  if (numAmount >= 100000) return `${(numAmount / 100000).toFixed(2)} L`; 
-  // Format for Thousands
-  if (numAmount >= 1000) return `${(numAmount / 1000).toFixed(2)} K`; 
+  if (numAmount >= 10000000) return `${(numAmount / 10000000).toFixed(2)} CR`;
+  if (numAmount >= 100000) return `${(numAmount / 100000).toFixed(2)} L`;
+  if (numAmount >= 1000) return `${(numAmount / 1000).toFixed(2)} K`;
   return `${numAmount.toFixed(2)} H`;
 };
 
@@ -76,7 +71,6 @@ const formatDate = (dateString) => {
   const options = { day: 'numeric', month: 'short', year: 'numeric' };
   return date.toLocaleDateString('en-GB', options).replace(/ /g, ' ');
 };
-
 
 const StyledTableCell = styled(TableCell)({
   textAlign: "center",
@@ -111,14 +105,18 @@ const TemplatePayment = ({ bookingcancelID, handleCancel }) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [payments, setPayments] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
+      debugger;
+
       try {
         const response = await axios.get(
           `https://apiforcornershost.cubisysit.com/api/api-fetch-cancelprojectbooking.php?bookingcancelID=${bookingcancelID}`
         );
         setData(response.data.data);
+     
         setLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -129,9 +127,86 @@ const TemplatePayment = ({ bookingcancelID, handleCancel }) => {
     fetchData();
   }, [bookingcancelID]);
 
+  useEffect(() => {
+    const fetchData = async () => {
+     // Ensure valid BookingID before making the API call.
+debugger;
+      setLoading(true); // Start loading.
+      setError(null); // Reset any previous error.
+
+      try {
+        const apiUrl = `https://apiforcornershost.cubisysit.com/api/api-singel-bookingremark.php?BookingID=${bookingcancelID}`;
+        const response = await axios.get(apiUrl);
+
+        if (response.data.status === "Success") {
+          setPayments(response.data.data.payments || []); // Handle cases where payments might be null.
+        
+        } else {
+          setError("Failed to fetch data");
+        }
+      } catch (error) {
+        console.error("Fetch error:", error);
+        setError("Error fetching data");
+      } finally {
+        setLoading(false); // Stop loading in all cases.
+      }
+    };
+    fetchData();
+  }, [bookingcancelID]); // Watch specifically for changes to BookingID.
+
+
+
+
   const handlePrint = () => {
+    const printContents = printRef.current.innerHTML;
+    const originalContents = document.body.innerHTML;
+    document.body.innerHTML = printContents;
     window.print();
+    document.body.innerHTML = originalContents;
+    window.location.reload(); // Reload to restore the original content
   };
+  let runningBalance = data?.bookingDetails.bookingcancelTotalCost || 0;
+  const totalCash = payments.reduce((sum, payment) => sum + (payment.Cash || 0), 0);
+  const totalCheque = payments.reduce((sum, payment) => sum + (payment.ChequeAmount || 0), 0);
+  const totalAPlusB = totalCash + totalCheque;
+
+
+
+const rows = payments.map((payment) => {
+  const cash = payment.Cash || 0;
+  const chequeAmount = payment.ChequeAmount || 0;
+  const totalAPlusB = cash + chequeAmount;
+  
+  runningBalance -= totalAPlusB; // Correctly update bala
+  return {
+    Date: payment.Date,
+    Cash: cash,
+    ChequeAmount: chequeAmount,
+    TotalAPlusB: totalAPlusB,
+    Balance: runningBalance, // Store updated balance
+    Wing: data?.WingName || "",
+    Floor: data?.FloorNo || "",
+    FlatNo: data?.FlatNumber || "",
+    Type: data?.Type || "",
+  };
+});
+
+  
+  const totalRows = 23;
+  const defaultRowsCount = Math.max(totalRows - rows.length, 0);
+  const defaultRows = Array.from({ length: defaultRowsCount }, () => ({
+    Date: "",
+    Cash: "",
+    ChequeAmount: "",
+    TotalAPlusB: "",
+    Balance: "",
+    Wing: "",
+    Floor: "",
+    FlatNo: "",
+    Type: "",
+  }));
+
+  const finalRows = [...rows, ...defaultRows];
 
   if (loading) return <Typography>Loading...</Typography>;
   if (error) return <Typography>Error loading data</Typography>;
@@ -194,8 +269,12 @@ const TemplatePayment = ({ bookingcancelID, handleCancel }) => {
                 >
                   <StyledTableCell style={{ textAlign: "center", padding: 1, width: "355px" ,height:"160px" }}>
 
-                    <img src={`https://apiforcornershost.cubisysit.com/projectimage/${data.bookingDetails.images || "rosenagar.png"}`} alt="Logo" width={350} height={150} />
-
+                   <img
+      src={`https://apiforcornershost.cubisysit.com/projectimage/${data.bookingDetails.images|| ""}`}
+      alt="Logo"
+      width={350}
+      height={150}
+    /> 
                   </StyledTableCell>
                
                   <Box
@@ -537,7 +616,92 @@ const TemplatePayment = ({ bookingcancelID, handleCancel }) => {
     </Table>
   </TableContainer>
 </InvoiceBox>
+   <InvoiceBox className="printableArea" ref={printRef}>
+        <TableContainer component={Paper}>
+          <Table>
+            <TableBody>
 
+              <TableRow>
+                <StyledTableCell
+                  colSpan={5}
+                  style={{ textAlign: "center", borderBottom: "none" }}
+                >
+                  <Typography style={{ fontSize: 20, fontWeight: 700 }}>
+                    PROJECT
+                  </Typography>
+                  <Typography variant="body2">
+                  {data.bookingDetails.ProjectName}
+                  </Typography>
+                </StyledTableCell>
+                <StyledTableCell style={{ textAlign: "center" }}>
+                  <Typography variant="body1">WING</Typography>
+                  <Typography variant="body2">  {data.bookingDetails.WingName}</Typography>
+                </StyledTableCell>
+
+                <StyledTableCell style={{ textAlign: "center" }}>
+                  <Typography variant="body1">FLOOR</Typography>
+                  <Typography variant="body2"> {data.bookingDetails.bookingcancelFloorNo}</Typography>
+                </StyledTableCell>
+                <StyledTableCell style={{ textAlign: "center" }}>
+                  <Typography variant="body1">FLAT NO</Typography>
+                  <Typography variant="body2">  {data.bookingDetails.bookingcancelFlatNo}</Typography>
+                </StyledTableCell>
+                <StyledTableCell style={{ textAlign: "center" }}>
+                  <Typography variant="body1">TYPE</Typography>
+                  <Typography variant="body2">  {data.bookingDetails.UnittypeName}</Typography>
+                </StyledTableCell>
+              </TableRow>
+
+              <TableRow>
+                <StyledTableCell style={{ textAlign: "center" }}>
+                  DATE
+                </StyledTableCell>
+                <StyledTableCell style={{ textAlign: "center" }}>
+                  A
+                </StyledTableCell>
+                <StyledTableCell colSpan={4} style={{ textAlign: "center" }}>
+                  B
+                </StyledTableCell>
+                <StyledTableCell style={{ textAlign: "center" }}>
+                  A + B
+                </StyledTableCell>
+                <StyledTableCell style={{ textAlign: "center" }}>
+                  Balance
+                </StyledTableCell>
+                <StyledTableCell style={{ textAlign: "center" }}>
+                  Sign.
+                </StyledTableCell>
+              </TableRow>
+
+              {/* Render Rows */}
+              {finalRows?.map((row, index) => (
+                <TableRow key={index}>
+                  <StyledTableCell style={{ textAlign: "center" }}>
+                    {row.Date}
+                  </StyledTableCell>
+                  <StyledTableCell style={{ textAlign: "center" }}>
+                    {row.Cash}
+                  </StyledTableCell>
+                  <StyledTableCell colSpan={4} style={{ textAlign: "center" }}>
+                    {row.ChequeAmount}
+                  </StyledTableCell>
+                  <StyledTableCell style={{ textAlign: "center" }}>
+                    {row.TotalAPlusB}
+                  </StyledTableCell>
+                  <StyledTableCell style={{ textAlign: "center" }}>
+                    {row.Balance}
+                  </StyledTableCell>
+                  <StyledTableCell style={{ textAlign: "center" }}>
+                    {" "}
+                    {/* Signature here */}{" "}
+                  </StyledTableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+
+      </InvoiceBox>
     </>
   );
 };

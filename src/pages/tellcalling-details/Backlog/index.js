@@ -223,7 +223,7 @@ const BacklogLead = () => {
 
   return (
     <Grid container spacing={6}>
-      <Grid item xs={4}>
+       <Grid item xs={12} md={4} style={{background:"white",zIndex:"99",display:"flex", flexWrap:"wrap"}}>
         <BacklogSidebar rows={rows} onItemClick={handleShow} onEdit={handleEdit} onCreate={handleAddTelecaller} onDashboardClick={handleNavigation} />
       </Grid>
       <Grid item xs={8}>
@@ -234,4 +234,4 @@ const BacklogLead = () => {
 };
 
 export default BacklogLead;
-``
+

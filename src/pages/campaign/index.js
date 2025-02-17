@@ -101,7 +101,7 @@ const StatisticsCard = () => {
     <Card>
       <CardHeader
         title="Statistics Card"
-      
+        
       />
       <CardContent sx={{ pt: (theme) => `${theme.spacing(3)} !important` }}>
         <Grid container spacing={[5, 0]}>
@@ -264,7 +264,7 @@ const Tellecalling = () => {
 
   return (
     <Grid container spacing={6}>
-      <Grid item xs={4}>
+<Grid item xs={12} md={4} style={{background:"white",zIndex:"99",display:"flex", flexWrap:"wrap"}}>
         <Sidebar
           rows={rows}
           onItemClick={handleShow}

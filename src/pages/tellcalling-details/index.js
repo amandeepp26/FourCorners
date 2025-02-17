@@ -41,7 +41,7 @@ const Tellecalling = () => {
     if (showAddDetailsFlag === 'true') {
       setShowAddDetails(true);
       setContactData(selectedContact ? JSON.parse(selectedContact) : null);
-      localStorage.removeItem('showAddDetails');
+      localStorage.removeItem('showAddDetails'); // Clear flag
     } else {
       setShowAddDetails(false);
     }
@@ -81,6 +81,7 @@ const Tellecalling = () => {
 
     fetchData();
   };
+
   const handleEdit = (row) => {
     setEditData(row);
     setRowDataToUpdate(null);
@@ -89,6 +90,7 @@ const Tellecalling = () => {
     setFirstVisit(false);
     setShowDashboard(false);
   };
+
   const handleShow = (item) => {
     setRowDataToUpdate(item);
     setShowAddDetails(false);
@@ -96,6 +98,9 @@ const Tellecalling = () => {
     setFirstVisit(false);
     setShowDashboard(false);
   };
+
+
+  
   const handleAddTelecaller = () => {
     setEditData(null);
     setRowDataToUpdate(null);
@@ -111,16 +116,24 @@ const Tellecalling = () => {
       console.warn('No contact data available');
     }
   };
+  
+  
+
   const handleShowHistory = () => {
     setShowHistory(true);
     setShowAddDetails(false);
     setShowDashboard(false);
+
     setFirstVisit(false);
   };
+
   const handleNavigation = () => {
     setShowDashboard(true);
     setShowAddDetails(false);
   };
+  
+  
+
   const renderStats = () => {
     console.log(counts, 'dekh>>>>>>>>>>>>>>>>>>');
     
@@ -253,9 +266,8 @@ const Tellecalling = () => {
 
   return (
 <Grid container spacing={6}>
-  <Grid item xs={4}>
+<Grid item xs={12} md={4} style={{background:"white",zIndex:"99",display:"flex", flexWrap:"wrap"}}>
     <Sidebar 
-      // rows={rows} 
       onItemClick={handleShow} 
       onEdit={handleEdit} 
       onCreate={handleAddTelecaller} 
@@ -264,8 +276,7 @@ const Tellecalling = () => {
   </Grid>
   <Grid item xs={8}>
     {loading && <CircularProgress />}
-    {/* {error && <Alert severity="error">{error.message}</Alert>} */}
-    
+
     {showDashboard && !loading && !error && !showAddDetails && <WelcomeScreen />}
     
     {!showDashboard && firstVisit && !loading && !error && !leadData && !showAddDetails && (

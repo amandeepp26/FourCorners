@@ -208,7 +208,7 @@ const ProjectMaster = () => {
 
   return (
     <Grid container spacing={6}>
-      <Grid item xs={4}>
+      <Grid item xs={12} md={4} style={{background:"white",zIndex:"99",display:"flex", flexWrap:"wrap"}}>
         <SidebarBookingCancel rows={rows} onItemClick={handleShow} onEdit={handleEdit} onCreate={handleAddTelecaller} />
       </Grid>
       <Grid item xs={8}>

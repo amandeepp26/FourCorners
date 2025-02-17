@@ -24,40 +24,48 @@ import {
   RadioGroup,
   Radio,
   FormLabel,
+  CircularProgress,
 } from "@mui/material";
 import MuiAlert from "@mui/material/Alert";
 import { useCookies } from "react-cookie";
 
 
- 
-const AddContact = ({ show, editData  , onDashboardClick}) => {
+
+const AddContact = ({ show, editData, onDashboardClick }) => {
   const [cookies, setCookie] = useCookies(["amr"]);
   console.log(editData, 'Edit data aaya contact ka');
 
 
   const initialFormData = {
     TitleID: "",
-    CName:"",
-    CustomerTypeID:"",
+    CName: "",
+    CustomerTypeID: "",
     ContactTypeID: "",
-    CountryCodeID:"",
+    CountryCodeID: "",
     Mobile: "",
     OtherNumbers: "",
     Email: "",
-    CityID:"",
-    LocationID:"",
-    PinCode:"",
-    SourceID:"",
-    UserID: cookies.amr?.UserID || 1 ,
-    Status:1,
-    CreateUID:1,
-    Cid:"",
+    CityID: "",
+    LocationID: "",
+    PinCode: "",
+    KeyWordID: 1,
+    SourceID: "",
+    SourceTypeID: "",
+    UserID: cookies.amr?.UserID || 1,
+    Status: 1,
+    CreateUID: 1,
+    Cid: "",
     ModifyUID: 1,
 
-    
+
   };
+
+
+
   const [rows, setRows] = useState([]);
   const [localities, setLocalities] = useState([]);
+
+
   const [contactTypes, setContactTypes] = useState([]);
   const [countryCodes, setCountryCodes] = useState([]);
   const [cities, setCities] = useState([]);
@@ -72,8 +80,8 @@ const AddContact = ({ show, editData  , onDashboardClick}) => {
   const [customerType, setCustomerType] = useState([]);
   const requiredFields = ['TitleID', 'CName', 'CustomerTypeID', 'ContactTypeID', 'CountryCodeID', 'Mobile', 'Email', 'CityID', 'LocationID', 'PinCode', 'SourceID', 'SourceTypeID', 'UserID'];
   const [errors, setErrors] = useState({});
-  
-  
+
+
   const [source, setSource] = useState([]);
   const [estimatedBudget, setEstimatedBudget] = useState([]);
   const [leadStatus, setLeadStatus] = useState([]);
@@ -87,7 +95,7 @@ const AddContact = ({ show, editData  , onDashboardClick}) => {
   useEffect(() => {
     fetchData();
     fetchDataBhk();
-  
+
     fetchDataTitle();
   }, []);
 
@@ -95,7 +103,7 @@ const AddContact = ({ show, editData  , onDashboardClick}) => {
     if (editData) {
       // Destructure editData to access necessary properties
       const { TitleID, CName, CustomerTypeID, ContactTypeID, CountryCodeID, Mobile, OtherNumbers, Email, CityID, LocationID, PinCode, SourceID, SourceTypeID, UserID, Status, CreateUID, Cid, ModifyUID } = editData;
-  
+
       // Set the form data using editData values
       setFormData({
         TitleID: TitleID || "",
@@ -107,28 +115,28 @@ const AddContact = ({ show, editData  , onDashboardClick}) => {
         OtherNumbers: OtherNumbers || "",
         Email: Email || "",
         CityID: CityID || "",
-        LocationID: LocationID || "", 
+        LocationID: LocationID || "",
         PinCode: PinCode || "",
         SourceID: SourceID || "",
-        UserID:  CreateUID || 1, 
+        UserID: CreateUID || 1,
         Status: Status || 1,
         CreateUID: CreateUID || 1,
         Cid: Cid || "",
         ModifyUID: ModifyUID || 1,
-       
+
       });
-  
+
       if (CustomerTypeID) {
         fetchContactTypes(CustomerTypeID);
       }
-  
-      
+
+
       if (SourceID) {
         setDynamicSourceID(SourceID);
       }
     }
   }, [editData]);
-  
+
 
   useEffect(() => {
     fetchDataCustomerType();
@@ -175,7 +183,7 @@ const AddContact = ({ show, editData  , onDashboardClick}) => {
         console.error("Error fetching country codes:", error);
       });
   }, []);
-  
+
 
   useEffect(() => {
     axios.get("https://apiforcornershost.cubisysit.com/api/api-fetch-citymaster.php")
@@ -189,7 +197,7 @@ const AddContact = ({ show, editData  , onDashboardClick}) => {
 
 
 
-    useEffect(() => {
+  useEffect(() => {
     axios
       .get("https://apiforcornershost.cubisysit.com/api/api-fetch-source.php")
       .then((response) => {
@@ -284,7 +292,7 @@ const AddContact = ({ show, editData  , onDashboardClick}) => {
       axios.get(`https://apiforcornershost.cubisysit.com/api/api-fetch-sourcetype.php?SourceID=${dynamicSourceID}`)
         .then((response) => {
           if (response.data.status === "Success") {
-            console.log(response.data.data , 'Source name');
+            console.log(response.data.data, 'Source name');
             setSourceTypes(response.data.data);
           } else {
             console.error("Failed to fetch source types:", response.data.message);
@@ -316,17 +324,17 @@ const AddContact = ({ show, editData  , onDashboardClick}) => {
       EmailNotification: value === 1 ? 0 : 1,
     });
   };
-  
+
 
   const handleChange = (event) => {
     const { name, value } = event.target;
-  
+
     // Clear the error for the current field when user starts typing
     setErrors({
       ...errors,
       [name]: "", // Clearing the error for the current field
     });
-  
+
     // Handle numeric input formatting or other specific input manipulations
     if (["Mobile", "OtherNumbers", "TelephoneNo", "AlternateTelephoneNo", "Countrycode", "PinCode"].includes(name)) {
       const numericValue = value.replace(/\D/g, "");
@@ -340,14 +348,14 @@ const AddContact = ({ show, editData  , onDashboardClick}) => {
         [name]: value,
       });
     }
-  
+
     // Handle specific state updates based on input changes (e.g., dynamic source types)
     if (name === 'SourceID') {
       setDynamicSourceID(value);
     }
   };
-  
-  
+
+
 
   function getCurrentTime() {
     const now = new Date();
@@ -367,7 +375,7 @@ const AddContact = ({ show, editData  , onDashboardClick}) => {
   const handleContactType = (event) => {
     const contactTypeID = event.target.value;
 
-  setErrors((prevErrors) => ({
+    setErrors((prevErrors) => ({
       ...prevErrors,
       ContactTypeID: undefined,
     }));
@@ -381,7 +389,7 @@ const AddContact = ({ show, editData  , onDashboardClick}) => {
   const handleCustomerType = (event) => {
     const customerTypeID = event.target.value;
 
-    
+
     setErrors((prevErrors) => ({
       ...prevErrors,
       CustomerTypeID: undefined,
@@ -440,7 +448,10 @@ const AddContact = ({ show, editData  , onDashboardClick}) => {
       errors.CName = "Customer Name is required";
     }
     if (!data.CustomerTypeID) {
-      errors.CustomerTypeID = "Customer Type is required";
+      errors.CustomerTypeID = "Location is required";
+    }
+    if (!data.LocationID) {
+      errors.LocationID = "Location is required";
     }
     if (!data.ContactTypeID) {
       errors.ContactTypeID = "Contact Type is required";
@@ -450,8 +461,6 @@ const AddContact = ({ show, editData  , onDashboardClick}) => {
     }
     if (!data.Mobile) {
       errors.Mobile = "Mobile is required";
-    }else if (data.Mobile.length < 10) {
-      errors.Mobile = "Mobile number must be 10 digits";
     }
     if (!data.Email) {
       errors.Email = "Email is required";
@@ -462,43 +471,45 @@ const AddContact = ({ show, editData  , onDashboardClick}) => {
     if (!data.LocationID) {
       errors.LocationID = "Location is required";
     }
+
     if (!data.PinCode) {
-      errors.PinCode = "Pin Code is required";
+      errors.PinCode = "Pincode is required";
     }
     if (!data.SourceID) {
       errors.SourceID = "Source is required";
     }
-
+    setLoading(false);
     return errors;
+
   };
 
 
-const handleSubmit = async (event) => {
+  const handleSubmit = async (event) => {
 
-  
+
     event.preventDefault();
+    setLoading(true);
     const newErrors = validateForm(formData);
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
 
-    console.log(formData , 'hehehe');
-  
+
     // Prepare API URL based on editData flag
     const url = editData
       ? "https://proxy-forcorners.vercel.app/api/proxy/api-update-contacts.php"
       : "https://proxy-forcorners.vercel.app/api/proxy/api-insert-contacts.php";
-  
 
 
 
-      const dataToSend = editData
+
+    const dataToSend = editData
       ? formData
       : {
-          ...formData,
-          CreateUID: cookies.amr?.UserID || 1, 
-        };
+        ...formData,
+        CreateUID: cookies.amr?.UserID || 1,
+      };
 
 
     try {
@@ -507,25 +518,27 @@ const handleSubmit = async (event) => {
           "Content-Type": "application/json",
         },
       });
-  
+
       if (response.data.status === "Success") {
         setFormData(initialFormData); // Reset form data after successful submission
         setErrors({});
         setSubmitSuccess(true);
         setSubmitError(false);
         show(false); // Hide the modal or close form
-  console.log()
+
         Swal.fire({
           icon: "success",
           title: editData ? "Data Updated Successfully" : "Data Added Successfully",
           showConfirmButton: false,
           timer: 1000,
-        })
+        }).then(() => {
+          window.location.reload();
+        });
 
       } else {
         setSubmitSuccess(false);
         setSubmitError(true);
-  
+
         Swal.fire({
           icon: 'error',
           title: 'Oops...',
@@ -536,16 +549,17 @@ const handleSubmit = async (event) => {
       console.error("There was an error!", error);
       setSubmitSuccess(false);
       setSubmitError(true);
-  
+
       Swal.fire({
         icon: 'error',
         title: 'Oops...',
         text: 'Mobile Number is already Exits!',
-      });
-    }
-  };
+      });
+      setLoading(false);
+    }
+  };
 
-  
+
 
   const handleAlertClose = (event, reason) => {
     if (reason === "clickaway") {
@@ -569,7 +583,7 @@ const handleSubmit = async (event) => {
   };
   const handleCountryCode = (event) => {
 
-       setErrors((prevErrors) => ({
+    setErrors((prevErrors) => ({
       ...prevErrors,
       CountryCodeID: undefined,
     }));
@@ -585,7 +599,7 @@ const handleSubmit = async (event) => {
       CityID: event.target.value,
     });
   };
-  
+
 
   const handleTelecaller = (event) => {
 
@@ -606,195 +620,190 @@ const handleSubmit = async (event) => {
   return (
     <>
 
+      <Card sx={{ height: "auto" }}>
+
+        <CardContent>
+          <Grid item xs={12} sx={{ marginTop: 4.8, marginBottom: 3 }}>
 
 
+            <Box display="flex" justifyContent="space-between" alignItems="center">
+              <Typography
+                variant="body2"
+                sx={{ fontWeight: 'bold', fontSize: 20 }}
+              >
+                {editData
+                  ? "Edit Contact Details"
+                  : "Add Contact Details"}
+              </Typography>
+              <Button
+                variant="contained"
+                onClick={onDashboardClick}
+                style={{ marginTop: 0 }}
+              >
+                Dashboard
+              </Button>
+            </Box>
+          </Grid>
+          <form style={{ marginTop: "50px" }}>
+            <Grid container spacing={7}>
+              <Grid item xs={8} sm={4}>
+                <FormControl fullWidth>
+                  <InputLabel>Title <RequiredIndicator /></InputLabel>
+                  <Select
+                    value={formData.TitleID}
+                    onChange={handleTitleChange}
+                    label="Title"
+                    error={!!errors.TitleID}
+                    helperText={errors.TitleID}
 
-    <Card sx={{ height:"auto" }}>
-   
-      <CardContent>
-        <Grid item xs={12} sx={{ marginTop: 4.8, marginBottom: 3 }}>
-
-
-          <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Typography
-          variant="body2"
-          sx={{ fontWeight: 'bold', fontSize: 20 }}
-        >
-          {editData
-                ? "Edit Contact Details"
-                : "Add Contact Details"}
-        </Typography>
-        <Button
-          variant="contained"
-          onClick={onDashboardClick}
-          style={{ marginTop: 0 }}
-        >
-          Dashboard
-        </Button>
-      </Box>
-        </Grid>
-        <form style={{ marginTop: "50px" }}>
-          <Grid container spacing={7}>
-            <Grid item xs={8} sm={4}>
-              <FormControl fullWidth>
-                <InputLabel>Title <RequiredIndicator /></InputLabel>
-                <Select
-                  value={formData.TitleID}
-                  onChange={handleTitleChange}
-                  label="Title"
-                  error={!!errors.TitleID}
-                  helperText={errors.TitleID}
-              
-                >
-                  {titles.map((title) => (
-                    <MenuItem key={title.TitleID} value={title.TitleID}>
-                      {title.TitleName}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
+                  >
+                    {titles.map((title) => (
+                      <MenuItem key={title.TitleID} value={title.TitleID}>
+                        {title.TitleName}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
 
 
-            <Grid item xs={8} sm={4}>
-              <TextField
-                fullWidth
-                label={
-                  <>
-                    Full Name <RequiredIndicator />
-                  </>
-                }
-                type="text"
-                name="CName"
-                value={formData.CName}
-                onChange={handleChange}
-                error={!!errors.CName}
-                helperText={errors.CName}
-            
-              
-              />
-            </Grid>
-
-     
-      <Grid item xs={8} sm={4}>
-        <FormControl fullWidth>
-          <InputLabel>Customer Type <RequiredIndicator /></InputLabel>
-          <Select
-            value={formData.CustomerTypeID}
-            onChange={handleCustomerType}
-            label="Customer Type"
-            error={!!errors.CustomerTypeID}
-            helperText={errors.CustomerTypeID}
-          >
-            {customerType.map((type) => (
-              <MenuItem key={type.CustomerTypeID} value={type.CustomerTypeID}>
-                {type.CustomerTypeName}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Grid>
-      <Grid item xs={8} sm={4}>
-        <FormControl fullWidth>
-          <InputLabel>Contact Type <RequiredIndicator /></InputLabel>
-          <Select
-            value={formData.ContactTypeID}
-            onChange={handleContactType}
-            label="Contact Type"
-            error={!!errors.ContactTypeID}
-            helperText={errors.ContactTypeID}
-          >
-            {contactTypes.map((type) => (
-              <MenuItem key={type.ContactTypeID} value={type.ContactTypeID}>
-                {type.ContactName}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Grid>
-
-      <Grid item xs={8} sm={4}>
-  <FormControl fullWidth>
-    <InputLabel>Country Code <RequiredIndicator /></InputLabel>
-    <Select
-      value={formData.CountryCodeID}
-      onChange={handleCountryCode}
-      label="Country Code"
-      name="CountryCodeID"
-      error={!!errors.CountryCodeID}
-      helperText={errors.CountryCodeID}
-    >
-      {countryCodes.map((country) => (
-        <MenuItem key={country.CountryCode} value={country.CountryCode}>
-          {country.CountryName}
-        </MenuItem>
-      ))}
-    </Select>
-  </FormControl>
-</Grid>
+              <Grid item xs={8} sm={4}>
+                <TextField
+                  fullWidth
+                  label={
+                    <>
+                      Full Name <RequiredIndicator />
+                    </>
+                  }
+                  type="text"
+                  name="CName"
+                  value={formData.CName}
+                  onChange={handleChange}
+                  error={!!errors.CName}
+                  helperText={errors.CName}
 
 
-            <Grid item xs={8} sm={4}>
-              <TextField
-                fullWidth
-                label={
-                  <>
-                    Mobile <RequiredIndicator />
-                  </>
-                }
-                type="tel"
-                name="Mobile"
-                value={formData.Mobile}
-                onChange={handleChange}
-                error={!!errors.Mobile}
-                helperText={errors.Mobile}
-                inputProps={{
-                  pattern: "[0-9]*",
-                  maxLength: 10
-                }}
-              />
-            </Grid>
+                />
+              </Grid>
 
-            <Grid item xs={8} sm={4}>
-              <TextField
-                fullWidth
-                type="tel"
-                name="OtherNumbers"
-                label="Alternate Mobile Number"
-                placeholder="Alternate Mobile Number"
-                value={formData.OtherNumbers}
-                
-                onChange={handleChange}
-                inputProps={{
-                  pattern: "[0-9]*",
-                 maxLength: 10
 
-                }}
-              />
-            </Grid>
+              <Grid item xs={8} sm={4}>
+                <FormControl fullWidth>
+                  <InputLabel>Customer Type <RequiredIndicator /></InputLabel>
+                  <Select
+                    value={formData.CustomerTypeID}
+                    onChange={handleCustomerType}
+                    label="Customer Type"
+                    error={!!errors.CustomerTypeID}
+                    helperText={errors.CustomerTypeID}
+                  >
+                    {customerType.map((type) => (
+                      <MenuItem key={type.CustomerTypeID} value={type.CustomerTypeID}>
+                        {type.CustomerTypeName}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={8} sm={4}>
+                <FormControl fullWidth>
+                  <InputLabel>Contact Type <RequiredIndicator /></InputLabel>
+                  <Select
+                    value={formData.ContactTypeID}
+                    onChange={handleContactType}
+                    label="Contact Type"
+                    error={!!errors.ContactTypeID}
+                    helperText={errors.ContactTypeID}
+                  >
+                    {contactTypes.map((type) => (
+                      <MenuItem key={type.ContactTypeID} value={type.ContactTypeID}>
+                        {type.ContactName}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
 
-            <Grid item xs={8} sm={4}>
-              <TextField
-                fullWidth
-                label={
-                  <>
-                    Email <RequiredIndicator />
-                  </>
-                }
-                name="Email"
-                placeholder="E-Mail"
-                value={formData.Email}
-                error={!!errors.Email}
-                helperText={errors.Email}
-                onChange={handleChange}
-              />
-            </Grid>
+              <Grid item xs={8} sm={4}>
+                <FormControl fullWidth>
+                  <InputLabel>Country Code <RequiredIndicator /></InputLabel>
+                  <Select
+                    value={formData.CountryCodeID}
+                    onChange={handleCountryCode}
+                    label="Country Code"
+                    name="CountryCodeID"
+                    error={!!errors.CountryCodeID}
+                    helperText={errors.CountryCodeID}
+                  >
+                    {countryCodes.map((country) => (
+                      <MenuItem key={country.CountryCode} value={country.CountryCode}>
+                        {country.CountryName}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={8} sm={4}>
+                <TextField
+                  fullWidth
+                  label={
+                    <>
+                      Mobile <RequiredIndicator />
+                    </>
+                  }
+                  type="tel"
+                  name="Mobile"
+                  value={formData.Mobile}
+                  onChange={handleChange}
+                  error={!!errors.Mobile}
+                  helperText={errors.Mobile}
+                  inputProps={{
+                    pattern: "[0-9]*",
+                    maxLength: 10
+                  }}
+                />
+              </Grid>
 
-            <Grid item xs={8} md={4}>
+              <Grid item xs={8} sm={4}>
+                <TextField
+                  fullWidth
+                  type="tel"
+                  name="OtherNumbers"
+                  label="Alternate Mobile Number"
+                  placeholder="Alternate Mobile Number"
+                  value={formData.OtherNumbers}
+
+                  onChange={handleChange}
+                  inputProps={{
+                    pattern: "[0-9]*",
+                    maxLength: 10
+
+                  }}
+                />
+              </Grid>
+
+              <Grid item xs={8} sm={4}>
+                <TextField
+                  fullWidth
+                  label={
+                    <>
+                      Email <RequiredIndicator />
+                    </>
+                  }
+                  name="Email"
+                  placeholder="E-Mail"
+                  value={formData.Email}
+                  error={!!errors.Email}
+                  helperText={errors.Email}
+                  onChange={handleChange}
+                />
+              </Grid>
+
+              <Grid item xs={8} md={4}>
                 <FormControl fullWidth>
                   <InputLabel>City <RequiredIndicator /></InputLabel>
-                  <Select name="CityID"          error={!!errors.CityID}
-            helperText={errors.CityID} value={formData.CityID} label='City' onChange={handleCityChange}>
+                  <Select name="CityID" error={!!errors.CityID}
+                    helperText={errors.CityID} value={formData.CityID} label='City' onChange={handleCityChange}>
                     {cities.map((city) => (
                       <MenuItem key={city.CityID} value={city.CityID}>
                         {city.CityName}
@@ -805,71 +814,73 @@ const handleSubmit = async (event) => {
                 </FormControl>
               </Grid>
 
-       
+
               <Grid item xs={12} md={4}>
-              <FormControl fullWidth>
-                <InputLabel>Locality</InputLabel>
-                <Select
-                  name="LocationID"
-                  label="Location"
-                  value={formData.LocationID}
+                <FormControl fullWidth>
+                  <InputLabel>Locality</InputLabel>
+                  <Select
+                    name="LocationID"
+                    label="Location"
+                    error={!!errors.LocationID}
+                    helperText={errors.LocationID}
+                    value={formData.LocationID}
+                    onChange={handleChange}
+                  >
+                    {localities.map((locality) => (
+                      <MenuItem
+                        key={locality.LocationID}
+                        value={locality.LocationID}
+                      >
+                        {locality.LocationName}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+
+              <Grid item xs={8} sm={4}>
+                <TextField
+                  fullWidth
+                  label={
+                    <>
+                      Pincode
+                    </>
+                  }
+                  name="PinCode"
+                  placeholder="Pincode"
+                  value={formData.PinCode}
+                  error={!!errors.PinCode}
+                  helperText={errors.PinCode}
                   onChange={handleChange}
-                >
-                  {localities.map((locality) => (
-                    <MenuItem
-                      key={locality.LocationID}
-                      value={locality.LocationID}
-                    >
-                      {locality.LocationName}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-
-            <Grid item xs={8} sm={4}>
-  <TextField
-    fullWidth
-    label={
-      <>
-        Pincode <RequiredIndicator />
-      </>
-    }
-    name="PinCode"
-    placeholder="Pincode"
-    value={formData.PinCode}
-    error={!!errors.PinCode}
-    helperText={errors.PinCode}
-    onChange={handleChange}
-    inputProps={{
-      pattern: "[0-9]*",
-    }}
-  />
-</Grid>
+                  inputProps={{
+                    pattern: "[0-9]*",
+                  }}
+                />
+              </Grid>
 
 
-        {/* Other form elements */}
-        <Grid item xs={8} sm={4}>
-          <FormControl fullWidth>
-            <InputLabel>Source <RequiredIndicator /></InputLabel>
-            <Select
-                     error={!!errors.SourceID}
-                     helperText={errors.SourceID}
-              value={formData.SourceID}
-              name="SourceID"
-              onChange={handleChange}
-              label="Source"
-            >
-              {source.map((source) => (
-                <MenuItem key={source.SourceID} value={source.SourceID}>
-                  {source.SourceName}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Grid>
+              {/* Other form elements */}
+              <Grid item xs={8} sm={4}>
+                <FormControl fullWidth>
+                  <InputLabel>Source <RequiredIndicator /></InputLabel>
+                  <Select
+                    error={!!errors.SourceID}
+                    helperText={errors.SourceID}
+                    value={formData.SourceID}
+                    name="SourceID"
+                    onChange={handleChange}
+                    label="Source"
+                  >
+                    {source.map((source) => (
+                      <MenuItem key={source.SourceID} value={source.SourceID}>
+                        {source.SourceName}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
 
-        {/* <Grid item xs={8} sm={4}>
+              {/* <Grid item xs={8} sm={4}>
           <FormControl fullWidth>
             <InputLabel>Source Type <RequiredIndicator /></InputLabel>
             <Select
@@ -888,12 +899,12 @@ const handleSubmit = async (event) => {
             </Select>
           </FormControl>
         </Grid> */}
-        
-        {/* Other form elements */}
-  
-      
 
-            {/* <Grid item xs={8} sm={4}>
+              {/* Other form elements */}
+
+
+
+              {/* <Grid item xs={8} sm={4}>
               <FormControl fullWidth>
                 <InputLabel>Telecall Attended By <RequiredIndicator /></InputLabel>
                 <Select
@@ -912,63 +923,68 @@ const handleSubmit = async (event) => {
               </FormControl>
             </Grid> */}
 
-   
-            <Grid item xs={12}>
-              <Button
-                variant="contained"
-                sx={{
-                  marginRight: 3.5,
-                  marginTop: 5,
-                  backgroundColor: "#9155FD",
-                  color: "#FFFFFF",
-                }}
-                onClick={handleSubmit}
-              >
-                Submit
-              </Button>
+
+              <Grid item xs={12}>
+                <Button
+                  variant="contained"
+                  sx={{
+                    marginRight: 3.5,
+                    marginTop: 5,
+                    backgroundColor: "#9155FD",
+                    color: "#FFFFFF",
+                  }}
+                  onClick={handleSubmit}
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <CircularProgress size={24} sx={{ color: "white" }} />
+                  ) : (
+                    "Submit"
+                  )}
+                </Button>
+              </Grid>
             </Grid>
-          </Grid>
-        </form>
+          </form>
 
-        <Snackbar
-          open={submitSuccess}
-          autoHideDuration={6000}
-          onClose={handleAlertClose}
-        >
-          <MuiAlert
+          <Snackbar
+            open={submitSuccess}
+            autoHideDuration={6000}
             onClose={handleAlertClose}
-            severity="success"
-            sx={{
-              width: "100%",
-              backgroundColor: "green",
-              color: "#ffffff",
-            }}
           >
-            {editData
-              ? "Data Updated Successfully"
-              : submitSuccess
-              ? "Data Added Successfully"
-              : ""}
-          </MuiAlert>
-        </Snackbar>
+            <MuiAlert
+              onClose={handleAlertClose}
+              severity="success"
+              sx={{
+                width: "100%",
+                backgroundColor: "green",
+                color: "#ffffff",
+              }}
+            >
+              {editData
+                ? "Data Updated Successfully"
+                : submitSuccess
+                  ? "Data Added Successfully"
+                  : ""}
+            </MuiAlert>
+          </Snackbar>
 
-        <Snackbar
-          open={submitError}
-          autoHideDuration={6000}
-          onClose={handleAlertClose}
-        >
-          <MuiAlert
+          <Snackbar
+            open={submitError}
+            autoHideDuration={6000}
             onClose={handleAlertClose}
-            severity="error"
-            sx={{ width: "100%" }}
           >
-            {submitError.message}
-          </MuiAlert>
-        </Snackbar>
-      </CardContent>
-    </Card>
+            <MuiAlert
+              onClose={handleAlertClose}
+              severity="error"
+              sx={{ width: "100%" }}
+            >
+              {submitError.message}
+            </MuiAlert>
+          </Snackbar>
+        </CardContent>
+      </Card>
     </>
   );
 };
 
-export default AddContact;
+export default AddContact;

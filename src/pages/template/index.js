@@ -62,12 +62,32 @@ const StatisticsCard = () => {
 
   const renderStats = () => {
     return salesData.map((item, index) => (
-      <Grid item  key={index} sx={{ display: "flex", alignItems: "center",justifyContent:"right" }}>
-        <Box sx={{ display: "flex", alignItems: "center",justifyContent:"center" }}>
+      <Grid
+        item
+        xs={12}
+        sm={6}
+        md={4}
+        key={index}
+        sx={{
+          display: "flex",
+          justifyContent: "center", // Center horizontally
+          alignItems: "center",     // Center vertically
+          textAlign: "center",      // Center the text
+          marginBottom: "16px",     // Add some space between cards (optional)
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexDirection: "column",  // Stack the icon and text vertically
+          }}
+        >
           <Avatar
             variant="rounded"
             sx={{
-              mr: 3,
+              mb: 2, // Adds margin below the icon
               width: 44,
               height: 44,
               boxShadow: 3,
@@ -77,15 +97,13 @@ const StatisticsCard = () => {
           >
             {item.icon}
           </Avatar>
-          <Box sx={{ display: "flex", flexDirection: "column" }}>
-            <Typography variant="caption">{item.title}</Typography>
-            <Typography variant="h6">{item.stats}</Typography>
-          </Box>
+          <Typography variant="caption">{item.title}</Typography>
+          <Typography variant="h6">{item.stats}</Typography>
         </Box>
       </Grid>
     ));
   };
-
+  
   return (
     <Card>
       <CardHeader
@@ -100,7 +118,7 @@ const StatisticsCard = () => {
         }
       />
       <CardContent sx={{ pt: (theme) => `${theme.spacing(3)} !important` }}>
-        <Grid container spacing={[5, 0]}>
+        <Grid container spacing={5} sx={{ justifyContent: "center" }}>
           {renderStats()}
           <Grid item xs={12}>
             {loading ? (
@@ -133,6 +151,7 @@ const StatisticsCard = () => {
       </CardContent>
     </Card>
   );
+  
 };
 
 const WelcomeScreen = () => {
@@ -261,7 +280,7 @@ const Tellecalling = () => {
 
   return (
     <Grid container spacing={6}>
-      <Grid item xs={4}>
+     <Grid item xs={12} md={4} style={{background:"white",zIndex:"99",display:"flex", flexWrap:"wrap"}}>
         <Sidebar rows={rows} onItemClick={handleShow} onEdit={handleEdit} onCreate={handleAddTelecaller} />
       </Grid>
       <Grid item xs={8}>

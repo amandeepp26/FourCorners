@@ -147,6 +147,91 @@ const ListBookingCancel = ({ onChequeReceiptClick, item }) => {
     setBookingID(bookingcancelID); 
     setOpenTemplate(true); 
   };
+// Handle Download CSV
+const downloadCSV = () => {
+  const headers = [
+    'Booking Date',
+    'Mobile',
+    'Name',
+    'Address',
+    'Aadhar',
+    'Pancard',
+    'Email',
+    'Project Name',
+    'Wing Name',
+    'Floor No',
+    'Flat No',
+    'Unit Type',
+    'Area (sqft)',
+    'Rate per sqft',
+    'Total Amount',
+    'Charges',
+    'Parking Facility',
+    'Parking Availability',
+    'Flat Cost',
+    'GST',
+    'Stamp Duty',
+    'Registration',
+    'Advocate',
+    'Extra Cost',
+    'Total Cost',
+    'Usable Area',
+    'Agreement Carpet Area',
+    'Source Name',
+    'Booking Ref',
+    'Agreement Amount',
+    'Created Date'
+  ];
+
+  let csvContent = "data:text/csv;charset=utf-8," + headers.join(",") + "\n";
+
+  // Loop through the data (either filtered rows or all wing details)
+  (searchQuery ? filteredRows : wingDetails).forEach((row) => {
+    const rowData = [
+      row.bookingcancelBookingDate,   // Booking Date
+      row.bookingcancelMobile,         // Mobile
+      row.bookingcancelName,           // Name
+      `"${row.bookingcancelAddress.replace(/"/g, '""')}"`,        // Address
+      row.bookingcancelAadhar,         // Aadhar
+      row.bookingcancelPancard,        // Pancard
+      row.bookingcancelEmail,          // Email
+      row.ProjectName,                 // Project Name
+      row.WingName,                    // Wing Name
+      row.bookingcancelFloorNo,        // Floor No
+      row.bookingcancelFlatNo,         // Flat No
+      row.UnittypeName,                // Unit Type (e.g., 3 BHK)
+      row.bookingcancelArea,           // Area
+      row.bookingcancelRatesqft,       // Rate per sqft
+      row.bookingcancelTtlAmount,      // Total Amount
+      row.bookingcancelCharges,        // Charges
+      row.bookingcancelParkingFacility,// Parking Facility
+      row.ParkingAvilability,          // Parking Availability
+      row.bookingcancelFlatCost,       // Flat Cost
+      row.bookingcancelGst,            // GST
+      row.bookingcancelStampDuty,      // Stamp Duty
+      row.bookingcancelRegistration,   // Registration
+      row.bookingcancelAdvocate,       // Advocate
+      row.bookingcancelExtraCost,      // Extra Cost
+      row.bookingcancelTotalCost,      // Total Cost
+      row.bookingcancelUsableArea,     // Usable Area
+      row.bookingcancelAgreementCarpet, // Agreement Carpet Area
+      row.bookingcancelSourceName,     // Source Name
+      row.bookingcancelBookingRef,     // Booking Ref
+      row.bookingcancelAggrementAmount,// Agreement Amount
+      row.CreateDate     // Created Date
+    ];
+
+    csvContent += rowData.join(",") + "\n";
+  });
+
+  const encodedUri = encodeURI(csvContent);
+  const link = document.createElement("a");
+  link.setAttribute("href", encodedUri);
+  link.setAttribute("download", "wing_details.csv");
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
 
 
   const handleCloseTemplate = () => {
@@ -217,6 +302,9 @@ const ListBookingCancel = ({ onChequeReceiptClick, item }) => {
               <CircularProgress />
             ) : dataAvailable ? (
               <>
+               <Button variant="contained" color="primary" onClick={downloadCSV} sx={{ marginBottom: 2 }}>
+                  <DownloadIcon sx={{ marginRight: 1 }} /> Download CSV
+                </Button>
                 <TableContainer component={Paper}>
                   <Table sx={{ minWidth: 800 }} aria-label="wing details table">
                     <TableHead>

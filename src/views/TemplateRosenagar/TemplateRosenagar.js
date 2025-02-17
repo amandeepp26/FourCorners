@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import axios from 'axios';
-import { Box, Typography, Table, TableBody, TableCell, TableContainer, TableRow, Paper, Button } from '@mui/material';
+import { Box, Typography, Table, TableBody, TableCell, TableContainer, TableRow, Paper, Button, Avatar, ListItemAvatar, } from '@mui/material';
 import { createGlobalStyle } from 'styled-components';
 import styled from 'styled-components';
 import { useRouter } from 'next/router';
@@ -101,14 +101,21 @@ const TemplateRosenagar = ({ bookingID , onGoBack }) => {
               </TableRow>
               <TableRow sx={{ padding: 0 }}>
                 <StyledTableCell colSpan={3} sx={{ padding: 0 }}>
-                  <Typography style={{ textAlign: 'center', fontSize: 20, fontWeight: 700 }}>RERA NO.  {data.reraregistration}</Typography>
+                  <Typography style={{ textAlign: 'center', fontSize: 20, fontWeight: 700 }}>RERA NO.  {data?.reraregistration || 0}</Typography>
                   <Typography style={{ float: 'left', fontSize: 15, fontWeight: 200 }}>Date: {data.BookingDate}</Typography>
                   <Typography style={{ float: 'right', fontSize: 15, fontWeight: 200 }}>Booked By: {data.UserName}</Typography>
                 </StyledTableCell>
               </TableRow>
               <TableRow sx={{ padding: 0 }}>
-                <StyledTableCell style={{ textAlign: 'center', padding: 0 }}>
-                  <img src="{images}" alt="Logo" width="70" height="100" />
+              <StyledTableCell style={{ textAlign: "center",width: "150px" }}>
+               
+              <img
+      src={`https://apiforcornershost.cubisysit.com/projectimage/${data.images || "rosenagar.png"}`}
+      alt="Logo"
+      width={350}
+      height={150}
+    />
+                 
                 </StyledTableCell>
                 <StyledTableCell sx={{ padding: 0 }}>
                   <img src="https://static.thenounproject.com/png/3764342-200.png" alt="200 * 200" width="80px" height="100px" />
@@ -159,12 +166,6 @@ const TemplateRosenagar = ({ bookingID , onGoBack }) => {
                 </StyledTableCell>
                 <StyledTableCell colSpan={10} style={{ textAlign: 'center', padding: 0 }}>{data.Email}</StyledTableCell>
               </TableRow>
-              {/* <TableRow sx={{ padding: 0 }}>
-                <StyledTableCell style={{ textAlign: 'left', padding: 0 }} colSpan={2}>
-                  <Typography>Source Name.</Typography>
-                </StyledTableCell>
-                <StyledTableCell colSpan={10} style={{ textAlign: 'center', padding: 0 }}>{data.SourceName}</StyledTableCell>
-              </TableRow> */}
             </TableBody>
           </Table>
         </TableContainer>
@@ -244,7 +245,7 @@ const TemplateRosenagar = ({ bookingID , onGoBack }) => {
         <StyledTableCell style={{ width: '20%', padding: 0 }} colSpan={1}>{data.ExtraCost}</StyledTableCell>
       </TableRow>
       <TableRow sx={{ padding: 0 }}>
-        <StyledTableCell style={{ width: '30%', padding: 0 }} colSpan={4}>Parking Facility</StyledTableCell>
+        <StyledTableCell style={{ width: '30%', padding: 0 }} colSpan={4}>Parking Facility | {data.ParkingAvilability} </StyledTableCell>
         <StyledTableCell style={{ width: '20%', padding: 0 }} colSpan={1}>{data.ParkingFacility}</StyledTableCell>
         
         <StyledTableCell style={{ width: '30%', padding: 0 }} colSpan={4}>Total (A + B)</StyledTableCell>

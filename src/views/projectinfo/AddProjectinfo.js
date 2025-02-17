@@ -62,9 +62,9 @@ const Addprojectinfo = ({ show, editData }) => {
             const projectDetails = response.data.data[0];
             setFormData({
               ProjectDetailsID: projectDetails.ProjectDetailsID,
-              projectstartdate: new Date(projectDetails.LaunchDate),
-              completiondate: new Date(projectDetails.CompletionDate),
-              possessiondate: new Date(projectDetails.PossessionDate),
+              projectstartdate: formatDate(new Date(projectDetails.LaunchDate)),
+              completiondate: formatDate(new Date(projectDetails.CompletionDate)),
+              possessiondate: formatDate(new Date(projectDetails.PossessionDate)),
               ProjectID: projectDetails.ProjectID,
               ProjectCode: projectDetails.ProjectCode,
               PlotAreaInSqft: projectDetails.Areasqft,
@@ -79,7 +79,7 @@ const Addprojectinfo = ({ show, editData }) => {
               amenitiesIDs: projectDetails.AmenitiesID.split(',').map(id => id.trim()),
               video: projectDetails.VideoLink || "",
               virtualvideo: projectDetails.VirtualLink || "",
-              ProjectManager: projectDetails.UserID 
+              ProjectManager: projectDetails.UserID
             });
           }
         } catch (error) {
@@ -130,29 +130,53 @@ const Addprojectinfo = ({ show, editData }) => {
     });
   };
 
-  const handleDateChange = (date, name) => {
+  const handleDateChange = (dateString, field) => {
+    // Check if the dateString is valid (this assumes dateString is a valid ISO date string)
+    const date = new Date(dateString);
+  
+    if (isNaN(date)) {
+      console.error("Invalid date:", dateString);
+      return; // Don't update state with an invalid date
+    }
+  
+    // Format the date to "YYYY-MM-DD"
+    const formattedDate = formatDate(date);
+  
     setFormData({
       ...formData,
-      [name]: date,
+      [field]: formattedDate, // Store the formatted date string
+    });
+  };
+  
+  // Function to format date as YYYY-MM-DD
+  const formatDate = (date) => {
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Adding leading zero if necessary
+    const day = date.getDate().toString().padStart(2, "0"); // Adding leading zero if necessary
+    return `${year}-${month}-${day}`;
+  };
+  
+  const handleAmenitiesChange = (event) => {
+    const { value } = event.target;
+
+    // Remove duplicates by converting the array to a Set and back to an array
+    const uniqueAmenities = Array.from(new Set(value));
+
+    setFormData({
+      ...formData,
+      amenitiesIDs: uniqueAmenities,
     });
   };
 
-  const handleAmenitiesChange = (event) => {
-    const { value } = event.target;
-    setFormData({
-      ...formData,
-      amenitiesIDs: value,
-    });
-  };
 
   const handleSubmitData = async (event) => {
     event.preventDefault();
-    
+
     const body = {
       ProjectDetailsID: formData.ProjectDetailsID,
-      LaunchDate: formData.projectstartdate.toISOString(),
-      CompletionDate: formData.completiondate.toISOString(),
-      PossessionDate: formData.possessiondate.toISOString(),
+      LaunchDate: formData.projectstartdate,
+      CompletionDate: formData.completiondate,
+      PossessionDate: formData.possessiondate,
       ProjectID: formData.ProjectID,
       ProjectCode: formData.ProjectCode,
       Remark: formData.WelcomeMessage,
@@ -168,13 +192,14 @@ const Addprojectinfo = ({ show, editData }) => {
       AmenitiesIDs: formData.amenitiesIDs,
       Areasqft: formData.PlotAreaInSqft,
       ProjectManager: formData.ProjectManager,
-      CreateUID:cookies.amr?.UserID || 1,
+      CreateUID: cookies.amr?.UserID || 1,
     };
-  
+debugger;
+console.log("paased data ", body);
     const url = formData.ProjectDetailsID
       ? "https://proxy-forcorners.vercel.app/api/proxy/api-update-projectdetails.php"
       : "https://proxy-forcorners.vercel.app/api/proxy/api-insert-projectdetails.php";
-  
+debugger;
     try {
       const response = await axios.post(url, body);
       if (response.data.status === "Success") {
@@ -184,6 +209,8 @@ const Addprojectinfo = ({ show, editData }) => {
           title: formData.ProjectDetailsID ? "Data Updated Successfully" : "Data Added Successfully",
           showConfirmButton: false,
           timer: 1000,
+        }).then(() => {
+          window.location.reload(); 
         });
       } else {
         Swal.fire({
@@ -201,7 +228,7 @@ const Addprojectinfo = ({ show, editData }) => {
       });
     }
   };
-  
+
   if (loading) return <p>Loading...</p>;
 
 
@@ -213,58 +240,73 @@ const Addprojectinfo = ({ show, editData }) => {
             variant="body2"
             sx={{ marginTop: 5, fontWeight: "bold", fontSize: 20 }}
           >
-            {editData ? "Edit Project Master" : "Add Project Master"}
+            {editData ? "Edit Project Info" : "Add Project Info"}
           </Typography>
         </Box>
         <Box>
           <form style={{ marginTop: "30px" }} onSubmit={handleSubmitData}>
             <Grid container spacing={3}>
               <Grid item xs={12} md={4}>
-                <DatePicker
-                  selected={formData.projectstartdate}
-                  onChange={(date) => handleDateChange(date, "projectstartdate")}
-                  dateFormat="dd-MM-yyyy"
-                  customInput={
-                    <TextField
-                      fullWidth
-                      label="Launch date"
-                      value={formData.projectstartdate ? formData.projectstartdate.toLocaleDateString() : ""}
-                      InputProps={{ readOnly: true }}
-                    />
-                  }
+
+                <TextField
+                  fullWidth
+                  type="date"
+                  label="Launch date"
+                  value={formData.projectstartdate}
+                  onChange={(e) => handleDateChange(e.target.value, "projectstartdate")}
+                  variant="outlined"
+                  InputLabelProps={{ shrink: true }}
+                  showMonthDropdown
+                  showYearDropdown
+                  yearDropdownItemNumber={15}
+                  scrollableYearDropdown
                 />
+
+
+
               </Grid>
 
               <Grid item xs={12} md={4}>
-                <DatePicker
-                  selected={formData.completiondate}
-                  onChange={(date) => handleDateChange(date, "completiondate")}
-                  dateFormat="dd-MM-yyyy"
-                  customInput={
-                    <TextField
-                      fullWidth
-                      label="Completion date"
-                      value={formData.completiondate ? formData.completiondate.toLocaleDateString() : ""}
-                      InputProps={{ readOnly: true }}
-                    />
-                  }
-                />
-              </Grid>
+  <TextField
+    fullWidth
+    type="date"
+    label="Completion date"
+    value={formData.completiondate}
+    onChange={(e) => handleDateChange(e.target.value, "completiondate")}
+    variant="outlined"
+    InputLabelProps={{ shrink: true }}
+    sx={{ backgroundColor: "#ffffff" }}
+    showMonthDropdown
+    showYearDropdown
+    yearDropdownItemNumber={15}
+    scrollableYearDropdown
+    required
+  />
+</Grid>
+
 
               <Grid item xs={12} md={4}>
-                <DatePicker
-                  selected={formData.possessiondate}
-                  onChange={(date) => handleDateChange(date, "possessiondate")}
-                  dateFormat="dd-MM-yyyy"
-                  customInput={
-                    <TextField
-                      fullWidth
-                      label="Possession date"
-                      value={formData.possessiondate ? formData.possessiondate.toLocaleDateString() : ""}
-                      InputProps={{ readOnly: true }}
-                    />
-                  }
+
+
+                <TextField
+                  fullWidth
+                  type="date"
+                  label="Possession date"
+                 
+                  onChange={(e) => handleDateChange(e.target.value, "possessiondate")}
+    
+                  value={formData.possessiondate}
+                  variant="outlined"
+                  InputLabelProps={{ shrink: true }}
+             
+                  showMonthDropdown
+                  showYearDropdown
+                  yearDropdownItemNumber={15} // Number of years to show in dropdown
+                  scrollableYearDropdown
+                  required
                 />
+
+
               </Grid>
 
               <Grid item xs={12} md={4}>
@@ -279,22 +321,23 @@ const Addprojectinfo = ({ show, editData }) => {
               </Grid>
 
               <Grid item xs={12} md={4}>
-              <FormControl fullWidth>
-  <InputLabel id="project-manager-label">Project Manager</InputLabel>
-  <Select
-    labelId="project-manager-label"
-    id="ProjectManager"
-    name="ProjectManager"
-    value={formData.ProjectManager || ""} // Ensure it reflects the formData correctly
-    onChange={handleInputChange}
-  >
-    {userMaster.map((user) => (
-      <MenuItem key={user.UserID} value={user.UserID}>
-        {user.Name}
-      </MenuItem>
-    ))}
-  </Select>
-</FormControl>
+                <FormControl fullWidth>
+                  <InputLabel id="project-manager-label">Project Manager</InputLabel>
+                  <Select
+                    labelId="project-manager-label"
+                    id="ProjectManager"
+                    name="ProjectManager"
+                    value={formData.ProjectManager || ""} // Ensure it reflects the formData correctly
+                    onChange={handleInputChange}
+                    label="Project Manager"
+                  >
+                    {userMaster.map((user) => (
+                      <MenuItem key={user.UserID} value={user.UserID}>
+                        {user.Name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
 
               </Grid>
 
@@ -338,7 +381,7 @@ const Addprojectinfo = ({ show, editData }) => {
                 />
               </Grid>
 
-   
+
 
               <Grid item xs={12} md={4}>
                 <TextField
@@ -369,7 +412,7 @@ const Addprojectinfo = ({ show, editData }) => {
               <Grid item xs={12} md={4}>
                 <TextField
                   fullWidth
-                  label="Remarks"
+                  label="Unit Type"
                   name="WelcomeMessage"
                   value={formData.WelcomeMessage}
                   onChange={handleInputChange}
@@ -379,7 +422,7 @@ const Addprojectinfo = ({ show, editData }) => {
               <Grid item xs={12} md={4}>
                 <TextField
                   fullWidth
-                  label="Para"
+                  label="Paragraph"
                   name="Para"
                   value={formData.Para}
                   onChange={handleInputChange}
@@ -389,7 +432,7 @@ const Addprojectinfo = ({ show, editData }) => {
               <Grid item xs={12} md={4}>
                 <TextField
                   fullWidth
-                  label="Latitude"
+                  label="Project Location"
                   name="Latitude"
                   value={formData.Latitude}
                   onChange={handleInputChange}
@@ -436,32 +479,32 @@ const Addprojectinfo = ({ show, editData }) => {
                 />
               </Grid>
               <Grid item xs={12} md={12}>
-              <FormControl fullWidth>
-  <InputLabel>Amenities</InputLabel>
-  <Select
-    label="Amenities"
-    multiple
-    value={formData.amenitiesIDs}
-    onChange={handleAmenitiesChange}
-    input={<Input />}
-    renderValue={(selected) => (
-      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-        {selected.map((value) => (
-          <Chip
-            key={value}
-            label={amenities.find((amenity) => amenity.amenitiesID === value)?.amenitiesName || ""}
-          />
-        ))}
-      </Box>
-    )}
-  >
-    {amenities.map((amenity) => (
-      <MenuItem key={amenity.amenitiesID} value={amenity.amenitiesID}>
-        {amenity.amenitiesName}
-      </MenuItem>
-    ))}
-  </Select>
-</FormControl>
+                <FormControl fullWidth>
+                  <InputLabel>Amenities</InputLabel>
+                  <Select
+                    label="Amenities"
+                    multiple
+                    value={formData.amenitiesIDs}
+                    onChange={handleAmenitiesChange}
+                    input={<Input />}
+                    renderValue={(selected) => (
+                      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                        {selected.map((value) => (
+                          <Chip
+                            key={value}
+                            label={amenities.find((amenity) => amenity.amenitiesID === value)?.amenitiesName || ""}
+                          />
+                        ))}
+                      </Box>
+                    )}
+                  >
+                    {amenities.map((amenity) => (
+                      <MenuItem key={amenity.amenitiesID} value={amenity.amenitiesID}>
+                        {amenity.amenitiesName}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
 
               </Grid>
               <Grid item xs={12} textAlign="center">

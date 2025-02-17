@@ -3,6 +3,7 @@ import { Grid, CircularProgress, Alert, Typography, Box } from '@mui/material';
 import axios from 'axios';
 import AddTellecallingDetails from 'src/views/add-tellecallingDetails/AddTellecallingDetails';
 import MyleadSidebar from 'src/views/TellecallingSidebar/Mylead/MyleadSidebar';
+import Listmylead from 'src/views/list-tellecalling/Mylead/Listmylead';
 import Listbacklog from 'src/views/list-tellecalling/Backlog/Listbacklog';
 import HistoryTelecalling from 'src/views/history-telecalling/HistoryTelecalling';
 import PieChartIcon from '@mui/icons-material/PieChart';
@@ -219,7 +220,7 @@ const Tellecalling = () => {
       <>
         <CardHeader
           title='Statistics Card'
-        
+         
           titleTypographyProps={{
             sx: {
               mb: 2.5,
@@ -271,7 +272,7 @@ const Tellecalling = () => {
   };
   return (
     <Grid container spacing={6}>
-      <Grid item xs={4}>
+       <Grid item xs={12} md={4} style={{background:"white",zIndex:"99",display:"flex", flexWrap:"wrap"}}>
         <MyleadSidebar rows={rows} onItemClick={handleShow} onEdit={handleEdit} onCreate={handleAddTelecaller} onDashboardClick={handleNavigation} />
       </Grid>
       <Grid item xs={8}>

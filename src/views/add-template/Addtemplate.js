@@ -18,30 +18,29 @@ import Snackbar from "@mui/material/Snackbar";
 import dynamic from "next/dynamic"; 
 import "react-quill/dist/quill.snow.css"; 
 
-const ReactQuill = dynamic(() => import("react-quill"), { ssr: false }); 
+const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 
 const AddContact = ({ show, editData }) => {
   const [cookies] = useCookies(["amr"]);
-  
+
   const initialFormData = {
     TName: editData ? editData.TName : "",
-    templatetypeID: editData ? editData.templatetypeID : "",
-    file: null,
-    ProjectID: editData ? editData.ProjectID : "",
+    templatetypeID: editData ? editData.templatetypeID.toString() : "", // Ensure it's a string
+    templateID: editData ? editData.templateID : "",
+    entityID: editData ? editData.entityID : "",
+    senderID: editData ? editData.senderID : "",
     content: editData ? editData.content : "",
     CreateUID: cookies.amr?.UserID || 1,
   };
 
   const [formData, setFormData] = useState(initialFormData);
   const [templateTypes, setTemplateTypes] = useState([]);
-  const [projectTypeData, setProjectTypeData] = useState([]);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitError, setSubmitError] = useState(false);
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
     fetchTemplateTypes();
-    fetchProject();
   }, []);
 
   const fetchTemplateTypes = async () => {
@@ -55,32 +54,11 @@ const AddContact = ({ show, editData }) => {
     }
   };
 
-  const fetchProject = async () => {
-    try {
-      const response = await axios.get("https://apiforcornershost.cubisysit.com/api/api-fetch-projectmaster.php");
-      if (response.data.status === "Success") {
-        setProjectTypeData(response.data.data);
-      } else {
-        console.error("Failed to fetch projects:", response.data.message);
-      }
-    } catch (error) {
-      console.error("Error fetching project data:", error);
-    }
-  };
-
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormData({
       ...formData,
       [name]: value,
-    });
-  };
-
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    setFormData({
-      ...formData,
-      file: file,
     });
   };
 
@@ -93,6 +71,8 @@ const AddContact = ({ show, editData }) => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    
+    // Validate the form data
     const newErrors = validateForm(formData);
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -102,37 +82,20 @@ const AddContact = ({ show, editData }) => {
     const url = editData
       ? "https://proxy-forcorners.vercel.app/api/proxy/api-update-contacts.php"
       : "https://proxy-forcorners.vercel.app/api/proxy/api-insert-template.php";
-  
+    
+    // Construct the dataToSend object
     const dataToSend = {
       TName: formData.TName,
       templatetypeID: formData.templatetypeID,
-      ProjectID: formData.ProjectID,
+      templateid: formData.templateID,
+      entityid: formData.entityID,
+      senderid: formData.senderID,
       content: formData.content,
+      remark: formData.remark, // Ensure remark is part of the payload
       CreateUID: formData.CreateUID,
     };
-  
+    
     try {
-      // First, upload the file and get the file path
-      if (formData.filePath) {
-        const formDataUpload = new FormData();
-        formDataUpload.append("file", formData.file);
-        
-        const uploadResponse = await axios.post("https://apiforcornershost.cubisysit.com/api/template", formDataUpload, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
-  
-        if (uploadResponse.data.status === "Success") {
-          dataToSend.filePath = uploadResponse.data.filePath; // Add the file path to the data
-        } else {
-          setSubmitError(true);
-          console.error("Image upload failed:", uploadResponse.data.message);
-          return;
-        }
-      }
-  
-      // Now send the main data as JSON
       const response = await axios.post(url, dataToSend, {
         headers: {
           "Content-Type": "application/json", // Send data as JSON
@@ -164,7 +127,6 @@ const AddContact = ({ show, editData }) => {
     }
   };
   
-
   const validateForm = (formData) => {
     let errors = {};
 
@@ -174,8 +136,16 @@ const AddContact = ({ show, editData }) => {
     if (!formData.templatetypeID) {
       errors.templatetypeID = "Template Type is required";
     }
-    if (!formData.ProjectID) {
-      errors.ProjectID = "Project is required";
+
+    // Only validate templateID, entityID, senderID for types 1 or 2
+    if ((formData.templatetypeID === "3" || formData.templatetypeID === "2") && !formData.templateID) {
+      errors.templateID = "Template ID is required";
+    }
+    if ((formData.templatetypeID === "3" || formData.templatetypeID === "2") && !formData.entityID) {
+      errors.entityID = "Entity ID is required";
+    }
+    if ((formData.templatetypeID === "3" || formData.templatetypeID === "2") && !formData.senderID) {
+      errors.senderID = "Sender ID is required";
     }
 
     return errors;
@@ -205,34 +175,6 @@ const AddContact = ({ show, editData }) => {
                   helperText={errors.TName}
                 />
               </Grid>
-              <Grid item xs={8} sm={6}>
-                <FormControl fullWidth error={!!errors.ProjectID}>
-                  <InputLabel>
-                    Select Project
-                    <span style={{ color: "red", marginLeft: "5px" }}>*</span>
-                  </InputLabel>
-                  <Select
-                    value={formData.ProjectID}
-                    name="ProjectID"
-                    onChange={handleChange}
-                    label="Select Project"
-                  >
-                    <MenuItem value="">
-                      <em>None</em>
-                    </MenuItem>
-                    {projectTypeData.map((project) => (
-                      <MenuItem key={project.ProjectID} value={project.ProjectID}>
-                        {project.ProjectName}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                  {errors.ProjectID && (
-                    <Typography variant="caption" color="error">
-                      {errors.ProjectID}
-                    </Typography>
-                  )}
-                </FormControl>
-              </Grid>
               <Grid item xs={12} sm={6}>
                 <FormControl fullWidth error={!!errors.templatetypeID}>
                   <InputLabel>Template Type</InputLabel>
@@ -245,7 +187,7 @@ const AddContact = ({ show, editData }) => {
                       <em>None</em>
                     </MenuItem>
                     {templateTypes.map((type) => (
-                      <MenuItem key={type.templatetypeID} value={type.templatetypeID}>
+                      <MenuItem key={type.templatetypeID} value={type.templatetypeID.toString()}> {/* Ensure this is a string */}
                         {type.templatetypeName}
                       </MenuItem>
                     ))}
@@ -255,42 +197,63 @@ const AddContact = ({ show, editData }) => {
                   )}
                 </FormControl>
               </Grid>
-              <Grid item xs={12} sm={6}>
-                <Box
-                  sx={{
-                    border: "1px dashed #ccc",
-                    borderRadius: "4px",
-                    padding: "16px",
-                    textAlign: "center",
-                  }}
-                >
-                  <input
-                    type="file"
-                    name="file"
-                    accept="image/png, image/jpeg, image/jpg"
-                    onChange={handleFileChange}
-                    style={{ display: "none" }}
-                    id="file-upload"
+
+          
+                <>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      fullWidth
+                      name="templateID"
+                      label="Template ID"
+                      value={formData.templateID}
+                      onChange={handleChange}
+                      error={!!errors.templateID}
+                      helperText={errors.templateID}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      fullWidth
+                      name="entityID"
+                      label="Entity ID"
+                      value={formData.entityID}
+                      onChange={handleChange}
+                      error={!!errors.entityID}
+                      helperText={errors.entityID}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      fullWidth
+                      name="senderID"
+                      label="Sender ID"
+                      value={formData.senderID}
+                      onChange={handleChange}
+                      error={!!errors.senderID}
+                      helperText={errors.senderID}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      fullWidth
+                      name="remark"
+                      label="Note"
+                      value={formData.remark}
+                      onChange={handleChange}
+                      error={!!errors.remark}
+                      helperText={errors.remark}
+                    />
+                  </Grid>
+                </>
+              
+                <Grid item xs={12}>
+                  <ReactQuill
+                    value={formData.content}
+                    onChange={handleEditorChange}
+                    placeholder="Write content here..."
                   />
-                  <label htmlFor="file-upload">
-                    <Button variant="outlined" component="span">
-                      Choose Image
-                    </Button>
-                  </label>
-                  {formData.file && (
-                    <Typography variant="body2" sx={{ marginTop: 1 }}>
-                      {formData.file.name}
-                    </Typography>
-                  )}
-                </Box>
-              </Grid>
-              <Grid item xs={12}>
-                <ReactQuill
-                  value={formData.content}
-                  onChange={handleEditorChange}
-                  placeholder="Write content here..."
-                />
-              </Grid>
+                </Grid>
+        
             </Grid>
             <Grid container justifyContent="flex-start" sx={{ mt: 3 }}>
               <Grid item>

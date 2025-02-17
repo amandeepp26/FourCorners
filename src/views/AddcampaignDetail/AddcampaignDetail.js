@@ -109,13 +109,11 @@ const AddcampaignDetails = () => {
     // Payload to match the expected format
     const payload = {
       CampaignName: formData.campaignName,
-      CampaignTypeID: parseInt(formData.campaignTypeID), // Ensure integer format
-      TemplateIDs: formData.templateID.map(id => parseInt(id)), // Ensure array of integers for template IDs
+     TemplateIDs: formData.templateID.map(id => parseInt(id)), // Ensure array of integers for template IDs
       Date: formData.date,
       Time: formData.time,
       CreateUID: formData.CreateUID, // CreateUID as a string if required
       ContactCids: formData.contactCids,
-      ProjectID: formData.ProjectID,
     };
 
     try {
@@ -136,7 +134,7 @@ const AddcampaignDetails = () => {
           time: '',
           CreateUID: '123', // Reset CreateUID to default
           contactCids: [],
-          ProjectID: 1, // Reset ProjectID to default
+         
         });
       }
     } catch (error) {
@@ -166,23 +164,7 @@ const AddcampaignDetails = () => {
                 required
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
-              <FormControl fullWidth>
-                <InputLabel>Campaign Type</InputLabel>
-                <Select
-                  name="campaignTypeID"
-                  value={formData.campaignTypeID}
-                  onChange={handleChange}
-                  required
-                >
-                  {campaignTypes.map((type) => (
-                    <MenuItem key={type.CampaignTypeID} value={type.CampaignTypeID}>
-                      {type.CampaignTypeName}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
+            
             <Grid item xs={12} sm={6}>
               <FormControl fullWidth>
                 <InputLabel>Template</InputLabel>

@@ -113,14 +113,14 @@ const Cancelform = ({ bookingID }) => {
         bookingcancelremarksDate: detail.cancelDate,
       })),
     };
-
+debugger;
     try {
       const response = await axios.post(
         'https://proxy-forcorners.vercel.app/api/proxy/api-insert-bookingcancel.php',
         payload
       );
       console.log('API response:', response.data);
-
+debugger;
       // Hide the modal after successful submission
       setBookingData(null); // This will close the modal (or reset the form)
 
@@ -236,7 +236,12 @@ const Cancelform = ({ bookingID }) => {
                   variant="outlined"
                   InputLabelProps={{ shrink: true }}
                   sx={{ backgroundColor: "#ffffff" }}
+                  showMonthDropdown
+                  showYearDropdown
+                  yearDropdownItemNumber={15} // Number of years to show in dropdown
+                  scrollableYearDropdown
                 />
+                 
               </Grid>
               <Grid item>
                 <IconButton onClick={() => handleRemoveRow(index)} sx={{ color: 'red' }}>

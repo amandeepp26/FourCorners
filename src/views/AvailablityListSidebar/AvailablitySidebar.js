@@ -235,7 +235,7 @@ const AvailablitySidebar = ({ onEdit, onItemClick, onCreate }) => {
         overflowY: "auto",
       }}
     >
-      <Grid item xs={12} sx={{ marginBottom: 3 }}>
+      <Grid item xs={12} sx={{ marginBottom: 3 }} style={{background:"white",zIndex:"99",display:"flex", flexWrap:"wrap"}}>
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Typography variant="body2" sx={{ fontWeight: "bold", fontSize: 20 }}>
             All Project

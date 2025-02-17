@@ -26,6 +26,10 @@ import SortIcon from "@mui/icons-material/Sort";
 import PersonIcon from '@mui/icons-material/Person';
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
+import PollIcon from "@mui/icons-material/Poll";
+
+
+
 import { useCookies } from "react-cookie";
 
 const Sidebar = ({ onEdit, onItemClick, onCreate }) => {
@@ -63,7 +67,7 @@ const Sidebar = ({ onEdit, onItemClick, onCreate }) => {
     setFilteredRows(rows);
   }, [rows]);
 
-  useEffect(() => {
+  useEffect(() => { 
     const lowerCaseQuery = searchQuery.toLowerCase().trim();
     if (lowerCaseQuery === "") {
       setFilteredRows(rows);
@@ -166,11 +170,7 @@ const Sidebar = ({ onEdit, onItemClick, onCreate }) => {
               <Card sx={{ marginBottom: 2 }}>
                 <ListItem disablePadding onClick={() => handleListItemClick(item)}>
                   <ListItemAvatar>
-                    <Avatar
-                      alt="John Doe"
-                      sx={{ width: 40, height: 40, margin: 2 }}
-                      src="/images/avatars/1.png"
-                    />
+                  <PollIcon sx={{ml: 3 }}/>
                   </ListItemAvatar>
                   <ListItemText
                     primary={
@@ -180,12 +180,7 @@ const Sidebar = ({ onEdit, onItemClick, onCreate }) => {
                     }
                     secondary={
                       <>
-                        <Typography variant="body2" style={{ fontSize: 10 }}>
-                          Template Name: {item?.TName}
-                        </Typography>
-                        <Typography variant="body2" style={{ fontSize: 10 }}>
-                          Project Name: {item?.ProjectName}
-                        </Typography>
+                       
                         <Typography variant="body2" style={{ fontSize: 10 }}>
                           Date: {formatDate(item?.Date)} - Time: {formatTime(item?.Time)}
                         </Typography>
@@ -199,22 +194,7 @@ const Sidebar = ({ onEdit, onItemClick, onCreate }) => {
         </List>
       )}
 
-      <Dialog open={confirmDelete} onClose={() => setConfirmDelete(false)}>
-        <DialogTitle>{"Confirm Delete"}</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Are you sure you want to delete this record?
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setConfirmDelete(false)} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={() => { /* Handle delete */ }} color="primary" autoFocus>
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
+      
     </Card>
   );
 };

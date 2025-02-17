@@ -475,7 +475,7 @@ console.log(item , 'dekh bhai not intert');
 
           <Box
             sx={{
-              width: "100%",
+             
               display: "flex",
               alignItems: "center",
               ml: 20,

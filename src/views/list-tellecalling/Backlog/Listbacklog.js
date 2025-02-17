@@ -33,7 +33,7 @@ import Swal from "sweetalert2";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { useCookies } from "react-cookie";
 const ListTellecalling = ({ item, onDelete, onEdit, onHistoryClick }) => {
-console.log(item, "seet<<<<<<<>>>>>>>></>");
+  console.log(item, "seet<<<<<<<>>>>>>>></>");
   const [cookies, setCookie, removeCookie] = useCookies(["amr"]);
   const intialName = {
     Tid: "",
@@ -53,7 +53,7 @@ console.log(item, "seet<<<<<<<>>>>>>>></>");
   const [anchorElOpportunity, setAnchorElOpportunity] = useState(null);
   const [userMaster, setUserMaster] = useState([]);
   const [setRowDataToUpdate] = useState(null);
-  
+
   const [modalVisible, setModalVisible] = useState(false);
   const [projects, setProjects] = useState([]);
   const [selectedProject, setSelectedProject] = useState(null);
@@ -61,9 +61,9 @@ console.log(item, "seet<<<<<<<>>>>>>>></>");
   const handleDropdownClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
-  const handlenavigate =() => {
+  const handlenavigate = () => {
     window.location.href = "/opportunity/";
-  
+
   }
   const handleCurrentUpdate = (event) => {
     setFormData({
@@ -121,10 +121,10 @@ console.log(item, "seet<<<<<<<>>>>>>>></>");
 
     // Add Tid to formData
     const formData = {
-      UserID:userID,
-      Cid:item?.Cid,
+      UserID: userID,
+      Cid: item?.Cid,
       Tid: item.Tid,
-      Status:1,
+      Status: 1,
       CreateUID: cookies?.amr?.UserID || 1,
 
     };
@@ -150,9 +150,9 @@ console.log(item, "seet<<<<<<<>>>>>>>></>");
         // Show success message using SweetAlert
         Swal.fire({
           icon: "success",
-          title: 
-             "Lead Converted to opportunity Successfully",
-            
+          title:
+            "Lead Converted to opportunity Successfully",
+
           showConfirmButton: false,
           timer: 1000,
         }).then(() => {
@@ -237,7 +237,25 @@ console.log(item, "seet<<<<<<<>>>>>>>></>");
       ...formData,
       Tid: item.Tid,
     };
-
+    if (
+      !formData.CurrentUpdateID ||
+      !formData.NextFollowUpDate ||
+      !formData.NextFollowUpTime ||
+      !formData.Interest
+    ) {
+      Swal.fire({
+        icon: "error",
+        title: "Missing Fields",
+        text: "Please fill in all required fields.",
+        didOpen: () => {
+          const swalContainer = document.querySelector('.swal2-container');
+          if (swalContainer) {
+            swalContainer.style.zIndex = '9999'; // Explicitly set a higher z-index
+          }
+        },
+      });
+      return;
+    }
     const url =
       "https://proxy-forcorners.vercel.app/api/proxy/api-insert-nextfollowup.php";
 
@@ -320,16 +338,37 @@ console.log(item, "seet<<<<<<<>>>>>>>></>");
     document.body.removeChild(a);
   };
 
+
   const handleSubmitProject = async () => {
     if (!selectedProject) {
       console.error('Project not selected.');
       return;
     }
-  
+
     try {
+      // Fetch project details using the provided ProjectID
       const projectResponse = await axios.get(`https://apiforcornershost.cubisysit.com/api/api-fetch-projectdetails.php?ProjectID=${selectedProject.ProjectID}`);
       const projectData = projectResponse.data.data[0];
-  
+
+      // Validate all necessary fields
+      const requiredFields = [
+        'ProjectID', 'ProjectCode', 'ProjectManager', 'Areasqft', 'VideoLink', 'VirtualLink',
+        'LaunchDate', 'CompletionDate', 'PossessionDate', 'Remark', 'Cc', 'Oc', 'FacebookLink',
+        'InstagramLink', 'Latitude', 'Para', 'ProjectName', 'AmenitiesNames', 'AmenitiesIcon', 'CName', 'Email', 'Mobile'
+      ];
+
+      const missingFields = requiredFields.filter(field => !projectData[field] && !item[field]);
+
+      if (missingFields.length > 0) {
+        console.error(`Missing required fields: ${missingFields.join(', ')}`);
+        Swal.fire({
+          icon: 'error',
+          title: 'Missing Fields',
+          text: `The following fields are missing: ${missingFields.join(', ')}`,
+        });
+        return; // Stop the process if any fields are missing
+      }
+
       // Prepare email data with project details and amenities
       const emailData = {
         projectID: projectData.ProjectID,
@@ -342,7 +381,8 @@ console.log(item, "seet<<<<<<<>>>>>>>></>");
         completionDate: projectData.CompletionDate,
         possessionDate: projectData.PossessionDate,
         remark: projectData.Remark,
-        cc: projectData.Cc,
+        Cc: projectData.Cc,
+images:projectData.images,
         oc: projectData.Oc,
         facebookLink: projectData.FacebookLink,
         instagramLink: projectData.InstagramLink,
@@ -354,19 +394,28 @@ console.log(item, "seet<<<<<<<>>>>>>>></>");
         name: item.CName,
         email: item.Email,
       };
-  
-      // Send email request
-      const emailResponse = await axios.post("https://proxy-forcorners.vercel.app/api/proxy/api-email.php", emailData, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-  
-      if (emailResponse.data.status !== "Success") {
-        throw new Error('Failed to send email');
+
+      // Send email request with individual try-catch block
+      let emailError = null;
+      try {
+        const emailResponse = await axios.post("https://proxy-forcorners.vercel.app/api/proxy/api-email.php", emailData, {
+          headers: { "Content-Type": "application/json" },
+        });
+
+        if (emailResponse.data.status !== "Success") {
+          throw new Error('Failed to send email');
+        }
+      } catch (error) {
+        emailError = error;
+        console.error("Error sending email:", error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Email Failed',
+          text: 'There was an issue sending the email. The email was not sent.',
+        });
       }
-  
-      // Now, send SMS
+
+      // Prepare SMS data
       const smsData = {
         projectID: projectData.ProjectID,
         projectName: projectData.ProjectName,
@@ -374,27 +423,84 @@ console.log(item, "seet<<<<<<<>>>>>>>></>");
         name: item.CName,
         phone: item.Mobile,
       };
-  
-      const smsResponse = await axios.post("https://proxy-forcorners.vercel.app/api/proxy/api-sms.php", smsData, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-  
-      if (smsResponse.data.status !== "Success") {
-        throw new Error('Failed to send SMS');
+
+      // Send SMS request with individual try-catch block
+      let smsError = null;
+      try {
+        const smsResponse = await axios.post("https://proxy-forcorners.vercel.app/api/proxy/api-sms.php", smsData, {
+          headers: { "Content-Type": "application/json" },
+        });
+
+        if (smsResponse.data.status !== "Success") {
+          throw new Error('Failed to send SMS');
+        }
+      } catch (error) {
+        smsError = error;
+        console.error("Error sending SMS:", error);
+        Swal.fire({
+          icon: 'error',
+          title: 'SMS Failed',
+          text: 'There was an issue sending the SMS. The SMS was not sent.',
+        });
       }
-  
-      Swal.fire({
-        icon: 'success',
-        title: 'Email & SMS Sent!',
-        text: 'The email and SMS have been sent successfully.',
-      });
-  
-      // Close the modal after successful submission
+
+      // Prepare WhatsApp data
+      const whatsappData = {
+        Areasqft: projectData.Areasqft,
+        VideoLink: projectData.VideoLink,
+        VirtualLink: projectData.VirtualLink,
+        LaunchDate: projectData.LaunchDate,
+        CompletionDate: projectData.CompletionDate,
+        PossessionDate: projectData.PossessionDate,
+        Remark: projectData.Remark,
+        Cc: projectData.Cc,
+images:projectData.images,
+        Oc: projectData.Oc,
+        ProjectName: projectData.ProjectName,
+        CompanyName: projectData.CompanyName,
+        projectAddress: projectData.address,
+        Partyname: item.CName,
+        phone: item.Mobile,
+        Name: projectData.Name,
+        reraregistration: projectData.reraregistration,
+        amenities: projectData.AmenitiesNames.join(', '),
+        amenitieIcons: projectData.AmenitiesIcon.join(', ')
+      };
+      console.log("whatsapp json data ", whatsappData);
+
+      let whatsappError = null;
+      try {
+        const whatsappResponse = await axios.post("https://proxy-forcorners.vercel.app/api/proxy/api-whatsapp.php", whatsappData, {
+          headers: { "Content-Type": "application/json" },
+        });
+
+        if (whatsappResponse.data.status !== "Success") {
+          throw new Error('Failed to send WhatsApp message');
+        }
+      } catch (error) {
+        whatsappError = error;
+        console.error("Error sending WhatsApp:", error);
+        Swal.fire({
+          icon: 'error',
+          title: 'WhatsApp Failed',
+          text: 'There was an issue sending the WhatsApp message. The message was not sent.',
+        });
+      }
+
+      // Show success message only if all actions succeed
+      if (!emailError && !smsError && !whatsappError) {
+        Swal.fire({
+          icon: 'success',
+          title: 'Success!',
+          text: 'The email, SMS, and WhatsApp messages have been sent successfully.',
+        });
+      }
+
+      // Close the modal after the entire process
       setModalVisible(false);
+
     } catch (error) {
-      console.error("Error sending email and SMS:", error);
+      console.error("Error processing request:", error);
       Swal.fire({
         icon: 'error',
         title: 'Error',
@@ -402,6 +508,7 @@ console.log(item, "seet<<<<<<<>>>>>>>></>");
       });
     }
   };
+
   useEffect(() => {
     fetchProjects();
   }, []);
@@ -427,7 +534,7 @@ console.log(item, "seet<<<<<<<>>>>>>>></>");
 
   return (
     <>
-        <Modal open={modalVisible} onClose={() => setModalVisible(false)}>
+      <Modal open={modalVisible} onClose={() => setModalVisible(false)}>
         <Box
           sx={{
             display: 'flex',
@@ -509,25 +616,7 @@ console.log(item, "seet<<<<<<<>>>>>>>></>");
             Edit Details
           </Button>
         </Grid>
-        <Grid item>
-          <Button
-            variant="contained"
-            onClick={downloadCSV}
-            startIcon={<GetAppIcon />}
-            sx={{
-              color: "#333333",
-              fontSize: "0.6rem",
-              backgroundColor: "#f0f0f0",
-              minWidth: "auto",
-              minHeight: 20,
-              "&:hover": {
-                backgroundColor: "#dcdcdc",
-              },
-            }}
-          >
-            Download
-          </Button>
-        </Grid>
+
         <Grid item>
           <Button
             variant="contained"
@@ -562,9 +651,9 @@ console.log(item, "seet<<<<<<<>>>>>>>></>");
             </MenuItem>
             {userMaster.length > 0 ? (
               userMaster.map((user, index) => (
-                <MenuItem key={user.UserID}  onClick={(event) => handleMenuItemClick(event, user.UserID)}>
-                {index + 1}. {user.Name}
-              </MenuItem>
+                <MenuItem key={user.UserID} onClick={(event) => handleMenuItemClick(event, user.UserID)}>
+                  {index + 1}. {user.Name}
+                </MenuItem>
               ))
             ) : (
               <MenuItem disabled>No data available</MenuItem>
@@ -643,17 +732,20 @@ console.log(item, "seet<<<<<<<>>>>>>>></>");
             component="h3"
             gutterBottom
           >
-            Select Next Follow-Up Date and Time
+           Next Follow-Up 
           </Typography>
 
           <Grid container spacing={2} mt={8}>
             <Grid item xs={6}>
               <FormControl fullWidth>
-                <InputLabel>Current Update</InputLabel>
+                <InputLabel>
+                  Current Update <span style={{ color: "red" }}>*</span>
+                </InputLabel>
                 <Select
                   value={formData.CurrentUpdateID}
                   onChange={handleCurrentUpdate}
                   label="Current Update"
+                  error={!formData.CurrentUpdateID} // Highlight field in case of error
                   MenuProps={{
                     PaperProps: {
                       style: {
@@ -677,55 +769,78 @@ console.log(item, "seet<<<<<<<>>>>>>>></>");
             <Grid item xs={6}>
               <TextField
                 fullWidth
-                // label="Next Follow-Up Date"
                 type="date"
                 name="NextFollowUpDate"
                 value={formData.NextFollowUpDate}
                 onChange={handleChange}
-                label="Next Follow Up Date"
+                label={
+                  <span>
+                    Next Follow-Up Date <span style={{ color: "red" }}>*</span>
+                  </span>
+                }
                 InputLabelProps={{
                   shrink: true,
                 }}
-          
+                inputProps={{
+                  min: new Date().toISOString().split("T")[0], // Only allow today or future dates
+                }}
+                error={!formData.NextFollowUpDate} // Highlight field in case of error
               />
             </Grid>
+
             <Grid item xs={6}>
               <TextField
                 fullWidth
-                // label="Next Follow-Up Time"
                 type="time"
-                name="NextFollowUpTime"                               
+                name="NextFollowUpTime"
                 value={formData.NextFollowUpTime}
                 onChange={handleChange}
-                label="Next Follow Up Time"
+                label={
+                  <span>
+                    Next Follow-Up Time <span style={{ color: "red" }}>*</span>
+                  </span>
+                }
                 InputLabelProps={{
                   shrink: true,
                 }}
-          
+                error={!formData.NextFollowUpTime} // Highlight field in case of error
               />
             </Grid>
+
             <Grid item xs={6}>
               <TextField
                 fullWidth
-                label="Interest In"
                 type="text"
                 name="Interest"
                 value={formData.Interest}
                 onChange={handleChange}
+                label={
+                  <span>
+                    Interest In <span style={{ color: "red" }}>*</span>
+                  </span>
+                }
                 InputLabelProps={{ sx: { mb: 1 } }}
+                error={!formData.Interest} // Highlight field in case of error
               />
             </Grid>
+
             <Grid item xs={12}>
               <TextField
                 fullWidth
-                label="Note"
                 type="text"
                 name="Note"
                 value={formData.Note}
                 onChange={handleChange}
+                label={
+                  <span>
+                    Note <span style={{ color: "red" }}>*</span>
+                  </span>
+                }
                 InputLabelProps={{ sx: { mb: 1 } }}
+              
               />
             </Grid>
+
           </Grid>
 
           <Box sx={{ textAlign: "left" }}>
@@ -776,13 +891,12 @@ console.log(item, "seet<<<<<<<>>>>>>>></>");
 
           <Box
             sx={{
-              width: "100%",
               display: "flex",
               alignItems: "center",
               ml: 20,
             }}
           >
-              <div style={{ marginRight: 5 }}>
+            <div style={{ marginRight: 5 }}>
               <Typography
                 variant="body2"
                 sx={{
@@ -802,8 +916,8 @@ console.log(item, "seet<<<<<<<>>>>>>>></>");
                 Source Name: {item?.SourceName}
               </Typography>
             </div>
-          
-          
+
+
             <div style={{ marginRight: 5 }}>
               <Typography
                 variant="body2"
@@ -841,30 +955,30 @@ console.log(item, "seet<<<<<<<>>>>>>>></>");
                   },
                 }}
               >
-                Alternate Mobile Number: {item.OtherNumbers}
+                Alternate Number: {item.OtherNumbers}
               </Typography>
             </div>
           </Box>
 
-          <Box sx={{ display: "flex",  mt: 10 , justifyContent:"center"}}>
-        <a href={`tel:${item?.Mobile}`} style={{ marginRight: 40 }}>
-          <IconButton
-            aria-label="phone"
-            size="small"
-            sx={{
-              color: "green",
-              backgroundColor: "#e0f7fa",
-              borderRadius: "50%",
-              padding: "10px",
-              "&:hover": {
-                backgroundColor: "#b2ebf2",
-              },
-            }}
-          >
-            <PhoneIcon />
-          </IconButton>
-        </a>
-        <a onClick={() => setModalVisible(true)} style={{ marginRight: 40 }}>
+          <Box sx={{ display: "flex", mt: 10, ml: 20 }}>
+            <a href={`tel:${item?.Mobile}`} style={{ marginRight: 40 }}>
+              <IconButton
+                aria-label="phone"
+                size="small"
+                sx={{
+                  color: "green",
+                  backgroundColor: "#e0f7fa",
+                  borderRadius: "50%",
+                  padding: "10px",
+                  "&:hover": {
+                    backgroundColor: "#b2ebf2",
+                  },
+                }}
+              >
+                <PhoneIcon />
+              </IconButton>
+            </a>
+            <a onClick={() => setModalVisible(true)} style={{ marginRight: 35 }}>
               <IconButton
                 aria-label="email"
                 size="small"
@@ -881,65 +995,66 @@ console.log(item, "seet<<<<<<<>>>>>>>></>");
                 <ShareIcon />
               </IconButton>
             </a>
-              <a style={{ marginRight:40 }}>
-                <IconButton
-                  aria-label="share"
-                  size="small"
-                  sx={{
-                    color: "#000",
-                    backgroundColor: "#e3f2fd",
-                    borderRadius: "50%",
-                    padding: "10px",
-                    "&:hover": {
-                      backgroundColor: "#bbdefb",
-                    },
-                  }}
-                  onClick={handleHistoryClick}
-                >
-                  <HistoryIcon />
-                </IconButton>
-              </a>
-              <a href={`mailto:${item?.Email}`} style={{ marginRight: 40 }}>
-                <IconButton
-                  aria-label="email"
-                  size="small"
-                  sx={{
-                    color: "red",
-                    backgroundColor: "#ffebee",
-                    borderRadius: "50%",
-                    padding: "10px",
-                    "&:hover": {
-                      backgroundColor: "#ffcdd2",
-                    },
-                  }}
-                >
-                  <EmailIcon />
-                </IconButton>
-              </a>
-        <a
-          href={`https://wa.me/${item?.Mobile}`}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <IconButton
-            aria-label="whatsapp"
-            size="small"
-            sx={{
-              color: "green",
-              backgroundColor: "#e8f5e9",
-              borderRadius: "50%",
-              padding: "10px",
-              "&:hover": {
-                backgroundColor: "#c8e6c9",
-              },
-            }}
-          >
-            <WhatsAppIcon />
-          </IconButton>
-        </a>
-      </Box>
+            <a style={{ marginRight: 1 }}>
+              <IconButton
+                aria-label="share"
+                size="small"
+                sx={{
+                  color: "#000",
+                  backgroundColor: "#e3f2fd",
+                  borderRadius: "50%",
+                  padding: "10px",
+                  marginRight: 15,
+                  "&:hover": {
+                    backgroundColor: "#bbdefb",
+                  },
+                }}
+                onClick={handleHistoryClick}
+              >
+                <HistoryIcon />
+              </IconButton>
+            </a>
+            <a href={`mailto:${item?.Email}`} style={{ marginRight: 35 }}>
+              <IconButton
+                aria-label="email"
+                size="small"
+                sx={{
+                  color: "red",
+                  backgroundColor: "#ffebee",
+                  borderRadius: "50%",
+                  padding: "10px",
+                  "&:hover": {
+                    backgroundColor: "#ffcdd2",
+                  },
+                }}
+              >
+                <EmailIcon />
+              </IconButton>
+            </a>
+            <a
+              href={`https://wa.me/${item?.Mobile}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <IconButton
+                aria-label="whatsapp"
+                size="small"
+                sx={{
+                  color: "green",
+                  backgroundColor: "#e8f5e9",
+                  borderRadius: "50%",
+                  padding: "10px",
+                  "&:hover": {
+                    backgroundColor: "#c8e6c9",
+                  },
+                }}
+              >
+                <WhatsAppIcon />
+              </IconButton>
+            </a>
+          </Box>
 
-          
+
 
           <Box
             sx={{
@@ -1063,7 +1178,7 @@ console.log(item, "seet<<<<<<<>>>>>>>></>");
                     variant="body2"
                     sx={{ fontWeight: 600, fontSize: "0.8rem" }}
                   >
-                   Follow Up Note
+                    Follow Up Note
                   </Typography>
                   <Typography variant="body2" sx={{ fontSize: "0.7rem" }}>
                     {item?.Note}

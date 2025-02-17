@@ -365,7 +365,7 @@ const Sidebar = ({ onEdit, onItemClick, onCreate , onDashboardClick}) => {
             <ListItem disablePadding onClick={() => handleListItemClick(item)}>
               <ListItemAvatar>
                 <Avatar
-                  alt="John Doe"
+                  alt={item.Name}
                   sx={{ width: 40, height: 40, margin: 2 }}
                   src="/images/avatars/1.png"
                 />
@@ -383,13 +383,13 @@ const Sidebar = ({ onEdit, onItemClick, onCreate , onDashboardClick}) => {
                 }
                 secondary={
                   <>                
-                        <Typography variant="body2" style={{ fontSize: 10 }}>
+                        <Typography variant="body2" style={{ fontSize: 10 ,fontWeight:600}}>
                           Remark: {item?.bookingcancelremarksRemark}
                         </Typography>
-                        <Typography variant="body2" style={{ fontSize: 10 }}>
+                        <Typography variant="body2" style={{ fontSize: 10,fontWeight:600 }}>
                           Followup Date: {item?.bookingcancelremarksDate}
                         </Typography>
-                    <Typography variant="body2" style={{ fontSize: 10 }}>
+                    <Typography variant="body2" style={{ fontSize: 10,fontWeight:600 }}>
                       Source Name: {item?.bookingcancelSourceName}
                     </Typography>
                   </>

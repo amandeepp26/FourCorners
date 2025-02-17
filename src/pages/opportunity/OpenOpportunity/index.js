@@ -10,6 +10,7 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardHeader from '@mui/material/CardHeader';
 import Avatar from '@mui/material/Avatar';
+import AddOpportunityDetails from 'src/views/add-opportunitydetails/AddOpportunityDetails';
 import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer } from 'recharts';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import ScheduleIcon from '@mui/icons-material/Schedule';
@@ -21,6 +22,7 @@ import CellphoneLink from 'mdi-material-ui/CellphoneLink'
 import AccountOutline from 'mdi-material-ui/AccountOutline'
 import CurrencyUsd from 'mdi-material-ui/CurrencyUsd'
 import HistoryOpenOpportunity from 'src/views/history-apportunity/HistoryOpenOpportunity/HistoryOpenOpportunity';
+import Listmyopportunity from 'src/views/list-opportunity/MyOpportunity/Listmyopportunity';
 const OpenOpportunity = () => {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -132,7 +134,7 @@ const OpenOpportunity = () => {
       <>
         <CardHeader
           title='Statistics Card'
-        
+         
           titleTypographyProps={{
             sx: {
               mb: 2.5,
@@ -226,7 +228,7 @@ const WelcomeScreen = () => {
 
   return (
     <Grid container spacing={6}>
-      <Grid item xs={4}>
+     <Grid item xs={12} md={4} style={{background:"white",zIndex:"99",display:"flex", flexWrap:"wrap"}}>
         <OpenOpportunitySidebar
           rows={rows}
           onItemClick={handleShow}
@@ -241,7 +243,7 @@ const WelcomeScreen = () => {
 
         {view === 'welcome' && !loading && !error && <WelcomeScreen />}
         {view === 'details' && !loading && !error && rowDataToUpdate && (
-          <ListOpenOpportunity
+          <Listmyopportunity
             item={rowDataToUpdate}
             onDelete={handleDelete}
             onHistoryClick={handleShowHistory}
@@ -249,7 +251,7 @@ const WelcomeScreen = () => {
           />
         )}
         {view === 'addDetails' && (
-          <AddTellecallingDetails
+          <AddOpportunityDetails
             editData={editData}
             onBack={handleBack}
             onSave={() => {

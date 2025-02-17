@@ -33,7 +33,7 @@ const ListLoanReport = ({ item }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredData, setFilteredData] = useState([]);
   const [error, setError] = useState(""); // To track error message
-  const [totalLoanAmountToDraw, setTotalLoanAmountToDraw] = useState(null); // State for allovertotalloamountotdrwn
+  const [totalLoanAmountToDraw, setTotalLoanAmountToDraw] = useState(null); 
 
   // Log to check what is passed as 'item'
   console.log("Row Data to Update:", item);

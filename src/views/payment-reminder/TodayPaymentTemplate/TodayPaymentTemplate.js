@@ -16,6 +16,7 @@ import {
   Button,
   Modal,
   IconButton,
+  colors,
 } from "@mui/material";
 import { createGlobalStyle } from "styled-components";
 import styled from "styled-components";
@@ -24,6 +25,7 @@ import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { useCookies } from "react-cookie";
 import Swal from "sweetalert2";
+import { red } from "@mui/material/colors";
 
 const GlobalStyle = createGlobalStyle`
   @media print {
@@ -57,7 +59,7 @@ const InvoiceBox = styled(Box)({
 
 const TodayPaymentTemplate = ({ item }) => {
   const router = useRouter();
-  console.log(item, "DEKHHH BHAIIIII id aaya");
+ 
   const printRef = useRef();
   const [data, setData] = useState(null);
   const [open, setOpen] = useState(false);
@@ -69,6 +71,8 @@ const TodayPaymentTemplate = ({ item }) => {
   const [bookingRemarkDetails, setBookingRemarkDetails] = useState({});
   const [bookingRemarks, setBookingRemarks] = useState([]);
   const [payments, setPayments] = useState([]);
+  const [remarkType, setRemarkType] = useState('complete'); // Default to 'partial'
+
   const [formData, setFormData] = useState("");
 
   const handlePrint = () => {
@@ -83,31 +87,35 @@ const TodayPaymentTemplate = ({ item }) => {
 
   const handleClose = () => setOpen(false);
 
- 
   useEffect(() => {
     const fetchData = async () => {
-      if (!item) return; // Exit if no item is provided
+      if (!item?.BookingID) return; // Ensure valid BookingID before making the API call.
+  
+      setLoading(true); // Start loading.
+      setError(null); // Reset any previous error.
+  
       try {
-        const apiUrl = `https://apiforcornershost.cubisysit.com/api/api-singel-bookingremark.php?BookingID=${item?.BookingID}`;
+        const apiUrl = `https://apiforcornershost.cubisysit.com/api/api-singel-bookingremark.php?BookingID=${item.BookingID}`;
         const response = await axios.get(apiUrl);
-
+  
         if (response.data.status === "Success") {
-          console.log(response.data, "data aaya deh");
+          setPayments(response.data.data.payments || []); // Handle cases where payments might be null.
           setData(response.data.data);
-          setPayments(response.data.data.payments);
+          console.log("Data received:", response.data);
         } else {
           setError("Failed to fetch data");
         }
       } catch (error) {
+        console.error("Fetch error:", error);
         setError("Error fetching data");
       } finally {
-        setLoading(false);
+        setLoading(false); // Stop loading in all cases.
       }
     };
-
+  
     fetchData();
-  }, [item]);
-
+  }, [item?.BookingID]); // Watch specifically for changes to BookingID.
+  
   const totalCash = payments.reduce(
     (sum, payment) => sum + (payment.Cash || 0),
     0
@@ -243,32 +251,60 @@ const TodayPaymentTemplate = ({ item }) => {
   };
   const handleSubmit = async (event) => {
     event.preventDefault();
+    setLoading(true);
 
-    // Ensure item and selected booking remark are available
     if (!item || !selectedBookingRemark) {
       console.error("No valid item or selected booking remark found.");
       return;
     }
 
-    // Prepare the data object to be sent to the API
+    // Check for required fields
+    if (!formData.NextFollowUpDate || !formData.Note || !formData.Remarkamount) {
+      Swal.fire({
+        icon: "warning",
+        title: "Missing Fields",
+        text: "Please fill all required fields.",
+      });
+      setLoading(false);
+      setOpen(false);
+      return;
+    }
+
+    // Additional validation for partial remark type
+    if (remarkType === "partial" && (!formData.RemainingRemarkAmount || !formData.RemainingRemarkName || !formData.RemainingRemarkDate)) {
+      Swal.fire({
+        icon: "warning",
+        title: "Missing Fields",
+        text: "Please fill all remaining remark fields.",
+      });
+      setLoading(false);
+      setOpen(false);
+      return;
+    }
+
     const payload = {
       BookingID: item.BookingID,
-      BookingremarkID:item.BookingremarkID,
-      Remarkamount: bookingRemarkDetails.Remarkamount || 0,
-      RemarkName: bookingRemarkDetails.RemarkName || "",
-      RemarkDate: formData.NextFollowUpDate, // Use the NextFollowUpDate as RemarkDate
+      BookingremarkID: item.BookingremarkID,
+      Remarkamount: formData.Remarkamount,
+      RemarkName:  formData.Note,
+      RemarkDate: formData.NextFollowUpDate,
       AmountTypeID: bookingRemarkDetails.AmountTypeID,
       Loan: bookingRemarkDetails.Loan || 0,
-      Registraion: bookingRemarkDetails.Registraion || 0, // Replace this with the actual Loan field if present
+      Registraion: bookingRemarkDetails.Registraion || 0,
       Note: formData.Note,
       CreateUID: cookies?.amr?.UserID || 1,
+      RemainingRemarkAmount: formData.RemainingRemarkAmount || 0,
+      RemainingRemarkName: formData.RemainingRemarkName || "",
+      RemainingRemarkDate: formData.RemainingRemarkDate || "",
+      RemainingRemarkAmountTypeID:bookingRemarkDetails.AmountTypeID,
+      RemainingRemarkLoan:bookingRemarkDetails.Loan || 0,
+      RemainingRemarkRegistraion:bookingRemarkDetails.Registraion || 0,
+       RemainingRemarkNote:  formData.RemainingRemarkName || "",
+        RemainingBookingremarkID: selectedBookingRemark || "", 
+
     };
 
-    console.log(payload, "Payload to be sent to the API<<<<<<>>>>>>>>>>");
-
-    const url =
-      "https://proxy-forcorners.vercel.app/api/proxy/api-insert-paymentreminder.php";
-
+    const url = "https://proxy-forcorners.vercel.app/api/proxy/api-insert-paymentreminder.php";
     try {
       const response = await axios.post(url, payload, {
         headers: {
@@ -277,11 +313,11 @@ const TodayPaymentTemplate = ({ item }) => {
       });
 
       if (response.data.status === "Success") {
+  
         console.log("SUBMIITEDDD DATA ");
+        
         setFormData("");
         setOpen(false);
-        // setSubmitSuccess(true);
-        // setSubmitError(false);
         Swal.fire({
           icon: "success",
           title: "Success!",
@@ -290,8 +326,7 @@ const TodayPaymentTemplate = ({ item }) => {
           window.location.reload();
         });
       } else {
-        // setSubmitSuccess(false);
-        // setSubmitError(true);
+
         Swal.fire({
           icon: "error",
           title: "Oops...",
@@ -301,9 +336,8 @@ const TodayPaymentTemplate = ({ item }) => {
         });
       }
     } catch (error) {
+      
       console.error("There was an error!", error);
-      // setSubmitSuccess(false);
-      // setSubmitError(true);
       Swal.fire({
         icon: "error",
         title: "Oops...",
@@ -313,174 +347,318 @@ const TodayPaymentTemplate = ({ item }) => {
       });
     }
   };
+  const handleRemarkTypeChange = (event) => {
+    const type = event.target.value;
+    setRemarkType(type);
 
+    if (type === "complete") {
+      setFormData((prev) => ({
+        ...prev,
+        RemainingRemarkAmount: "",
+        RemainingRemarkName: "",
+        RemainingRemarkDate: "",
+      }));
+    }
+  };
+  const RequiredIndicator = () => {
+    return (
+      <span style={{ color: 'red', marginLeft: '5px' }}>*</span>
+    );
+  };
+     if (loading) {
+        return <Typography>Loading...</Typography>;
+      }
+    
+      if (error) {
+        return <Typography>Error loading data</Typography>;
+      }
   return (
     <>
-     <Modal open={open} onClose={handleClose}>
-  <Box
-    sx={{
-      position: "absolute",
-      top: "50%",
-      left: "50%",
-      transform: "translate(-50%, -50%)",
-      bgcolor: "background.paper",
-      boxShadow: 24,
-      p: 4,
-      minWidth: 500,
-      maxWidth: 700,
-    
-      borderRadius: 3, // Rounded corners
-      display: 'flex',
-      flexDirection: 'column',
-    }}
-  >
-    {/* Close Button */}
-    <IconButton
-      aria-label="cancel"
-      onClick={handleClose}
-      sx={{
-        position: "absolute",
-        top: 15,
-        right: 15,
-        backgroundColor: "#f0f0f0", 
-        '&:hover': {
-          backgroundColor: "#ffcccc", 
-        },
-      }}
-    >
-      <CancelIcon sx={{ color: "#d32f2f" }} />
-    </IconButton>
-
-    {/* Modal Title */}
-    <Typography
-      id="modal-modal-title"
-      variant="h6" // Bigger title for better visibility
-      component="h3"
-      align="center"
-      sx={{ fontWeight: "bold", color: "#333", mb: 3 }}
-    >
-      Select Next Follow-Up Date and Time
-    </Typography>
-
-    <Box
-      sx={{
-        display: "grid",
-        gridTemplateColumns: "repeat(2, 1fr)", // Two columns for better layout
-        gap: 3,
-        mb: 3,
-      }}
-    >
-      {/* Booking Remark */}
-      <Box item xs={3}>
-        <TextField
-          select
-          label="Select Booking Remark"
-          value={selectedBookingRemark}
-          onChange={handleBookingRemarkChange}
-          fullWidth
-          variant="outlined"
-          sx={{ mb: 2 }}
-        >
-          {bookingRemarks.map((option) => (
-            <MenuItem key={option.BookingremarkID} value={option.BookingremarkID}>
-              {option.RemarkName}
-            </MenuItem>
-          ))}
-        </TextField>
-      </Box>
-
-      {/* Display Remark Details when Selected */}
-      {selectedBookingRemark && (
-        <>
-          <Box item xs={3}>
-            <TextField
-              label="Remark Amount"
-              value={bookingRemarkDetails.Remarkamount || ""}
-              fullWidth
-              InputProps={{
-                readOnly: true,
-              }}
-              variant="outlined"
-              sx={{ mb: 2 }}
-            />
-          </Box>
-          <Box item xs={3}>
-            <TextField
-              label="Remark Name"
-              value={bookingRemarkDetails.RemarkName || ""}
-              fullWidth
-              InputProps={{
-                readOnly: true,
-              }}
-              variant="outlined"
-              sx={{ mb: 2 }}
-            />
-          </Box>
-        </>
-      )}
-
-      {/* Next Follow Up Date */}
-      <Box item xs={3}>
-        <TextField
-          fullWidth
-          type="date"
-          name="NextFollowUpDate"
-          value={formData.NextFollowUpDate}
-          onChange={handleChange}
-          label="Next Follow Up Date"
-          InputLabelProps={{
-            shrink: true,
+    <Modal open={open} onClose={handleClose}>
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 4,
+            minWidth: 500,
+            maxWidth: 700,
+            borderRadius: 2,
           }}
-          variant="outlined"
-          sx={{ mb: 2 }}
-          error={formData.NextFollowUpDate === ""}
-          helperText={formData.NextFollowUpDate === "" ? "This field is required" : ""}
-        />
-      </Box>
+        >
+          <IconButton
+            aria-label="cancel"
+            onClick={handleClose}
+            sx={{
+              position: "absolute",
+              top: 10,
+              right: 10,
+              backgroundColor: "#f5f5f5",
+              "&:hover": {
+                backgroundColor: "#ffdddd",
+              },
+            }}
+          >
+            <CancelIcon sx={{ color: "#d32f2f" }} />
+          </IconButton>
 
-      {/* Note */}
-      <Box item xs={3}>
-        <TextField
-          fullWidth
-          label="Note"
-          type="text"
-          name="Note"
-          value={formData.Note}
-          onChange={handleChange}
-          variant="outlined"
-          sx={{ mb: 2 }}
-          error={formData.Note === ""}
-          helperText={formData.Note === "" ? "This field is required" : ""}
-        />
-      </Box>
-    </Box>
+          <Typography
+            variant="h6"
+            component="h3"
+            gutterBottom
+            align="center"
+            sx={{ fontWeight: "bold", color: "#333", mb: 5 }}
+          >
+            Select Next Follow-Up Date and Time
+          </Typography>
 
-    {/* Submit Button */}
-    <Box sx={{ textAlign: "center", mt: 3 }}>
-      <Button
-        variant="contained"
-        sx={{
-          backgroundColor: "#9155FD",
-          color: "#FFFFFF",
-          padding: "10px 30px", // Increased padding for button size
-          borderRadius: "20px", // Rounded button corners
-          '&:hover': {
-            backgroundColor: "#7a33d7", // Darker on hover
-          },
-          position: "relative",
-        }}
-        onClick={handleSubmit}
-        disabled={loading} // Disable when loading
-      >
-        {loading ? (
-          <CircularProgress size={24} sx={{ position: "absolute" }} />
-        ) : (
-          "Submit"
-        )}
-      </Button>
-    </Box>
-  </Box>
-</Modal>
+          <Box
+            container
+            spacing={3}
+            sx={{
+              display: "grid",
+              gridTemplateColumns: "repeat(2, 1fr)",
+              gap: 2,
+              marginBottom: 5,
+            }}
+          >
+            {/* Booking Remark Dropdown */}
+            <Box item xs={3}>
+  <TextField
+    select
+    label="Select Booking Remark"
+    value={selectedBookingRemark}
+    onChange={handleBookingRemarkChange}
+    fullWidth
+    variant="outlined"
+    sx={{ mb: 2 }}
+  >
+    {bookingRemarks.map((option) => (
+      <MenuItem key={option.BookingremarkID} value={option.BookingremarkID}>
+        <Box
+          sx={{
+            maxWidth: '200px', // or any desired width
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+          }}
+        >
+          {option.Remarkamount} {option.RemarkName}
+        </Box>
+      </MenuItem>
+    ))}
+  </TextField>
+</Box>
+
+
+            {selectedBookingRemark && (
+              <>
+                <Box item xs={3}>
+                  <TextField
+                    label="Remark Amount"
+                    name="Remarkamount"
+                    value={ bookingRemarkDetails.Remarkamount || ""}
+              
+                    fullWidth
+                  
+                    variant="outlined"
+                    sx={{ mb: 2 }}
+                  />
+                </Box>
+                <Box item xs={3}>
+                  <TextField
+                    label="Remark Name"
+                    name="RemarkName"
+                    value={bookingRemarkDetails.RemarkName || ""}
+                 
+                    fullWidth
+              
+                    variant="outlined"
+                    sx={{ mb: 2 }}
+                  />
+                </Box>
+              </>
+            )}
+
+            <Box item xs={3}>
+              <TextField
+                fullWidth
+                type="date"
+                name="NextFollowUpDate"
+                value={formData.NextFollowUpDate}
+                onChange={handleChange}
+           
+                label={
+                  <>
+                   Next Follow Up Date <RequiredIndicator />
+                  </>
+                }
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                inputProps={{
+                  min: new Date().toISOString().split("T")[0],
+                }}
+                variant="outlined"
+                sx={{ mb: 2 }}
+                error={formData.NextFollowUpDate === ""}
+                helperText={formData.NextFollowUpDate === "" ? "This field is required" : ""}
+              />
+            
+            </Box>
+
+            <Box item xs={3}>
+              <TextField
+                fullWidth
+         
+                label={
+                  <>
+                    Remark amount <RequiredIndicator />
+                  </>
+                }
+                type="number"
+                name="Remarkamount"
+                value={formData.Remarkamount}
+                onChange={handleChange}
+                variant="outlined"
+                sx={{ mb: 2 }}
+                error={formData.Remarkamount === ""}
+                helperText={formData.Remarkamount === "" ? "This field is required" : ""}
+              />
+
+            </Box>
+            <Box item xs={3}>
+              <TextField
+                fullWidth
+                label={
+                  <>
+                    Note <RequiredIndicator />
+                  </>
+                }
+                type="text"
+                name="Note"
+                value={formData.Note}
+                onChange={handleChange}
+                variant="outlined"
+                sx={{ mb: 2 }}
+                error={formData.Note === ""}
+                helperText={formData.Note === "" ? "This field is required" : ""}
+              />
+            </Box>
+
+            {/* Remark Type Dropdown (Complete / Partial) */}
+            <Box item xs={3}>
+              <TextField
+                select
+                label="Remark Type"
+                value={remarkType}
+                onChange={handleRemarkTypeChange}
+                fullWidth
+                variant="outlined"
+                sx={{ mb: 2 }}
+              >
+                <MenuItem value="partial">Remark Partial</MenuItem>
+                <MenuItem value="complete">Remark Complete</MenuItem>
+              </TextField>
+            </Box>
+
+            {/* Show/Hide Remaining Remark Fields based on Remark Type */}
+            {remarkType === "partial" && (
+              <>
+                <Box item xs={3}>
+                  <TextField
+                    fullWidth
+                 
+                    label={
+                      <>
+                       Remaining Remark Amount <RequiredIndicator />
+                      </>
+                    }
+                    type="number"
+                    name="RemainingRemarkAmount"
+                    value={formData.RemainingRemarkAmount || ""}
+                    onChange={handleChange}
+                    variant="outlined"
+                    sx={{ mb: 2 }}
+                    error={formData.RemainingRemarkAmount === ""}
+                    helperText={formData.RemainingRemarkAmount === "" ? "This field is required" : ""}
+                  />
+                </Box>
+                <Box item xs={3}>
+                  <TextField
+                    fullWidth
+                  label={
+                      <>
+                       Remaining Remark Name <RequiredIndicator />
+                      </>
+                    }
+                    type="text"
+                    name="RemainingRemarkName"
+                    value={formData.RemainingRemarkName || ""}
+                    onChange={handleChange}
+                    variant="outlined"
+                    sx={{ mb: 2 }}
+                    error={formData.RemainingRemarkName === ""}
+                    helperText={formData.RemainingRemarkName === "" ? "This field is required" : ""}
+                  />
+                </Box>
+                <Box item xs={3}>
+                  <TextField
+                    fullWidth
+                    type="date"
+                    name="RemainingRemarkDate"
+                    label={
+                      <>
+                       Remaining Remark Date <RequiredIndicator />
+                      </>
+                    }
+                    value={formData.RemainingRemarkDate || ""}
+                    onChange={handleChange}
+                   
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                    inputProps={{
+                      min: new Date().toISOString().split("T")[0],
+                    }}
+                    variant="outlined"
+                    sx={{ mb: 2 }}
+                    error={formData.RemainingRemarkDate === ""}
+                    helperText={formData.RemainingRemarkDate === "" ? "This field is required" : ""}
+                  />
+                </Box>
+              </>
+            )}
+          </Box>
+
+          <Box sx={{ textAlign: "center", mt: 3 }}>
+            <Button
+              variant="contained"
+              sx={{
+                backgroundColor: "#9155FD",
+                color: "#FFFFFF",
+                padding: "10px 30px",
+                borderRadius: "20px",
+                "&:hover": {
+                  backgroundColor: "#7a33d7",
+                },
+                position: "relative",
+              }}
+              onClick={handleSubmit}
+              disabled={loading}
+            >
+              {loading ? (
+                <CircularProgress size={24} sx={{ position: "absolute" }} />
+              ) : (
+                "Submit"
+              )}
+            </Button>
+          </Box>
+        </Box>
+      </Modal>
       <Box sx={{ marginBottom: 100}}>
         <Button
           variant="contained"
@@ -543,13 +721,21 @@ const TodayPaymentTemplate = ({ item }) => {
                 </StyledTableCell>
               </TableRow>
               <TableRow sx={{ padding: 0 }}>
-                           <StyledTableCell sx={{width: "150px" , alignItems:"center"}}>
-                               <img src={`https://apiforcornershost.cubisysit.com/projectimage/${data.images || "rosenagar.png"}`} alt="Logo"  width={350}  height={160}/>
-                             </StyledTableCell>
-                             <StyledTableCell sx={{ padding: 0 }}>
-                               <img src="https://static.thenounproject.com/png/3764342-200.png" alt="200 * 200" width="80px" height="100px" />
-                             </StyledTableCell>
-                           </TableRow>
+              <StyledTableCell sx={{width: "150px" , alignItems:"center"}}>
+<img
+      src={`https://apiforcornershost.cubisysit.com/projectimage/${data.images || "rosenagar.png"}`}
+      alt="Logo"
+      width={350}
+      height={150}
+    />                </StyledTableCell>
+                <StyledTableCell sx={{ padding: 0 }}>
+                  <img
+                    src="https://static.thenounproject.com/png/3764342-200.png"
+                    alt="200 * 200"
+                  width="80px" height="100px"
+                  />
+                </StyledTableCell>
+              </TableRow>
             </TableBody>
           </Table>
         </TableContainer>
@@ -840,7 +1026,7 @@ const TodayPaymentTemplate = ({ item }) => {
                   style={{ width: "30%", padding: 0 }}
                   colSpan={4}
                 >
-                  Extra Cost
+                  Extra Cost (B)
                 </StyledTableCell>
                 <StyledTableCell
                   style={{ width: "20%", padding: 0 }}
@@ -866,7 +1052,7 @@ const TodayPaymentTemplate = ({ item }) => {
                   style={{ width: "30%", padding: 0 }}
                   colSpan={4}
                 >
-                  Total 
+                  Total (A + B)
                 </StyledTableCell>
                 <StyledTableCell
                   style={{ width: "20%", padding: 0 }}
@@ -880,7 +1066,7 @@ const TodayPaymentTemplate = ({ item }) => {
                   style={{ width: "30%", padding: 0 }}
                   colSpan={4}
                 >
-                  Gross Flat Cost
+                  Gross Flat Cost (A)
                 </StyledTableCell>
                 <StyledTableCell
                   style={{ width: "20%", padding: 0 }}
@@ -1046,9 +1232,7 @@ const TodayPaymentTemplate = ({ item }) => {
         <TableContainer component={Paper}>
           <Table>
             <TableBody>
-              {/* Payment Summary Row */}
-
-              {/* Table Headers */}
+          
               <TableRow>
                 <StyledTableCell
                   colSpan={5}
@@ -1080,7 +1264,7 @@ const TodayPaymentTemplate = ({ item }) => {
                 </StyledTableCell>
               </TableRow>
 
-              <TableRow>
+               <TableRow>
               <StyledTableCell style={{ textAlign: "center" }}>
                  Sr No.
                 </StyledTableCell>
@@ -1122,12 +1306,11 @@ const TodayPaymentTemplate = ({ item }) => {
                   </StyledTableCell>
                 </TableRow>
               ))}
+
             </TableBody>
           </Table>
         </TableContainer>
-        <Typography variant="body2" sx={{ fontWeight: "bold", fontSize: 20 }}>
-          Note: All payments are subject to receipt and realization.
-        </Typography>
+       
       </InvoiceBox>
       </Box>
     </>

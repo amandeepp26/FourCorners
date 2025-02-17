@@ -20,66 +20,59 @@ import Swal from 'sweetalert2';
 import { useCookies } from 'react-cookie';
 
 // Styled component for Paper
-const CustomPaper = styled(Paper)({
+const CustomPaper = styled(Paper)(() => ({
     padding: '6px 16px',
     maxWidth: '600px',
     margin: '0 auto',   // Center the cards
-});
+}));
 
 // Custom styling for the Timeline
-const CustomTimeline = styled(Timeline)({
+const CustomTimeline = styled(Timeline)(() => ({
     width: '100%',
     margin: '0 auto',
-});
+}));
 
 // SVG Image URL or import
 const NoDataSVG = 'https://path-to-your-svg-image.svg'; // Replace with your SVG URL or import
 
-
-
-const HistoryComponent = ({ item, type }) => {
-
+const HistoryComponent = ({ item, itemss, type }) => {
     const [cookies, setCookie, removeCookie] = useCookies(["amr"]);
-    const intialName = {
-        Tid: "",
-        CurrentUpdateID: "",
-        NextFollowUpDate: "",
-        NextFollowUpTime: "",
-        Interest: "",
-        Note: "",
-        CreateUID: cookies.amr?.UserID || 1,
-    }
-
     const [rowData, setRowDataToUpdate] = useState([]);
-    const [formData, setFormData] = useState(intialName);
     const [submitSuccess, setSubmitSuccess] = useState(false);
     const [submitError, setSubmitError] = useState(false);
 
-
     useEffect(() => {
         fetchData();
-    }, [item]);
+    }, [item, itemss]); // Re-run effect if `item` or `itemss` changes
 
     const fetchData = async () => {
-        debugger;
-        if (!item) return;
-        try {
-            const apiUrl = type == "sales" ? `https://apiforcornershost.cubisysit.com/api/api-singel-opportunityfollowup.php?Oid=${item}` :  `https://apiforcornershost.cubisysit.com/api/api-fetch-nextfollowup.php?Tid=${item}`;
-            const response = await axios.get(apiUrl);
-            if (response.data.status === 'Success') {
+        if (!item && !itemss) return; // If neither `item` nor `itemss` is available, don't fetch data
 
-                console.log(response.data.data, 'Single telecalling data fetched Lol');
+        try {
+            let apiUrl = '';
+            
+            if (itemss) {
+                // If `itemss` is provided, use Oid
+                apiUrl = `https://apiforcornershost.cubisysit.com/api/api-singel-opportunityfollowup.php?Oid=${itemss}`;
+            } else if (item) {
+                // If `item` is provided, use Tid
+                apiUrl = `https://apiforcornershost.cubisysit.com/api/api-fetch-nextfollowup.php?Tid=${item}`;
+            }
+
+            const response = await axios.get(apiUrl);
+
+            if (response.data.status === 'Success') {
                 setRowDataToUpdate(response.data.data);
             }
         } catch (error) {
-            console.error('Error fetching single telecalling data:', error);
+            console.error('Error fetching data:', error);
         }
     };
 
     return (
         <Box>
-            <Box  >
-                <CustomTimeline align="alternate" >
+            <Box>
+                <CustomTimeline align="alternate">
                     {rowData.length > 0 ? rowData.map((data, index) => (
                         <TimelineItem key={index} sx={{ display: 'flex', justifyContent: 'center' }}>
                             <TimelineOppositeContent>
@@ -118,11 +111,9 @@ const HistoryComponent = ({ item, type }) => {
                         </Box>
                     )}
                 </CustomTimeline>
-
             </Box>
         </Box>
     );
 };
-
 
 export default HistoryComponent;

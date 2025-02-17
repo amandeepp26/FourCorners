@@ -15,7 +15,7 @@ import GetAppIcon from "@mui/icons-material/GetApp";
 import CloseIcon from "@mui/icons-material/Close";
 import GroupIcon from "@mui/icons-material/Group";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
-import { Modal, TextField, IconButton, Menu, MenuItem, FormControl, InputLabel, Select } from "@mui/material";
+import { Modal, TextField, IconButton, Menu, MenuItem, FormControl, InputLabel, Select , CircularProgress, } from "@mui/material";
 import CancelIcon from "@mui/icons-material/Cancel";
 import Swal from 'sweetalert2';
 import EmailIcon from '@mui/icons-material/Email';
@@ -59,7 +59,7 @@ const ListContact = ({ item, onDelete, onEdit, onHistoryClick }) => {
   const [selectedProject, setSelectedProject] = useState(null);
   const [templates, setTemplates] = useState([]);
   const [selectedTemplate, setSelectedTemplate] = useState(null);
-
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
 
@@ -170,10 +170,30 @@ const ListContact = ({ item, onDelete, onEdit, onHistoryClick }) => {
       console.error('Project not selected.');
       return;
     }
-  
+    setLoading(true);
     try {
+      // Fetch project details using the provided ProjectID
       const projectResponse = await axios.get(`https://apiforcornershost.cubisysit.com/api/api-fetch-projectdetails.php?ProjectID=${selectedProject.ProjectID}`);
       const projectData = projectResponse.data.data[0];
+  
+      
+      const requiredFields = [
+        'ProjectID', 'ProjectCode', 'ProjectManager', 'Areasqft', 'VideoLink', 'VirtualLink', 
+        'LaunchDate', 'CompletionDate', 'PossessionDate', 'Remark', 'Cc', 'Oc', 'FacebookLink',
+        'InstagramLink', 'Latitude', 'Para', 'ProjectName', 'AmenitiesNames', 'AmenitiesIcon', 'CName', 'Email', 'Mobile'
+      ];
+  
+      const missingFields = requiredFields.filter(field => !projectData[field] && !item[field]);
+  
+      if (missingFields.length > 0) {
+        console.error(`Missing required fields: ${missingFields.join(', ')}`);
+        Swal.fire({
+          icon: 'error',
+          title: 'Missing Fields',
+          text: `The following fields are missing: ${missingFields.join(', ')}`,
+        });
+        return; // Stop the process if any fields are missing
+      }
   
       // Prepare email data with project details and amenities
       const emailData = {
@@ -187,7 +207,8 @@ const ListContact = ({ item, onDelete, onEdit, onHistoryClick }) => {
         completionDate: projectData.CompletionDate,
         possessionDate: projectData.PossessionDate,
         remark: projectData.Remark,
-        cc: projectData.Cc,
+        Cc: projectData.Cc,
+images:projectData.images,
         oc: projectData.Oc,
         facebookLink: projectData.FacebookLink,
         instagramLink: projectData.InstagramLink,
@@ -198,20 +219,30 @@ const ListContact = ({ item, onDelete, onEdit, onHistoryClick }) => {
         amenitieIcons: projectData.AmenitiesIcon.join(', '),
         name: item.CName,
         email: item.Email,
+       
       };
   
-      // Send email request
-      const emailResponse = await axios.post("https://proxy-forcorners.vercel.app/api/proxy/api-email.php", emailData, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      // Send email request with individual try-catch block
+      let emailError = null;
+      try {
+        const emailResponse = await axios.post("https://proxy-forcorners.vercel.app/api/proxy/api-email.php", emailData, {
+          headers: { "Content-Type": "application/json" },
+        });
   
-      if (emailResponse.data.status !== "Success") {
-        throw new Error('Failed to send email');
+        if (emailResponse.data.status !== "Success") {
+          throw new Error('Failed to send email');
+        }
+      } catch (error) {
+        emailError = error;
+        console.error("Error sending email:", error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Email Failed',
+          text: 'There was an issue sending the email. The email was not sent.',
+        });
       }
   
-      // Now, send SMS
+      // Prepare SMS data
       const smsData = {
         projectID: projectData.ProjectID,
         projectName: projectData.ProjectName,
@@ -220,26 +251,84 @@ const ListContact = ({ item, onDelete, onEdit, onHistoryClick }) => {
         phone: item.Mobile,
       };
   
-      const smsResponse = await axios.post("https://proxy-forcorners.vercel.app/api/proxy/api-sms.php", smsData, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      // Send SMS request with individual try-catch block
+      let smsError = null;
+      try {
+        const smsResponse = await axios.post("https://proxy-forcorners.vercel.app/api/proxy/api-sms.php", smsData, {
+          headers: { "Content-Type": "application/json" },
+        });
   
-      if (smsResponse.data.status !== "Success") {
-        throw new Error('Failed to send SMS');
+        if (smsResponse.data.status !== "Success") {
+          throw new Error('Failed to send SMS');
+        }
+      } catch (error) {
+        smsError = error;
+        console.error("Error sending SMS:", error);
+        Swal.fire({
+          icon: 'error',
+          title: 'SMS Failed',
+          text: 'There was an issue sending the SMS. The SMS was not sent.',
+        });
       }
   
-      Swal.fire({
-        icon: 'success',
-        title: 'Email & SMS Sent!',
-        text: 'The email and SMS have been sent successfully.',
-      });
+      // Prepare WhatsApp data
+      const whatsappData = {
+        Areasqft: projectData.Areasqft,
+        VideoLink: projectData.VideoLink,
+        VirtualLink: projectData.VirtualLink,
+        LaunchDate: projectData.LaunchDate,
+        CompletionDate: projectData.CompletionDate,
+        PossessionDate: projectData.PossessionDate,
+        Remark: projectData.Remark,
+        Cc: projectData.Cc,
+        Oc: projectData.Oc,
+        ProjectName: projectData.ProjectName,
+        CompanyName: projectData.CompanyName,
+        projectAddress: projectData.address,
+        Partyname: item.CName,
+        phone: item.Mobile,
+        Name: projectData.Name,
+        reraregistration: projectData.reraregistration,
+        amenities: projectData.AmenitiesNames.join(', '),
+        amenitieIcons: projectData.AmenitiesIcon.join(', '),
+        images:projectData.images,
+      };
+      debugger;
+       console.log("whatsapp json data ",whatsappData);
+     
+      let whatsappError = null;
+      try {
+        const whatsappResponse = await axios.post("https://proxy-forcorners.vercel.app/api/proxy/api-whatsapp.php", whatsappData, {
+          headers: { "Content-Type": "application/json" },
+        });
   
-      // Close the modal after successful submission
+        if (whatsappResponse.data.status !== "Success") {
+          throw new Error('Failed to send WhatsApp message');
+        }
+      } catch (error) {
+        whatsappError = error;
+        console.error("Error sending WhatsApp:", error);
+        Swal.fire({
+          icon: 'error',
+          title: 'WhatsApp Failed',
+          text: 'There was an issue sending the WhatsApp message. The message was not sent.',
+        });
+      }
+  
+      // Show success message only if all actions succeed
+      if (!emailError && !smsError && !whatsappError) {
+        Swal.fire({
+          icon: 'success',
+          title: 'Success!',
+          text: 'The email, SMS, and WhatsApp messages have been sent successfully.',
+        });
+      }
+  
+      setLoading(false);
       setModalVisible(false);
+  
     } catch (error) {
-      console.error("Error sending email and SMS:", error);
+      console.error("Error processing request:", error);
       Swal.fire({
         icon: 'error',
         title: 'Error',
@@ -247,6 +336,7 @@ const ListContact = ({ item, onDelete, onEdit, onHistoryClick }) => {
       });
     }
   };
+  
   
 
   const jsonToCSV = (json) => {
@@ -301,13 +391,15 @@ const ListContact = ({ item, onDelete, onEdit, onHistoryClick }) => {
     return formattedDate;
   };
 
-  useEffect(() => {
-    fetchProjects();
-  }, []);
+
 
   useEffect(() => {
     fetchTemplate();
   }, [selectedProject]);
+
+  useEffect(() => {
+    fetchProjects();
+  }, []);
 
   const fetchProjects = async () => {
     try {
@@ -380,6 +472,9 @@ const ListContact = ({ item, onDelete, onEdit, onHistoryClick }) => {
 
             {/* Submit Button */}
             <Grid item xs={12}>
+            {loading ? (
+        <CircularProgress /> 
+      ) : (
               <Button
                 variant="contained"
                 color="primary"
@@ -388,7 +483,7 @@ const ListContact = ({ item, onDelete, onEdit, onHistoryClick }) => {
                 sx={{ mt: 2 }}
               >
                 Submit
-              </Button>
+              </Button> )}
             </Grid>
           </Grid>
         </Box>
@@ -421,25 +516,7 @@ const ListContact = ({ item, onDelete, onEdit, onHistoryClick }) => {
             Edit Details
           </Button>
         </Grid>
-        <Grid item>
-          <Button
-            variant="contained"
-            onClick={downloadCSV}
-            startIcon={<GetAppIcon />}
-            sx={{
-              backgroundColor: "#f0f0f0",
-              color: "#333333",
-              fontSize: "0.6rem",
-              minWidth: "auto",
-              minHeight: 20,
-              "&:hover": {
-                backgroundColor: "#dcdcdc",
-              },
-            }}
-          >
-            Download
-          </Button>
-        </Grid>
+        
         <Grid item>
           <Button
             variant="contained"
@@ -460,7 +537,7 @@ const ListContact = ({ item, onDelete, onEdit, onHistoryClick }) => {
           </Button>
         </Grid>
       </Grid>
-      <Card sx={{}}>
+      <Card sx={{}} >
         <Paper sx={{ padding: 5 }}>
           <Box
             sx={{

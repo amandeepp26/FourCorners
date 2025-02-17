@@ -505,7 +505,7 @@ console.log(item , "not interestedddd dataa<<<<<<<<<<<<a");
 
           <Box
             sx={{
-              width: "100%",
+         
               display: "flex",
               alignItems: "center",
               ml: 20,

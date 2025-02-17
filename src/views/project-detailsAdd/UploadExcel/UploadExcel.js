@@ -74,6 +74,7 @@ const UploadExcel = ({ show, rowData }) => {
       const response = await axios.post(url, data, {
         headers: { "Content-Type": "multipart/form-data" },
       });
+      debugger;
       if (response.data.status === "Success") {
         Swal.fire({
           icon: "success",

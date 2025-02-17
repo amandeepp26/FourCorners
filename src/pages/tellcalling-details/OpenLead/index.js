@@ -193,7 +193,7 @@ const OpenLead = () => {
       <>
         <CardHeader
           title="Statistics Card"
-        
+         
           titleTypographyProps={{
             sx: {
               mb: 2.5,
@@ -307,7 +307,7 @@ const OpenLead = () => {
 
   return (
     <Grid container spacing={6}>
-      <Grid item xs={4}>
+       <Grid item xs={12} md={4} style={{background:"white",zIndex:"99",display:"flex", flexWrap:"wrap"}}>
         <OpenLeadSidebar
           rows={rows}
           onItemClick={handleShow}
